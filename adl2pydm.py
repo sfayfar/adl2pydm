@@ -9,10 +9,12 @@ import binascii
 from enum import Enum
 import json
 import os
-from scipy.stats._discrete_distns import geom
 
+
+# FIXME: resolve how "offset" is handled!
 
 TEST_ADL_FILE = "/usr/local/epics/synApps_5_8/support/xxx-5-8-3/xxxApp/op/adl/xxx.adl"
+QT_OUTPUT = False
 
 
 # enums
@@ -31,6 +33,61 @@ MAX_CALC_INPUTS         =   12   # max # of inputs for calc
 DL_MAX_COLORS           =   65   # max # of colors for display
 DL_COLORS_COLUMN_SIZE   =    5   # # of colors in each column
 EOF_CHAR                = ""     # end of file character
+
+
+veryFirst = True
+block_number = 0
+
+# match MEDM widgets with local handlers
+parseFuncTable = {
+    "rectangle" :            parseRectangle,
+    "oval" :                 parseOval,
+    "arc" :                  parseArc,
+    "text" :                 parseText,
+    "falling line" :         parsePolyline,
+    "rising line" :          parsePolyline,
+    "related display" :      parseRelatedDisplay,
+    "shell command" :        parseShellCommand,
+    "bar" :                  parseBar,
+    "indicator" :            parseIndicator,
+    "meter" :                parseMeter,
+    "byte" :                 parseByte,
+    "strip chart" :          parseStripChart,
+    "cartesian plot" :       parseCartesianPlot,
+    "text update" :          parseTextUpdate,
+    "choice button" :        parseChoiceButton,
+    "button" :               parseChoiceButton,
+    "message button" :       parseMessageButton,
+    "menu" :                 parseMenu,
+    "text entry" :           parseTextEntry,
+    "valuator" :             parseValuator,
+    "image" :                parseImage,
+    "composite" :            parseComposite,
+    "polyline" :             parsePolyline,
+    "polygon" :              parsePolygon,
+    "wheel switch" :         parseWheelSwitch,
+}
+
+
+class MEDM_Widget(object):
+    """description of a MEDM widget (from the .adl file)"""
+    
+    def __init__(self, widgetName, tag, widgetNumber):
+        self.geometry_object = DisplayObject()
+        self.widgetName = widgetName
+        self.widgetNumber = widgetNumber
+        if widgetNumber is not None:
+            self.widgetName += "_%d" % widgetNumber
+        self.widgetTag = tag
+        self.offsetX = 0
+        self.offsetY = 0
+        self.visibilityStatic = 0
+    
+    def __str__(self):
+        s = "name=%s" % self.widgetName
+        s +=  " tag=%s" & self.widgetTag
+        s +=  " visibility=%d" & self.visibilityStatic
+        return s
 
 
 class DisplayObject(object):
@@ -545,6 +602,90 @@ def parseDlColor(displayInfo):
     displayInfo.pos = savedBufferPos
 
 
+def parseAndAppendDisplayList(displayInfo, firstTokenType, firstToken):
+    """
+    """
+    global veryFirst
+
+    nestingLevel = 0
+    
+    if veryFirst:
+        veryFirst = False
+        bclr = displayInfo.drawingAreaBackgroundColor
+        color = displayInfo.dlColormap.dl_color[bclr]
+
+        medm_widget = MEDM_Widget("centralWidget", "QWidget", None)
+
+    while True:
+        if veryFirst:
+            tokenType, token = firstTokenType, firstToken
+        else:
+            tokenType, token = getToken(displayInfo)
+
+        if tokenType == T_WORD:
+            getNextElement(displayInfo, token, offset)
+        
+        elif tokenType == T_EQUAL:
+            pass
+        
+        elif tokenType == T_LEFT_BRACE:
+            nestingLevel += 1
+        
+        elif tokenType == T_RIGHT_BRACE:
+            nestingLevel -= 1
+ 
+        if tokenType in (T_RIGHT_BRACE, T_EOF) or nestingLevel == 0:
+            break
+    
+    if not QT_OUTPUT:
+        print(str(medm_widget))
+    return tokenType
+
+
+def parse(displayInfo):
+    """
+    parse MEDM XXXooREPLACEooXXX block
+    """
+    global block_number
+    medm_widget = MEDM_Widget("WIDGETNAME", "WIDGETTAG", block_number)
+    block_number += 1
+
+    nestingLevel = 0
+
+    while True:
+        if veryFirst:
+            tokenType, token = firstTokenType, firstToken
+        else:
+            tokenType, token = getToken(displayInfo)
+
+        if tokenType == T_WORD:
+            getNextElement(displayInfo, token, offset)
+        
+        elif tokenType == T_EQUAL:
+            pass
+        
+        elif tokenType == T_LEFT_BRACE:
+            nestingLevel += 1
+        
+        elif tokenType == T_RIGHT_BRACE:
+            nestingLevel -= 1
+ 
+        if tokenType in (T_RIGHT_BRACE, T_EOF) or nestingLevel == 0:
+            break
+    
+    if not QT_OUTPUT:
+        print(str(medm_widget))
+    return tokenType
+
+
+def getNextElement(pDI, token, offset):
+    """parse MEDM widget block"""
+    handler = parseFuncTable.get(token)
+    if handler is not None:
+        return handler(pDI, offset)
+    return None
+
+
 def correctOffset(dlobject, offset):
     w = dlobject.width
     h = dlobject.height
@@ -568,10 +709,10 @@ def writeRectangleDimensions(dlobject, offset, widget, correct):
     # TODO:
     print("must write method: writeRectangleDimensions()")
     
-    x=offset.frameX 
-    y=offset.frameY
-    w=offset.frameWidth
-    h=offset.frameHeight
+    x = offset.frameX 
+    y = offset.frameY
+    w = offset.frameWidth
+    h = offset.frameHeight
     
     if correct:
         x, y, w, h = correctOffset(dlobject, offset)
@@ -584,7 +725,10 @@ def writeRectangleDimensions(dlobject, offset, widget, correct):
     geometry = dict(rect=rect)
     property = dict(geometry=geometry)
     
-    print(json.dumps(property))
+    if QT_OUTPUT:
+        raise NotImplemented("needs Qt output code")
+    else:
+        print(json.dumps(property))
     return geometry
 
 
@@ -621,6 +765,11 @@ def convert_one_file(inputFile):
         tokenType, token = getToken(cdi)
         
     # TODO: more work to finish this
+    while True:
+        # tokenType, token, offset, state = parseAndAppendDisplayList(cdi, offset)
+        state = parseAndAppendDisplayList(cdi, tokenType, token)
+        if state == T_EOF:
+            break
 
 
 def main():
