@@ -48,7 +48,8 @@ class PYDM_Writer(object):
     write the screen description to a PyDM .ui file
     """
 
-    def __init__(self):
+    def __init__(self, adlParser):
+        self.adlParser = adlParser
         self.filename = None
         self.path = None
         self.file_suffix = FILE_SUFFIX
@@ -56,9 +57,6 @@ class PYDM_Writer(object):
         self.root = None
         self.outFile = None
         self.widget_stacking_info = []        # stacking order
-    
-    def openTag(self):
-        raise NotImplemented
     
     def openFile(self, outFile):
         """actually, begin to create the .ui file content IN MEMORY"""
@@ -88,6 +86,8 @@ class PYDM_Writer(object):
         # create the XML file root element
         self.root = ElementTree.Element("ui", attrib=dict(version="4.0"))
         # write the XML to the file in the close() method
+        
+        return self.root
 
     def closeFile(self):
         """finally, write .ui file (XML content)"""
@@ -107,17 +107,46 @@ class PYDM_Writer(object):
         with open(self.outFile, "w") as f:
             f.write(xmlstr)
 
-    def writeProperty(name, type, value): pass
-    def writeOpenProperty(name): pass
-    def writeTaggedString(type, value): pass
-    def writeCloseProperty(): pass
-    def writeStyleSheet(r, g, b): pass
+    def writeProperty(self, parent, name, value, tag="string"):
+        prop = self.writeOpenTag(parent, "property", name=name)
+        self.writeTaggedString(prop, value, tag)
+        return prop
+    
+    def writeOpenProperty(self, parent, name):
+        prop = self.writeOpenTag(parent, "property", name=prop)
+        return prop
+    
+    def writeTaggedString(self, parent, value, tag="string"):
+        element = ElementTree.SubElement(parent, tag)
+        element.text = value
+        return element
 
-    def writeOpenTag(type, cls = "", name = ""): pass
-    def writeCloseTag(type): pass
-    def test(): pass
-    def Init(adlParser): pass
-    def writeMessage(mess): pass
+    def writeCloseProperty(self):
+        pass        # nothing to do
+
+    def writeStyleSheet(self, parent, r, g, b):
+        # TODO: needed by PyDM?
+        prop = self.writeOpenProperty(parent, name="styleSheet")
+        
+        fmt = "\n\nQWidget#centralWidget {background: rgba(%d, %d, %d, %d;}\n\n"
+        color = fmt % (r, g, b, 255)
+        self.writeTaggedString(prop, color)
+
+    def writeOpenTag(self, parent, tag, cls="", name=""):
+        if parent is None:
+            msg = "writeOpenTag(): parent is None, cannot continue"
+            raise ValueError(msg)
+        element = ElementTree.SubElement(parent, tag)
+        if len(cls) > 0 and len(name)>0:
+            element.attrib["class"] = cls
+            element.attrib["name"] = name
+        return element
+
+    def writeCloseTag(self, tag):
+        pass        # nothing to do
+
+    def writeMessage(self, mess):
+        pass        # nothing to do
 
 
 def findFile(fname):
@@ -150,7 +179,7 @@ def findFile(fname):
 
 
 def test1():
-    writer = PYDM_Writer()
+    writer = PYDM_Writer(None)
     writer.openFile("test.xml")
     writer.widget_stacking_info.append(Qt_zOrder("widget_0", 2, 1))
     writer.widget_stacking_info.append(Qt_zOrder("widget_1", -3, 1))
@@ -158,5 +187,13 @@ def test1():
     writer.closeFile()
 
 
-# if __name__ == "__main__":
-#     test1()
+def test2():
+    writer = PYDM_Writer(None)
+    root = writer.openFile("test.xml")
+    writer.writeProperty(root, "example", "text value")
+    writer.writeProperty(root, "another_example", "upper", "enum")
+    writer.closeFile()
+
+
+if __name__ == "__main__":
+    test2()
