@@ -192,8 +192,11 @@ def test2():
     root = writer.openFile("test.xml")
     writer.writeProperty(root, "example", "text value")
     writer.writeProperty(root, "another_example", "upper", "enum")
+    sub = root
+    for i in range(4):
+        sub = writer.writeOpenTag(sub, "onion")
     writer.closeFile()
 
 
-if __name__ == "__main__":
-    test2()
+# if __name__ == "__main__":
+#     test2()
