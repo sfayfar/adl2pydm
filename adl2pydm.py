@@ -72,20 +72,21 @@ parseFuncTable = {
 class MEDM_Widget(object):
     """description of a MEDM widget (from the .adl file)"""
     
-    def __init__(self, widgetName, tag, widgetNumber):
+    def __init__(self, widgetClass, widgetName, widgetNumber):
         self.geometry_object = DisplayObject()
         self.widgetName = widgetName
         self.widgetNumber = widgetNumber
         if widgetNumber is not None:
             self.widgetName += "_%d" % widgetNumber
-        self.widgetTag = tag
+        self.widgetClass = widgetClass
         self.offsetX = 0
         self.offsetY = 0
         self.visibilityStatic = 0
+        self.properties = []
     
     def __str__(self):
         s = "name=%s" % self.widgetName
-        s +=  " tag=%s" & self.widgetTag
+        s +=  " widgetClass=%s" & self.widgetClass
         s +=  " visibility=%d" & self.visibilityStatic
         return s
 
@@ -614,7 +615,7 @@ def parseAndAppendDisplayList(displayInfo, firstTokenType, firstToken):
         bclr = displayInfo.drawingAreaBackgroundColor
         color = displayInfo.dlColormap.dl_color[bclr]
 
-        medm_widget = MEDM_Widget("centralWidget", "QWidget", None)
+        medm_widget = MEDM_Widget("QWidget", "centralWidget", None)
 
     while True:
         if veryFirst:
@@ -642,12 +643,12 @@ def parseAndAppendDisplayList(displayInfo, firstTokenType, firstToken):
     return tokenType
 
 
-def parse(displayInfo):
+def parseRectangle(displayInfo, offset):
     """
     parse MEDM XXXooREPLACEooXXX block
     """
     global block_number
-    medm_widget = MEDM_Widget("WIDGETNAME", "WIDGETTAG", block_number)
+    medm_widget = MEDM_Widget("caGraphics", "caRectangle", block_number)
     block_number += 1
 
     nestingLevel = 0
