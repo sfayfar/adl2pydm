@@ -3,6 +3,7 @@
 write the screen in the new protocol
 """
 
+import logging
 import os
 from xml.dom import minidom
 from xml.etree import ElementTree
@@ -12,6 +13,9 @@ FILE_SUFFIX = ".ui"
 QT_STYLESHEET_FILE = "stylesheet.qss"
 # the stylesheet should be in one of the directories in PYDM_DISPLAYS_PATH
 ENV_PYDM_DISPLAYS_PATH = "PYDM_DISPLAYS_PATH"
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 
 class Qt_zOrder:
@@ -62,24 +66,24 @@ class PYDM_Writer(object):
         """actually, begin to create the .ui file content IN MEMORY"""
         if os.environ.get(ENV_PYDM_DISPLAYS_PATH) is None:
             msg = "Environment variable %s is not defined." % "PYDM_DISPLAYS_PATH"
-            print(msg)      # TODO: use logger instead of print()
+            logger.info(msg)
 
         sfile = findFile(QT_STYLESHEET_FILE)
         if sfile is None:
             msg = "file not found: " + QT_STYLESHEET_FILE
-            print(msg)      # TODO: use logger instead of print()
+            logger.info(msg)
         else:
             with open(sfile, "r") as fp:
                 self.stylesheet = fp.read()
                 msg = "Using stylesheet file in .ui files: " + sfile
                 msg += "\n  unset %d to not use any stylesheet" % ENV_PYDM_DISPLAYS_PATH
-                print(msg)      # TODO: use logger instead of print()
+                logger.info(msg)
         
         # adl2ui opened outFile here AND started to write XML-like content
         # that is not necessary now
         if os.path.exists(outFile):
             msg = "output file already exists: " + outFile
-            print(msg)      # TODO: use logger instead of print()
+            logger.info(msg)
         self.outFile = outFile
         
         # Qt .ui files are XML, use XMl tools to create the content

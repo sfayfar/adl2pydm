@@ -3,13 +3,15 @@
 use the tokenizer to read the MEDM file
 """
 
+import logging
 import token
 import tokenize
-import pyRestTable
-
 
 TEST_FILE = "/usr/local/epics/synApps_5_8/support/xxx-5-8-3/xxxApp/op/adl/xxx.adl"
 TEST_FILE = "/usr/local/epics/synApps_5_8/support/motor-6-9/motorApp/op/adl/motorx_all.adl"
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 
 class MedmBlock(object):
@@ -21,7 +23,7 @@ class MedmBlock(object):
 
 
 class MedmColor(object):
-    """mEDM' widget color"""
+    """MEDM widget color"""
     
     def __init__(self, r, g, b, intensity=255):
         self.r = r
@@ -31,7 +33,7 @@ class MedmColor(object):
 
 
 class MedmGeometry(object):
-    """mEDM's object block contains the widget geometry"""
+    """MEDM's object block contains the widget geometry"""
     
     def __init__(self, x, y, width, height):
         self.x = x
@@ -49,14 +51,17 @@ class MedmWidgetBase(object):
         self.color = None
         self.geometry = None
         self.contents = []
+        
+        msg = "token %d" % parent.tokenPos
+        msg += " in MEDM block %s " % self.medm_block_type
+        logger.debug(msg)
 
 
 class MedmGenericWidget(MedmWidgetBase):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # TODO: use logger instead of print()
-        print("NOTE: using generic handler for '%s' block" % args[1])
+        logger.warning("using generic handler for '%s' block" % args[1])
 
 
 class Medm_file(MedmWidgetBase):
@@ -64,7 +69,6 @@ class Medm_file(MedmWidgetBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         parent = args[0]
-        print("token %d" % parent.tokenPos, " in file block ")
 
 
 known_handlers = {
@@ -98,8 +102,8 @@ class MEDM_Reader(object):
         self.parenthesis_nesting = 0
         self.contents = MedmBlock("")
     
-    def parse(self, parent=None, level=0):
-        parent = parent or self
+    def parse(self, owner=None, level=0):
+        owner = owner or self
         while self.tokenPos < self.numTokens:
             token = self.tokens[self.tokenPos]
             token_name = self.getTokenName(token)
@@ -116,27 +120,30 @@ class MEDM_Reader(object):
             
             if self.brace_nesting == level:
                 if token_name in ("NAME STRING".split()):
+                    # TODO: look ahead at next OP token:
+                    #   if "{" : make new block
+                    #   or "=" : add to owner as assignment
                     obj = known_handlers.get(token.string) or MedmGenericWidget
                     block = obj(self, token.string)
                     self.contents.contents.append(block)
                     self.print_token(token)
             elif self.brace_nesting > level:
-                print("enter level %d" % self.brace_nesting)
+                logger.debug(("enter level %d" % self.brace_nesting))
                 self.tokenPos += 1
                 self.parse(block, self.brace_nesting)
             else:
-                print("ended level %d" % level)
+                logger.debug(("ended level %d" % level))
                 return
             
             self.tokenPos += 1
         
     def print_token(self, token):
         token_name = self.getTokenName(token)
-        print(
+        logger.debug((
             self.tokenPos, 
             "  "*self.brace_nesting, 
             token_name, 
-            token.string.rstrip())
+            token.string.rstrip()))
         
     @property
     def numTokens(self):
@@ -157,4 +164,6 @@ class MEDM_Reader(object):
 if __name__ == "__main__":
     reader = MEDM_Reader(TEST_FILE)
     reader.parse()
+    ttypes = [reader.getTokenName(token) for token in reader.tokens]
+    print(" ".join(ttypes))
     print("done")
