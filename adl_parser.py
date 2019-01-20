@@ -51,7 +51,12 @@ class MedmWidgetBase(object):
         self.contents = []
 
 
-class MedmGenericWidget(MedmWidgetBase): pass
+class MedmGenericWidget(MedmWidgetBase):
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # TODO: use logger instead of print()
+        print("NOTE: using generic handler for '%s' block" % args[1])
 
 
 class Medm_file(MedmWidgetBase):
