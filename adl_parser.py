@@ -90,31 +90,48 @@ class MEDM_Reader(object):
         self.tokens = self.tokenizeFile()
         self.tokenPos = 0
         self.brace_nesting = 0
+        self.parenthesis_nesting = 0
         self.contents = MedmBlock("")
     
-    def parse(self, level=0):
+    def parse(self, parent=None, level=0):
+        parent = parent or self
         while self.tokenPos < self.numTokens:
             token = self.tokens[self.tokenPos]
             token_name = self.getTokenName(token)
 
-            if token_name == "OP" and token.string == "{":
-                self.brace_nesting += 1
-            elif token_name == "OP" and token.string == "}":
-                self.brace_nesting -= 1
+            if token_name == "OP":
+                if token.string == "{":
+                    self.brace_nesting += 1
+                elif token.string == "}":
+                    self.brace_nesting -= 1
+                elif token.string == "(":
+                    self.parenthesis_nesting += 1
+                elif token.string == ")":
+                    self.parenthesis_nesting -= 1
             
             if self.brace_nesting == level:
                 if token_name in ("NAME STRING".split()):
                     obj = known_handlers.get(token.string) or MedmGenericWidget
                     block = obj(self, token.string)
                     self.contents.contents.append(block)
-
-                    print(
-                        self.tokenPos, 
-                        "  "*self.brace_nesting, 
-                        token_name, 
-                        token.string)
+                    self.print_token(token)
+            elif self.brace_nesting > level:
+                print("enter level %d" % self.brace_nesting)
+                self.tokenPos += 1
+                self.parse(block, self.brace_nesting)
+            else:
+                print("ended level %d" % level)
+                return
             
             self.tokenPos += 1
+        
+    def print_token(self, token):
+        token_name = self.getTokenName(token)
+        print(
+            self.tokenPos, 
+            "  "*self.brace_nesting, 
+            token_name, 
+            token.string.rstrip())
         
     @property
     def numTokens(self):
