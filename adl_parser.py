@@ -10,6 +10,7 @@ import tokenize
 
 
 TEST_FILE = "/usr/local/epics/synApps_5_8/support/xxx-5-8-3/xxxApp/op/adl/xxx.adl"
+#TEST_FILE = "/home/mintadmin/sandbox/synApps/support/xxx-R6-0/xxxApp/op/adl/xxx.adl"
 TEST_FILE = "/usr/local/epics/synApps_5_8/support/motor-6-9/motorApp/op/adl/motorx_all.adl"
 
 logging.basicConfig(level=logging.DEBUG)
@@ -39,7 +40,7 @@ class MedmWidgetBase(object):
     
     def __init__(self, parent, block_type, *args, **kwargs):
         self.parent = parent
-        self.medm_block_type = block_type
+        self.medm_block_type = block_type.strip('"')
         self.color = None
         self.geometry = None
         self.contents = []
@@ -47,6 +48,9 @@ class MedmWidgetBase(object):
         msg = "token %d" % parent.tokenPos
         msg += " in MEDM block %s " % self.medm_block_type
         logger.debug(msg)
+    
+    def __str__(self, *args, **kwargs):
+        return "%s(type=\"%s\")" % (type(self).__name__, self.medm_block_type)
 
 
 class MedmGenericWidget(MedmWidgetBase):
@@ -94,21 +98,20 @@ class MEDM_Reader(object):
     read (and parse) entire MEDM .adl file
     """
     
-    block_handlers = {
-        "object": None,
-        "colors": None,
-        }
-    
     def __init__(self, filename):
         self.filename = filename
         self.tokens = self.tokenizeFile()
         self.tokenPos = 0
         self.brace_nesting = 0
         self.parenthesis_nesting = 0
-        self.contents = MedmBlock("")
+        self.block = MedmBlock("")
+        self.block_handlers = {
+            "object": self.parseObject,
+            "colors": self.parseColors,
+            }
     
     def parse(self, owner=None, level=0):
-        owner = owner or self.contents
+        owner = owner or self.block
         while self.tokenPos < self.numTokens:
             tkn = self.tokens[self.tokenPos]
             token_name = self.getTokenName(tkn)
@@ -122,19 +125,22 @@ class MEDM_Reader(object):
                     if self.isAssignment:
                         self.parseAssignment(owner)
                     elif self.isBlockStart:
-                        if tkn.string == "colors":
-                            self.parseColors(owner)
-                        else:
+                        handler = self.block_handlers.get(tkn.string)
+                        if handler is None:
                             block = self.parse_block(owner)
+                        else:
+                            handler(owner)
                         self.tokenPos += 1
-
                     else:
                         # TODO: display[n] ends up here, handle it
                         self.print_token(tkn)
             elif self.brace_nesting > level:
                 logger.debug(("enter level %d" % self.brace_nesting))
                 self.tokenPos += 1
-                self.parse(block, self.brace_nesting)
+                try:
+                    self.parse(block, self.brace_nesting)
+                except UnboundLocalError as exc:
+                    pass
             else:
                 logger.debug(("ended level %d" % level))
                 return
@@ -223,7 +229,7 @@ class MEDM_Reader(object):
         assignment = Assignment(key, value)
         owner.contents.append(assignment)
         self.tokenPos = ePos
-        logger.debug(("assignment: %s = %s" % (key, value)))
+        logger.debug(("assignment: %s" % str(assignment)))
         
     def parse_block(self, owner):
         """handle most blocks"""
@@ -254,11 +260,27 @@ class MEDM_Reader(object):
         tkn = self.tokens[self.tokenPos]
         key = tkn.string
         value = list(map(_parse_colors_, text.rstrip(",").split()))
-        assignment = Assignment(tkn.string, value)
+        assignment = Assignment(key, value)
         logger.debug(("assignment: %s = %s" % (key, "length=%d" % len(value))))
         owner.contents.append(assignment)
 
         self.tokenPos += 2 + offset
+        
+    def parseObject(self, owner):
+        """handle object (widget bounding box geometry) block"""
+        self.tokenPos += 1
+        ref = {}
+
+        for _i in "x y width height".split():
+            self.tokenPos = self.getNextTokenByType(token.NAME)
+            key = self.tokens[self.tokenPos].string
+            self.tokenPos += 2
+            value = self.tokens[self.tokenPos].string
+            ref[key] = value
+
+        owner.geometry = Geometry(ref["x"], ref["y"], ref["width"], ref["height"])
+        logger.debug(("geometry: %s" % str(owner.geometry)))
+        #self.tokenPos += 1
 
     def print_token(self, tkn):
         logger.debug((
