@@ -110,18 +110,18 @@ class MEDM_Reader(object):
     def parse(self, owner=None, level=0):
         owner = owner or self.contents
         while self.tokenPos < self.numTokens:
-            token = self.tokens[self.tokenPos]
-            token_name = self.getTokenName(token)
+            tkn = self.tokens[self.tokenPos]
+            token_name = self.getTokenName(tkn)
 
             if token_name == "OP":
-                if token.string == "{":
+                if tkn.string == "{":
                     logger.warning("incrementing self.brace_nesting")
                     self.brace_nesting += 1
-                elif token.string == "}":
+                elif tkn.string == "}":
                     self.brace_nesting -= 1
-                elif token.string == "(":
+                elif tkn.string == "(":
                     self.parenthesis_nesting += 1
-                elif token.string == ")":
+                elif tkn.string == ")":
                     self.parenthesis_nesting -= 1
             
             if self.brace_nesting == level:
@@ -130,7 +130,7 @@ class MEDM_Reader(object):
                     if self.isAssignment:
                         self.parseAssignment(owner)
                     elif self.isBlockStart:
-                        if token.string == "colors":
+                        if tkn.string == "colors":
                             self.parseColors(owner)
                         else:
                             block = self.parse_block(owner)
@@ -138,7 +138,7 @@ class MEDM_Reader(object):
 
                     else:
                         # TODO: display[n] ends up here, handle it
-                        self.print_token(token)
+                        self.print_token(tkn)
 
             elif self.brace_nesting > level:
                 logger.debug(("enter level %d" % self.brace_nesting))
@@ -163,15 +163,15 @@ class MEDM_Reader(object):
             token_name = [token_name]
         
         # look through the remaining tokens for the next occurence
-        for offset, token in enumerate(self.tokens[self.tokenPos:]):
-            if self.getTokenName(token) in token_name:
+        for offset, tkn in enumerate(self.tokens[self.tokenPos:]):
+            if self.getTokenName(tkn) in token_name:
                 return self.tokenPos + offset       # - 1
         
         raise ValueError("unexpected: failed to find next named token")
 
-    def getTokenName(self, token):
+    def getTokenName(self, tkn):
         """return the name of this token"""
-        return tokenize.tok_name[token.type]
+        return tokenize.tok_name[tkn.type]
     
     @property
     def isAssignment(self):
@@ -199,17 +199,17 @@ class MEDM_Reader(object):
         
     def parseAssignment(self, owner):
         """handle assignment operation"""
-        token = self.tokens[self.tokenPos]
+        tkn = self.tokens[self.tokenPos]
 
-        key = token.string
+        key = tkn.string
         
         # TODO: is it important to identify if number or string?
         ePos = self.getNextTokenName("NL")
         
         # tokenize splits up some things porrly
         # we'll parse it ourselves here
-        pos = token.line.find("=") + 1
-        value = token.line[pos:].strip().strip('"')
+        pos = tkn.line.find("=") + 1
+        value = tkn.line[pos:].strip().strip('"')
         
         assignment = Assignment(key, value)
         owner.contents.append(assignment)
@@ -218,19 +218,17 @@ class MEDM_Reader(object):
         
     def parse_block(self, owner):
         """handle most blocks"""
-        token = self.tokens[self.tokenPos]
+        tkn = self.tokens[self.tokenPos]
 
-        obj = widget_handlers.get(token.string) or MedmGenericWidget
-        block = obj(self, token.string)
-        logger.debug(("created %s(name=\"%s\")" % (block.__class__.__name__, token.string)))
+        obj = widget_handlers.get(tkn.string) or MedmGenericWidget
+        block = obj(self, tkn.string)
+        logger.debug(("created %s(name=\"%s\")" % (block.__class__.__name__, tkn.string)))
         self.brace_nesting += 1
         owner.contents.append(block)
         return block
         
     def parseColors(self, owner):
         """handle colors block"""
-        token = self.tokens[self.tokenPos]
-
         text = ""
         for offset, tok in enumerate(self.tokens[self.tokenPos+2:]):
             if tok.string == "}" and self.getTokenName(tok) == "OP":
@@ -244,21 +242,21 @@ class MEDM_Reader(object):
             b = int(rgbhex[4:6], 16)
             return Color(r, g, b)
         
-        key = token.string
+        tkn = self.tokens[self.tokenPos]
+        key = tkn.string
         value = list(map(_parse_colors_, text.rstrip(",").split()))
-        assignment = Assignment(token.string, value)
+        assignment = Assignment(tkn.string, value)
         logger.debug(("assignment: %s = %s" % (key, "length=%d" % len(value))))
         owner.contents.append(assignment)
 
         self.tokenPos += 2 + offset
 
-    def print_token(self, token):
-        token_name = self.getTokenName(token)
+    def print_token(self, tkn):
         logger.debug((
             self.tokenPos, 
             "  "*self.brace_nesting, 
-            token_name, 
-            token.string.rstrip()))
+            self.getTokenName(tkn), 
+            tkn.string.rstrip()))
 
     def tokenizeFile(self):
         """tokenize just one file"""
@@ -270,5 +268,5 @@ class MEDM_Reader(object):
 if __name__ == "__main__":
     reader = MEDM_Reader(TEST_FILE)
     reader.parse()
-    ttypes = [reader.getTokenName(token) for token in reader.tokens]
+    ttypes = [reader.getTokenName(tkn) for tkn in reader.tokens]
     print("done")
