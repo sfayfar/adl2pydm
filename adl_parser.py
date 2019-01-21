@@ -113,7 +113,7 @@ class MEDM_Reader(object):
             tkn = self.tokens[self.tokenPos]
             token_name = self.getTokenName(tkn)
 
-            if token_name == "OP":
+            if tkn.type == token.OP:
                 if tkn.string == "{":
                     logger.warning("incrementing self.brace_nesting")
                     self.brace_nesting += 1
