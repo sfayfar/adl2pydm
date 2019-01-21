@@ -149,24 +149,29 @@ class MEDM_Reader(object):
                 return
             
             self.tokenPos += 1
-
-    def print_token(self, token):
-        token_name = self.getTokenName(token)
-        logger.debug((
-            self.tokenPos, 
-            "  "*self.brace_nesting, 
-            token_name, 
-            token.string.rstrip()))
         
     def getTokenSequence(self, start=None, length=2):
         start = start or self.tokenPos
         if start+length >= self.numTokens:
             return []
         return self.tokens[start:start+length]
+
+    def getNextTokenName(self, token_name):
+        """return the index of the next token with given name(s)"""
+        # make sure token_name is a list
+        if not isinstance(token_name, (set, tuple, list)):
+            token_name = [token_name]
         
-    @property
-    def numTokens(self):
-        return len(self.tokens)
+        # look through the remaining tokens for the next occurence
+        for offset, token in enumerate(self.tokens[self.tokenPos:]):
+            if self.getTokenName(token) in token_name:
+                return self.tokenPos + offset       # - 1
+        
+        raise ValueError("unexpected: failed to find next named token")
+
+    def getTokenName(self, token):
+        """return the name of this token"""
+        return tokenize.tok_name[token.type]
     
     @property
     def isAssignment(self):
@@ -187,23 +192,10 @@ class MEDM_Reader(object):
             if tt_seq in ("NAME OP", "STRING OP"):
                 return tokens[-1].string.rstrip() == "{"
         return False
-
-    def getTokenName(self, token):
-        """return the name of this token"""
-        return tokenize.tok_name[token.type]
-
-    def getNextTokenName(self, token_name):
-        """return the index of the next token with given name(s)"""
-        # make sure token_name is a list
-        if not isinstance(token_name, (set, tuple, list)):
-            token_name = [token_name]
         
-        # look through the remaining tokens for the next occurence
-        for offset, token in enumerate(self.tokens[self.tokenPos:]):
-            if self.getTokenName(token) in token_name:
-                return self.tokenPos + offset       # - 1
-        
-        raise ValueError("unexpected: failed to find next named token")
+    @property
+    def numTokens(self):
+        return len(self.tokens)
         
     def parseAssignment(self, owner):
         """handle assignment operation"""
@@ -259,6 +251,14 @@ class MEDM_Reader(object):
         owner.contents.append(assignment)
 
         self.tokenPos += 2 + offset
+
+    def print_token(self, token):
+        token_name = self.getTokenName(token)
+        logger.debug((
+            self.tokenPos, 
+            "  "*self.brace_nesting, 
+            token_name, 
+            token.string.rstrip()))
 
     def tokenizeFile(self):
         """tokenize just one file"""
