@@ -131,7 +131,6 @@ class MEDM_Reader(object):
                     else:
                         # TODO: display[n] ends up here, handle it
                         self.print_token(tkn)
-
             elif self.brace_nesting > level:
                 logger.debug(("enter level %d" % self.brace_nesting))
                 self.tokenPos += 1
@@ -139,7 +138,6 @@ class MEDM_Reader(object):
             else:
                 logger.debug(("ended level %d" % level))
                 return
-            
             self.tokenPos += 1
         
     def adjustLevel(self, tkn):
@@ -215,7 +213,7 @@ class MEDM_Reader(object):
         key = tkn.string
         
         # TODO: is it important to identify if number or string?
-        ePos = self.getNextTokenByType(token.NEWLINE)
+        ePos = self.getNextTokenByType((token.NEWLINE, tokenize.NL))
         
         # tokenize splits up some things porrly
         # we'll parse it ourselves here
