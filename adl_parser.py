@@ -117,7 +117,7 @@ class MEDM_Reader(object):
                 self.adjustLevel(tkn)
             
             if self.brace_nesting == level:
-                if token_name in ("NAME STRING".split()):
+                if tkn.type in (token.NAME, token.STRING):
                     logger.debug(("token #%d : name=%s" % (self.tokenPos, token_name)))
                     if self.isAssignment:
                         self.parseAssignment(owner)
@@ -159,15 +159,15 @@ class MEDM_Reader(object):
             return []
         return self.tokens[start:start+length]
 
-    def getNextTokenName(self, token_name):
-        """return the index of the next token with given name(s)"""
+    def getNextTokenByType(self, token_types):
+        """return the index of the next token with given type(s)"""
         # make sure token_name is a list
-        if not isinstance(token_name, (set, tuple, list)):
-            token_name = [token_name]
+        if not isinstance(token_types, (set, tuple, list)):
+            token_types = [token_types]
         
         # look through the remaining tokens for the next occurence
         for offset, tkn in enumerate(self.tokens[self.tokenPos:]):
-            if self.getTokenName(tkn) in token_name:
+            if tkn.type in token_types:
                 return self.tokenPos + offset       # - 1
         
         raise ValueError("unexpected: failed to find next named token")
@@ -179,20 +179,28 @@ class MEDM_Reader(object):
     @property
     def isAssignment(self):
         """are we looking at a key=value assignment?"""
+        def make_text(tseq):
+            return " ".join(map(str, tseq))
+
         tokens = self.getTokenSequence(length=2)
         if len(tokens) == 2:
-            tt_seq = " ".join(map(self.getTokenName, tokens))
-            if tt_seq in ("NAME OP", "STRING OP"):
+            seq = make_text([tok.type for tok in tokens])
+            choices = [make_text([t, token.OP]) for t in (token.NAME, token.STRING)]
+            if seq in choices:
                 return tokens[-1].string.rstrip() == "="
         return False
     
     @property
     def isBlockStart(self):
         """are we looking at an MEDM block starting?:  name {"""
+        def make_text(tseq):
+            return " ".join(map(str, tseq))
+
         tokens = self.getTokenSequence(length=2)
         if len(tokens) == 2:
-            tt_seq = " ".join(map(self.getTokenName, tokens))
-            if tt_seq in ("NAME OP", "STRING OP"):
+            seq = make_text([tok.type for tok in tokens])
+            choices = [make_text([t, token.OP]) for t in (token.NAME, token.STRING)]
+            if seq in choices:
                 return tokens[-1].string.rstrip() == "{"
         return False
         
@@ -207,7 +215,7 @@ class MEDM_Reader(object):
         key = tkn.string
         
         # TODO: is it important to identify if number or string?
-        ePos = self.getNextTokenName("NL")
+        ePos = self.getNextTokenByType(token.NEWLINE)
         
         # tokenize splits up some things porrly
         # we'll parse it ourselves here
@@ -234,7 +242,7 @@ class MEDM_Reader(object):
         """handle colors block"""
         text = ""
         for offset, tok in enumerate(self.tokens[self.tokenPos+2:]):
-            if tok.string == "}" and self.getTokenName(tok) == "OP":
+            if tok.string == "}" and tok.type == token.OP:
                 break
             else:
                 text += tok.string
