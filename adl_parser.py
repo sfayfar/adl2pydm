@@ -114,15 +114,7 @@ class MEDM_Reader(object):
             token_name = self.getTokenName(tkn)
 
             if tkn.type == token.OP:
-                if tkn.string == "{":
-                    logger.warning("incrementing self.brace_nesting")
-                    self.brace_nesting += 1
-                elif tkn.string == "}":
-                    self.brace_nesting -= 1
-                elif tkn.string == "(":
-                    self.parenthesis_nesting += 1
-                elif tkn.string == ")":
-                    self.parenthesis_nesting -= 1
+                self.adjustLevel(tkn)
             
             if self.brace_nesting == level:
                 if token_name in ("NAME STRING".split()):
@@ -150,6 +142,17 @@ class MEDM_Reader(object):
             
             self.tokenPos += 1
         
+    def adjustLevel(self, tkn):
+        if tkn.string == "{":
+            logger.warning("incrementing self.brace_nesting")
+            self.brace_nesting += 1
+        elif tkn.string == "}":
+            self.brace_nesting -= 1
+        elif tkn.string == "(":
+            self.parenthesis_nesting += 1
+        elif tkn.string == ")":
+            self.parenthesis_nesting -= 1
+
     def getTokenSequence(self, start=None, length=2):
         start = start or self.tokenPos
         if start+length >= self.numTokens:
