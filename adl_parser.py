@@ -147,9 +147,7 @@ class MEDM_Reader(object):
                 return
             self.tokenPos += 1
 
-        # TODO: look through the widgets and convert:
-        #   clr=nn into clr=Color(rgb)
-        #   bclr=nn into clr=Color(rgb)
+        self.mapColors()
         
     def adjustLevel(self, tkn):
         if tkn.string == "{":
@@ -217,6 +215,12 @@ class MEDM_Reader(object):
                 return tokens[-1].string.rstrip() == "{"
         return False
         
+    def mapColors(self):
+        # TODO: look through the widgets and convert:
+        #   clr=nn into clr=Color(rgb)
+        #   bclr=nn into clr=Color(rgb)
+        pass
+
     @property
     def numTokens(self):
         return len(self.tokens)
