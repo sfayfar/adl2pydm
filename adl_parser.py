@@ -105,11 +105,11 @@ class MEDM_Reader(object):
         self.tokenPos = 0
         self.brace_nesting = 0
         self.parenthesis_nesting = 0
-        self.block = MedmBlock("")
+        self.root = MedmBlock("")
         self.color_table = None
     
     def parse(self, owner=None, level=0):
-        owner = owner or self.block
+        owner = owner or self.root
         while self.tokenPos < self.numTokens:
             tkn = self.getCurrentToken()
             token_type = self.getTokenTypeStr(tkn)
@@ -219,7 +219,7 @@ class MEDM_Reader(object):
         # TODO: look through the widgets and convert:
         #   clr=nn into clr=Color(rgb)
         #   bclr=nn into clr=Color(rgb)
-        pass
+        clut = self.root.color_table
 
     @property
     def numTokens(self):
