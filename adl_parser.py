@@ -106,10 +106,7 @@ class MEDM_Reader(object):
         self.brace_nesting = 0
         self.parenthesis_nesting = 0
         self.block = MedmBlock("")
-        self.block_handlers = {
-            "object": self.parseObject,
-            "colors": self.parseColors,
-            }
+        self.color_table = None
     
     def parse(self, owner=None, level=0):
         owner = owner or self.block
@@ -126,11 +123,12 @@ class MEDM_Reader(object):
                     if self.isAssignment:
                         self.parseAssignment(owner)
                     elif self.isBlockStart:
-                        handler = self.block_handlers.get(tkn.string)
-                        if handler is None:
-                            block = self.parse_block(self, owner)
+                        if tkn.string == "colors":
+                            self.parseColors(self)
+                        elif tkn.string == "object":
+                            self.parseObject(owner)
                         else:
-                            handler(owner)
+                            block = self.parse_block(self, owner)
                         self.tokenPos += 1
                     else:
                         if tkn.line.find("display[") >= 0:
@@ -148,6 +146,10 @@ class MEDM_Reader(object):
                 logger.debug(("ended level %d" % level))
                 return
             self.tokenPos += 1
+
+        # TODO: look through the widgets and convert:
+        #   clr=nn into clr=Color(rgb)
+        #   bclr=nn into clr=Color(rgb)
         
     def adjustLevel(self, tkn):
         if tkn.string == "{":
@@ -246,7 +248,7 @@ class MEDM_Reader(object):
         owner.contents.append(block)
         return block
         
-    def parseColors(self, owner):
+    def parseColors(self, root):
         """handle colors block"""
         text = ""
         for offset, tok in enumerate(self.tokens[self.tokenPos+2:]):
@@ -261,12 +263,9 @@ class MEDM_Reader(object):
             b = int(rgbhex[4:6], 16)
             return Color(r, g, b)
         
-        tkn = self.getCurrentToken()
-        key = tkn.string
         value = list(map(_parse_colors_, text.rstrip(",").split()))
-        assignment = Assignment(key, value)
-        logger.debug(("assignment: %s = %s" % (key, "length=%d" % len(value))))
-        owner.contents.append(assignment)
+        logger.debug(("color table: length = %d" % len(value)))
+        root.color_table = value
 
         self.tokenPos += 2 + offset
         
