@@ -17,14 +17,17 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
+"""MEDM's key = value assignment"""
+Assignment = namedtuple('Assignment', 'key value')
+
 """a color used in MEDM"""
 Color = namedtuple('Color', 'r g b')
 
 """MEDM's object block contains the widget geometry"""
 Geometry = namedtuple('Geometry', 'x y width height')
 
-"""MEDM's key = value assignment"""
-Assignment = namedtuple('Assignment', 'key value')
+"""MEDM's points item: points = [Point]"""
+Point = namedtuple('Point', 'x y')
 
 
 class MedmBlock(object):
@@ -127,6 +130,8 @@ class MEDM_Reader(object):
                             self.parseColors(self)
                         elif tkn.string == "object":
                             self.parseObject(owner)
+                        elif tkn.string == "points":
+                            self.parsePoints(owner)
                         else:
                             block = self.parse_block(self, owner)
                         self.tokenPos += 1
@@ -216,10 +221,22 @@ class MEDM_Reader(object):
         return False
         
     def mapColors(self):
-        # TODO: look through the widgets and convert:
-        #   clr=nn into clr=Color(rgb)
-        #   bclr=nn into clr=Color(rgb)
-        clut = self.root.color_table
+        """walk the widget stack and convert clr & bclr to Color()"""
+        clut = self.color_table     # Color LookUp Table from MEDM's "color map" block
+        
+        def remap_colors(widget):
+            for item in widget.contents:
+                if isinstance(item, Assignment):
+                    if item.key == "clr":
+                        widget.color = clut[int(item.value)]
+                        # TODO: pop that Assignment from the contents list
+                    elif item.key == "bclr":
+                        widget.background_color = clut[int(item.value)]
+                        # TODO: pop that Assignment from the contents list
+                elif isinstance(widget, (MedmBlock, Medm_file, MedmGenericWidget)):
+                    remap_colors(item)
+
+        remap_colors(self.root)
 
     @property
     def numTokens(self):
@@ -295,7 +312,6 @@ class MEDM_Reader(object):
 
         return owner
 
-
     def parseObject(self, owner):
         """handle object (widget bounding box geometry) block"""
         self.tokenPos += 1
@@ -310,6 +326,9 @@ class MEDM_Reader(object):
         owner.geometry = Geometry(ref["x"], ref["y"], ref["width"], ref["height"])
         logger.debug(("geometry: %s" % str(owner.geometry)))
         self.tokenPos = self.getNextTokenPosByType(token.OP)-1
+
+    def parsePoints(self, owner):
+        pass
 
     def print_token(self, tkn):
         logger.debug((
