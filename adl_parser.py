@@ -328,7 +328,21 @@ class MEDM_Reader(object):
         self.tokenPos = self.getNextTokenPosByType(token.OP)-1
 
     def parsePoints(self, owner):
-        pass
+        """handle points block"""
+        points = []
+        self.tokenPos = self.getNextTokenPosByType(tokenize.NL) + 1
+        tkn = self.getCurrentToken()
+
+        while tkn.string != "}":
+            x, y = map(int, tkn.line.strip(" \t\n()").split(","))
+            points.append(Point(x, y))
+            self.tokenPos = self.getNextTokenPosByType(tokenize.NL) + 1
+            tkn = self.getCurrentToken()
+
+        assignment = Assignment("points", points)
+        owner.contents.append(assignment)
+        logger.debug(("assignment: %s" % str(assignment)))
+        # self.tokenPos += 1
 
     def print_token(self, tkn):
         logger.debug((
@@ -347,5 +361,4 @@ class MEDM_Reader(object):
 if __name__ == "__main__":
     reader = MEDM_Reader(TEST_FILE)
     reader.parse()
-    ttypes = [reader.getTokenTypeStr(tkn) for tkn in reader.tokens]
     print("done")
