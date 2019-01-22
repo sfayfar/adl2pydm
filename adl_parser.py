@@ -28,11 +28,15 @@ Assignment = namedtuple('Assignment', 'key value')
 
 
 class MedmBlock(object):
+    # FIXME: Why this class exists?
     
     def __init__(self, nm):
-        self.name = nm
+        self.name = nm.strip()
         self.contents = []
         self.tokens = []
+    
+    def __str__(self, *args, **kwargs):
+        return "%s(type=\"%s\")" % (type(self).__name__, self.name)
 
 
 class MedmWidgetBase(object):
@@ -113,15 +117,15 @@ class MEDM_Reader(object):
     def parse(self, owner=None, level=0):
         owner = owner or self.block
         while self.tokenPos < self.numTokens:
-            tkn = self.tokens[self.tokenPos]
-            token_name = self.getTokenName(tkn)
+            tkn = self.getCurrentToken()
+            token_type = self.getTokenTypeStr(tkn)
 
             if tkn.type == token.OP:
                 self.adjustLevel(tkn)
             
             if self.brace_nesting == level:
                 if tkn.type in (token.NAME, token.STRING):
-                    logger.debug(("token #%d : name=%s" % (self.tokenPos, token_name)))
+                    logger.debug(("token #%d : type=%s" % (self.tokenPos, token_type)))
                     if self.isAssignment:
                         self.parseAssignment(owner)
                     elif self.isBlockStart:
@@ -132,8 +136,10 @@ class MEDM_Reader(object):
                             handler(owner)
                         self.tokenPos += 1
                     else:
-                        # TODO: display[n] ends up here, handle it
-                        self.print_token(tkn)
+                        if tkn.line.find("display[") >= 0:
+                            owner.contents.append(self.parse_display_n())
+                        else:
+                            self.print_token(tkn)
             elif self.brace_nesting > level:
                 logger.debug(("enter level %d" % self.brace_nesting))
                 self.tokenPos += 1
@@ -157,13 +163,17 @@ class MEDM_Reader(object):
         elif tkn.string == ")":
             self.parenthesis_nesting -= 1
 
+    def getCurrentToken(self, offset=0):
+        self.tokenPos += offset
+        return self.tokens[self.tokenPos]
+
     def getTokenSequence(self, start=None, length=2):
         start = start or self.tokenPos
         if start+length >= self.numTokens:
             return []
         return self.tokens[start:start+length]
 
-    def getNextTokenByType(self, token_types):
+    def getNextTokenPosByType(self, token_types):
         """return the index of the next token with given type(s)"""
         # make sure token_name is a list
         if not isinstance(token_types, (set, tuple, list)):
@@ -176,7 +186,7 @@ class MEDM_Reader(object):
         
         raise ValueError("unexpected: failed to find next named token")
 
-    def getTokenName(self, tkn):
+    def getTokenTypeStr(self, tkn):
         """return the name of this token"""
         return tokenize.tok_name[tkn.type]
     
@@ -214,12 +224,8 @@ class MEDM_Reader(object):
         
     def parseAssignment(self, owner):
         """handle assignment operation"""
-        tkn = self.tokens[self.tokenPos]
-
+        tkn = self.getCurrentToken()
         key = tkn.string
-        
-        # TODO: is it important to identify if number or string?
-        ePos = self.getNextTokenByType((token.NEWLINE, tokenize.NL))
         
         # tokenize splits up some things porrly
         # we'll parse it ourselves here
@@ -228,12 +234,14 @@ class MEDM_Reader(object):
         
         assignment = Assignment(key, value)
         owner.contents.append(assignment)
-        self.tokenPos = ePos
         logger.debug(("assignment: %s" % str(assignment)))
+        
+        ePos = self.getNextTokenPosByType((token.NEWLINE, tokenize.NL))
+        self.tokenPos = ePos - 1
         
     def parse_block(self, owner):
         """handle most blocks"""
-        tkn = self.tokens[self.tokenPos]
+        tkn = self.getCurrentToken()
 
         obj = widget_handlers.get(tkn.string) or MedmGenericWidget
         block = obj(self, tkn.string)
@@ -257,7 +265,7 @@ class MEDM_Reader(object):
             b = int(rgbhex[4:6], 16)
             return Color(r, g, b)
         
-        tkn = self.tokens[self.tokenPos]
+        tkn = self.getCurrentToken()
         key = tkn.string
         value = list(map(_parse_colors_, text.rstrip(",").split()))
         assignment = Assignment(key, value)
@@ -266,27 +274,49 @@ class MEDM_Reader(object):
 
         self.tokenPos += 2 + offset
         
+    def parse_display_n(self):
+        d_name = self.getCurrentToken().line.strip().split()[0]
+        owner = MedmBlock(d_name)
+        logger.debug(("created %s(name=\"%s\")" % (owner.__class__.__name__, d_name)))
+        self.tokenPos = self.getNextTokenPosByType(tokenize.NL)
+        
+        tkn = self.getCurrentToken()
+        while tkn.line.strip() != "}":
+            self.tokenPos = self.getNextTokenPosByType(token.NAME)
+            line = self.getCurrentToken().line.strip()
+            pos = line.find("=")
+            key = line[:pos]
+            value = line[pos+1:].strip()
+            assignment = Assignment(key, value.strip())
+            owner.contents.append(assignment)
+            logger.debug(("assignment: %s = %s" % (key, str(assignment))))
+
+            self.tokenPos = self.getNextTokenPosByType(tokenize.NL)+1
+            tkn = self.getCurrentToken()
+
+        return owner
+
+
     def parseObject(self, owner):
         """handle object (widget bounding box geometry) block"""
         self.tokenPos += 1
         ref = {}
 
         for _i in "x y width height".split():
-            self.tokenPos = self.getNextTokenByType(token.NAME)
-            key = self.tokens[self.tokenPos].string
-            self.tokenPos += 2
-            value = self.tokens[self.tokenPos].string
+            self.tokenPos = self.getNextTokenPosByType(token.NAME)
+            key = self.getCurrentToken().string
+            value = self.getCurrentToken(2).string
             ref[key] = value
 
         owner.geometry = Geometry(ref["x"], ref["y"], ref["width"], ref["height"])
         logger.debug(("geometry: %s" % str(owner.geometry)))
-        #self.tokenPos += 1
+        self.tokenPos = self.getNextTokenPosByType(token.OP)-1
 
     def print_token(self, tkn):
         logger.debug((
             self.tokenPos, 
             "  "*self.brace_nesting, 
-            self.getTokenName(tkn), 
+            self.getTokenTypeStr(tkn), 
             tkn.string.rstrip()))
 
     def tokenizeFile(self):
@@ -299,5 +329,5 @@ class MEDM_Reader(object):
 if __name__ == "__main__":
     reader = MEDM_Reader(TEST_FILE)
     reader.parse()
-    ttypes = [reader.getTokenName(tkn) for tkn in reader.tokens]
+    ttypes = [reader.getTokenTypeStr(tkn) for tkn in reader.tokens]
     print("done")
