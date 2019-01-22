@@ -10,20 +10,20 @@ import tokenize
 
 
 TEST_FILE = "/usr/local/epics/synApps_5_8/support/xxx-5-8-3/xxxApp/op/adl/xxx.adl"
-#TEST_FILE = "/home/mintadmin/sandbox/synApps/support/xxx-R6-0/xxxApp/op/adl/xxx.adl"
+TEST_FILE = "/home/mintadmin/sandbox/synApps/support/xxx-R6-0/xxxApp/op/adl/xxx.adl"
 TEST_FILE = "/usr/local/epics/synApps_5_8/support/motor-6-9/motorApp/op/adl/motorx_all.adl"
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
-# a color used in MEDM
+"""a color used in MEDM"""
 Color = namedtuple('Color', 'r g b')
 
-# MEDM's object block contains the widget geometry
+"""MEDM's object block contains the widget geometry"""
 Geometry = namedtuple('Geometry', 'x y width height')
 
-# MEDM's key = value assignment
+"""MEDM's key = value assignment"""
 Assignment = namedtuple('Assignment', 'key value')
 
 
@@ -45,6 +45,7 @@ class MedmWidgetBase(object):
         self.root = root
         self.medm_block_type = block_type.strip('"')
         self.color = None
+        self.background_color = None
         self.geometry = None
         self.contents = []
         
@@ -57,6 +58,7 @@ class MedmWidgetBase(object):
 
 
 class MedmGenericWidget(MedmWidgetBase):
+    """non-specific entity from MEDM .adl file, see ``medm_block_type``"""
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -219,17 +221,16 @@ class MEDM_Reader(object):
         
     def parseAssignment(self, owner):
         """handle assignment operation"""
-        tkn = self.getCurrentToken()
-        key = tkn.string
-        
         # tokenize splits up some things porrly
         # we'll parse it ourselves here
-        pos = tkn.line.find("=") + 1
-        value = tkn.line[pos:].strip().strip('"')
-        
-        assignment = Assignment(key, value)
+        line = self.getCurrentToken().line.strip()
+        pos = line.find("=")
+        key = line[:pos]
+        value = line[pos+1:].strip()
+
+        assignment = Assignment(key, value.strip('"'))
         owner.contents.append(assignment)
-        logger.debug(("assignment: %s" % str(assignment)))
+        logger.debug(("assignment: %s = %s" % (key, str(assignment))))
         
         ePos = self.getNextTokenPosByType((token.NEWLINE, tokenize.NL))
         self.tokenPos = ePos - 1
