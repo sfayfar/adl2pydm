@@ -28,7 +28,7 @@ Assignment = namedtuple('Assignment', 'key value')
 
 
 class MedmBlock(object):
-    # FIXME: Why this class exists?
+    """root object of the .ald file structure : contains Medm_file"""
     
     def __init__(self, nm):
         self.name = nm.strip()
@@ -137,7 +137,7 @@ class MEDM_Reader(object):
                         self.tokenPos += 1
                     else:
                         if tkn.line.find("display[") >= 0:
-                            owner.contents.append(self.parse_display_n())
+                            owner.contents.append(self.parse_display_n(owner))
                         else:
                             self.print_token(tkn)
             elif self.brace_nesting > level:
@@ -274,9 +274,9 @@ class MEDM_Reader(object):
 
         self.tokenPos += 2 + offset
         
-    def parse_display_n(self):
+    def parse_display_n(self, parent):
         d_name = self.getCurrentToken().line.strip().split()[0]
-        owner = MedmBlock(d_name)
+        owner = MedmGenericWidget(parent, d_name)
         logger.debug(("created %s(name=\"%s\")" % (owner.__class__.__name__, d_name)))
         self.tokenPos = self.getNextTokenPosByType(tokenize.NL)
         
