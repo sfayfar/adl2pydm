@@ -28,12 +28,11 @@ Assignment = namedtuple('Assignment', 'key value')
 
 
 class MedmBlock(object):
-    """root object of the .ald file structure : contains Medm_file"""
+    """root object of the .adl file structure : contains Medm_file"""
     
     def __init__(self, nm):
         self.name = nm.strip()
         self.contents = []
-        self.tokens = []
     
     def __str__(self, *args, **kwargs):
         return "%s(type=\"%s\")" % (type(self).__name__, self.name)
@@ -42,14 +41,14 @@ class MedmBlock(object):
 class MedmWidgetBase(object):
     """contains items common to all MEDM widgets"""
     
-    def __init__(self, parent, block_type, *args, **kwargs):
-        self.parent = parent
+    def __init__(self, root, block_type, *args, **kwargs):
+        self.root = root
         self.medm_block_type = block_type.strip('"')
         self.color = None
         self.geometry = None
         self.contents = []
         
-        msg = "token %d" % parent.tokenPos
+        msg = "token %d" % root.tokenPos
         msg += " in MEDM block %s " % self.medm_block_type
         logger.debug(msg)
     
@@ -64,11 +63,7 @@ class MedmGenericWidget(MedmWidgetBase):
         logger.warning("using generic handler for '%s' block" % args[1])
 
 
-class Medm_file(MedmWidgetBase):
-    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        parent = args[0]
+class Medm_file(MedmWidgetBase): pass
 
 
 widget_handlers = {
@@ -131,13 +126,13 @@ class MEDM_Reader(object):
                     elif self.isBlockStart:
                         handler = self.block_handlers.get(tkn.string)
                         if handler is None:
-                            block = self.parse_block(owner)
+                            block = self.parse_block(self, owner)
                         else:
                             handler(owner)
                         self.tokenPos += 1
                     else:
                         if tkn.line.find("display[") >= 0:
-                            owner.contents.append(self.parse_display_n(owner))
+                            owner.contents.append(self.parse_display_n(self))
                         else:
                             self.print_token(tkn)
             elif self.brace_nesting > level:
@@ -239,12 +234,12 @@ class MEDM_Reader(object):
         ePos = self.getNextTokenPosByType((token.NEWLINE, tokenize.NL))
         self.tokenPos = ePos - 1
         
-    def parse_block(self, owner):
+    def parse_block(self, root, owner):
         """handle most blocks"""
         tkn = self.getCurrentToken()
 
         obj = widget_handlers.get(tkn.string) or MedmGenericWidget
-        block = obj(self, tkn.string)
+        block = obj(root, tkn.string)
         logger.debug(("created %s(name=\"%s\")" % (block.__class__.__name__, tkn.string)))
         self.brace_nesting += 1
         owner.contents.append(block)
@@ -274,9 +269,9 @@ class MEDM_Reader(object):
 
         self.tokenPos += 2 + offset
         
-    def parse_display_n(self, parent):
+    def parse_display_n(self, root):
         d_name = self.getCurrentToken().line.strip().split()[0]
-        owner = MedmGenericWidget(parent, d_name)
+        owner = MedmGenericWidget(root, d_name)
         logger.debug(("created %s(name=\"%s\")" % (owner.__class__.__name__, d_name)))
         self.tokenPos = self.getNextTokenPosByType(tokenize.NL)
         
