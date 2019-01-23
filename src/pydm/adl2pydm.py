@@ -129,7 +129,7 @@ def write_pydm_ui(screen):
 
     screen_blocks = screen.root.contents[3:]    # FIXME: dynamically
     for block in screen_blocks:
-        # TODO: handle "block" if it describes a screen component
+        # TODO: handle "block" if it describes a screen component (#6)
         write_block(writer, form, block)
     
     # TODO: write widget <zorder/> elements here
