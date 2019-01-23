@@ -58,6 +58,7 @@ def write_block(writer, parent, block):
         geo = block.geometry
 
         write_geometry(writer, qw, geo.x, geo.y, geo.width, geo.height)
+        write_colors(writer, qw, block)
         write_tooltip(writer, qw, "PV: " + pv)
         propty = writer.writeProperty(qw, "readOnly", "true", tag="bool")
         write_channel(writer, qw, pv)
@@ -67,6 +68,25 @@ def write_channel(writer, parent, channel):
     propty = writer.writeOpenProperty(parent, "channel")
     propty.attrib["stdset"] = "0"      # TODO: what does this mean? (#5)
     writer.writeTaggedString(propty, value="ca://" + channel)
+
+
+def write_colors(writer, parent, block):
+    clr = block.color
+    bclr = block.background_color
+    style = ""
+    style += "%s#%s {\n" % (parent.attrib["class"], parent.attrib["name"])
+    fmt = "  %s: rgb(%d, %d, %d);\n"
+    if clr is not None:
+        style += fmt % ("color", clr.r, clr.g, clr.b)
+    if bclr is not None:
+        style += fmt % ("background-color", bclr.r, bclr.g, bclr.b)
+    style += "  }"
+
+    if clr is not None or bclr is not None:
+        propty = writer.writeOpenProperty(parent, "styleSheet")
+        ss = writer.writeOpenTag(propty, "string")
+        ss.attrib["notr"] = "true"
+        ss.text = style
 
 
 def write_customwidgets(writer, parent, customwidgets):
@@ -85,7 +105,6 @@ def write_geometry(writer, parent, x, y, width, height):
     writer.writeTaggedString(rect, "y", str(y))
     writer.writeTaggedString(rect, "width", str(width))
     writer.writeTaggedString(rect, "height", str(height))
-
 
 def write_tooltip(writer, parent, tip):
     propty = writer.writeOpenProperty(parent, "toolTip")
@@ -111,18 +130,7 @@ def write_pydm_ui(screen):
     display = getDisplayBlock(screen.root)
     geom = display.geometry
     write_geometry(writer, form, geom.x, geom.y, geom.width, geom.height)
-
-    clr = display.color
-    bclr = display.background_color
-    style = ""
-    style += "%s#%s {\n" % (form.attrib["class"], form.attrib["name"])
-    style += "  %s: rgb(%d, %d, %d);\n" % ("color", clr.r, clr.g, clr.b)
-    style += "  %s: rgb(%d, %d, %d);\n" % ("background-color", bclr.r, bclr.g, bclr.b)
-    style += "  }"
-    propty = writer.writeOpenProperty(form, "styleSheet")
-    ss = writer.writeOpenTag(propty, "string")
-    ss.attrib["notr"] = "true"
-    ss.text = style
+    write_colors(writer, form, display)
 
     propty = writer.writeOpenProperty(form, "windowTitle")
     writer.writeTaggedString(propty, value=title)
