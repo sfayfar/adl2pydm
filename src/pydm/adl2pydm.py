@@ -132,7 +132,7 @@ def write_pydm_ui(screen):
         # TODO: handle "block" if it describes a screen component (#6)
         write_block(writer, form, block)
     
-    # TODO: write widget <zorder/> elements here
+    # TODO: write widget <zorder/> elements here (#7)
 
     # TODO: need to define ONLY for the widgets actually used (#4)
     write_customwidgets(writer, root, PYDM_CUSTOM_WIDGETS)
