@@ -134,7 +134,7 @@ def write_pydm_ui(screen):
     
     # TODO: write widget <zorder/> elements here
 
-    # TODO: need to define ONLY for the widgets actually used
+    # TODO: need to define ONLY for the widgets actually used (#4)
     write_customwidgets(writer, root, PYDM_CUSTOM_WIDGETS)
 
     # TODO: write <resources/> elements here
