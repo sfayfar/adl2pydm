@@ -13,6 +13,7 @@ from output_handler import PYDM_Writer
 TEST_FILE = "/usr/local/epics/synApps_5_8/support/xxx-5-8-3/xxxApp/op/adl/xxx.adl"
 TEST_FILE = "/home/mintadmin/sandbox/synApps/support/xxx-R6-0/xxxApp/op/adl/xxx.adl"
 TEST_FILE = "/usr/local/epics/synApps_5_8/support/motor-6-9/motorApp/op/adl/motorx_all.adl"
+TEST_FILE = "/home/mintadmin/sandbox/screens/pydm/newDisplay.adl"
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -75,15 +76,21 @@ example:
 """
 CustomWidget = namedtuple('CustomWidget', 'cls extends header')
 
+# TODO: build this from only the widgets in use
+# TODO: where is this information available?
 PYDM_CUSTOM_WIDGETS = [
     CustomWidget("PyDMLineEdit", "QLineEdit", "pydm.widgets.line_edit"),
+    CustomWidget("PyDMLabel",    "QLabel",    "pydm.widgets.label"),
+    CustomWidget("PyDMEmbeddedDisplay", "QFrame", "pydm.widgets.embedded_display"),
+    # not in MEDM : CustomWidget("PyDMImageView", "QWidget", "pydm.widgets.image"),
+    CustomWidget("PyDMRelatedDisplayButton", "QPushButton", "pydm.widgets.related_display_button"),
     ]
 
 
 def write_channel(writer, parent, channel):
     propty = writer.writeOpenProperty(parent, "channel")
     propty.attrib["stdset"] = "0"      # TODO: what does this mean?
-    writer.writeTaggedString(propty, value=channel)
+    writer.writeTaggedString(propty, value="ca://" + channel)
 
 
 def write_customwidgets(writer, parent, customwidgets):
@@ -131,8 +138,8 @@ def write_pydm_ui(ui_filename):
 
 
 def main(adl_filename):
-    #reader = MEDM_Reader(TEST_FILE)
-    #reader.parse()
+    reader = MEDM_Reader(TEST_FILE)
+    reader.parse()
     write_pydm_ui("test.xml")
 
 
