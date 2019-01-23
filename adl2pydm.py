@@ -25,51 +25,6 @@ logger = logging.getLogger(__name__)
 
 
 """
-<?xml version="1.0" encoding="UTF-8"?>
-<ui version="4.0">
- <class>Form</class>
- <widget class="QWidget" name="Form">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>400</width>
-    <height>300</height>
-   </rect>
-  </property>
-  <property name="windowTitle">
-   <string>Form</string>
-  </property>
-  <widget class="PyDMLineEdit" name="PyDMLineEdit">
-   <property name="geometry">
-    <rect>
-     <x>40</x>
-     <y>40</y>
-     <width>127</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="toolTip">
-    <string/>
-   </property>
-   <property name="channel" stdset="0">
-    <string>prj:m1.VAL</string>
-   </property>
-  </widget>
- </widget>
- <customwidgets>
-  <customwidget>
-   <class>PyDMLineEdit</class>
-   <extends>QLineEdit</extends>
-   <header>pydm.widgets.line_edit</header>
-  </customwidget>
- </customwidgets>
- <resources/>
- <connections/>
-</ui>
-"""
-
-"""
 describes the PyDM connection to Qt
 
 example:
