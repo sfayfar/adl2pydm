@@ -16,7 +16,8 @@ from output_handler import PYDM_Writer
 # TEST_FILE = "/usr/local/epics/synApps_5_8/support/xxx-5-8-3/xxxApp/op/adl/xxx.adl"
 # TEST_FILE = "/home/mintadmin/sandbox/synApps/support/xxx-R6-0/xxxApp/op/adl/xxx.adl"
 # TEST_FILE = "/usr/local/epics/synApps_5_8/support/motor-6-9/motorApp/op/adl/motorx_all.adl"
-TEST_FILE = "medm/newDisplay.adl"
+TEST_FILE = "screens/medm/newDisplay.adl"
+OUTPUT_PATH = "screens/pydm"
 
 SCREEN_FILE_EXTENSION = ".ui"
 
@@ -94,9 +95,10 @@ def write_tooltip(writer, parent, tip):
 
 def write_pydm_ui(screen):
     title = os.path.split(os.path.splitext(screen.filename)[0])[-1]
-    ui_filename = title + SCREEN_FILE_EXTENSION
+    ui_filename = os.path.join(OUTPUT_PATH, title + SCREEN_FILE_EXTENSION)
     writer = PYDM_Writer(None)
     root = writer.openFile(ui_filename)
+    logging.info("writing screen file: " + ui_filename)
     writer.writeTaggedString(root, "class", title)
     form = writer.writeOpenTag(root, "widget", cls="QWidget", name="Form")
     
