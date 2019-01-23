@@ -3,6 +3,7 @@
 write the screen in the new protocol
 """
 
+from collections import namedtuple
 import logging
 import os
 from xml.dom import minidom
@@ -18,33 +19,39 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
-class Qt_zOrder:
-    """
-    control the stacking order of Qt widgets - important!
+"""
+control the stacking order of Qt widgets - important!
 
-    Sets the stacking order of sibling items. 
-    By default the stacking order is 0.
+Sets the stacking order of sibling items. 
+By default the stacking order is 0.
 
-    * Items with a higher stacking value are drawn
-        on top of siblings with a lower stacking order. 
-    * Items with the same stacking value are drawn 
-        bottom up in the order they appear. 
-    * Items with a negative stacking value are drawn 
-        under their parent's content.
+* Items with a higher stacking value are drawn
+    on top of siblings with a lower stacking order. 
+* Items with the same stacking value are drawn 
+    bottom up in the order they appear. 
+* Items with a negative stacking value are drawn 
+    under their parent's content.
     
-    Example how the zorder is given in the .ui file:
+PARAMS
 
-        <zorder>caRectangle_0</zorder>
-        <zorder>caRectangle_1</zorder>
-        <zorder>caLabel_0</zorder>
-        <zorder>caLabel_1</zorder>
-        ...
-    """    
-    
-    def __init__(self, text, order, vis):
-        self.order = order  # sorting order
-        self.vis = vis      # is this widget visible?
-        self.text = text    # the text content
+order (int) :
+    sorting order
+
+vis (int) :
+    is this widget visible?
+
+text (str) :
+    the text content
+
+Example how the zorder is given in the .ui file:
+
+    <zorder>caRectangle_0</zorder>
+    <zorder>caRectangle_1</zorder>
+    <zorder>caLabel_0</zorder>
+    <zorder>caLabel_1</zorder>
+    ...
+"""    
+Qt_zOrder = namedtuple('Qt_zOrder', 'order vis text')
 
 
 class PYDM_Writer(object):
@@ -202,5 +209,5 @@ def test2():
     writer.closeFile()
 
 
-# if __name__ == "__main__":
-#     test2()
+if __name__ == "__main__":
+    test2()
