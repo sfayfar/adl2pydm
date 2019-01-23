@@ -65,7 +65,7 @@ def write_block(writer, parent, block):
 
 def write_channel(writer, parent, channel):
     propty = writer.writeOpenProperty(parent, "channel")
-    propty.attrib["stdset"] = "0"      # TODO: what does this mean?
+    propty.attrib["stdset"] = "0"      # TODO: what does this mean? (#5)
     writer.writeTaggedString(propty, value="ca://" + channel)
 
 
