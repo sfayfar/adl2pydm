@@ -138,7 +138,7 @@ def write_pydm_ui(screen):
     write_customwidgets(writer, root, PYDM_CUSTOM_WIDGETS)
 
     # TODO: write .ui file <resources/> elements here (#9)
-    # TODO: write .ui file <connections/> elements here
+    # TODO: write .ui file <connections/> elements here (#10)
 
     writer.closeFile()
 
