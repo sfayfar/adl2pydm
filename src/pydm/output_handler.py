@@ -138,13 +138,13 @@ class PYDM_Writer(object):
     def writeCloseProperty(self):
         pass        # nothing to do
 
-    def writeStyleSheet(self, parent, r, g, b):
-        # TODO: needed by PyDM?
-        prop = self.writeOpenProperty(parent, name="styleSheet")
-        
-        fmt = "\n\nQWidget#centralWidget {background: rgba(%d, %d, %d, %d;}\n\n"
-        color = fmt % (r, g, b, 255)
-        self.writeTaggedString(prop, value=color)
+    # def writeStyleSheet(self, parent, r, g, b):
+    #     # TODO: needed by PyDM?
+    #     prop = self.writeOpenProperty(parent, name="styleSheet")
+    #     
+    #     fmt = "\n\nQWidget#centralWidget {background: rgba(%d, %d, %d, %d;}\n\n"
+    #     color = fmt % (r, g, b, 255)
+    #     self.writeTaggedString(prop, value=color)
 
     def writeOpenTag(self, parent, tag, cls="", name=""):
         if parent is None:
