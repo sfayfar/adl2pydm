@@ -1,0 +1,61 @@
+<?xml version="1.0" ?>
+<ui version="4.0">
+  <class>newDisplay</class>
+  <widget class="QWidget" name="Form">
+    <property name="geometry">
+      <rect>
+        <x>95</x>
+        <y>151</y>
+        <width>250</width>
+        <height>120</height>
+      </rect>
+    </property>
+    <property name="styleSheet">
+      <string notr="true">QWidget#Form {
+  color: rgb(0, 0, 0);
+  background-color: rgb(187, 187, 187);
+  }</string>
+    </property>
+    <property name="windowTitle">
+      <string>newDisplay</string>
+    </property>
+    <widget class="PyDMLineEdit" name="PyDMLineEdit">
+      <property name="geometry">
+        <rect>
+          <x>40</x>
+          <y>40</y>
+          <width>127</width>
+          <height>21</height>
+        </rect>
+      </property>
+      <property name="toolTip">
+        <string/>
+      </property>
+      <property name="channel" stdset="0">
+        <string>ca://prj:m1.VAL</string>
+      </property>
+    </widget>
+  </widget>
+  <customwidgets>
+    <customwidget>
+      <class>PyDMLineEdit</class>
+      <extends>QLineEdit</extends>
+      <header>pydm.widgets.line_edit</header>
+    </customwidget>
+    <customwidget>
+      <class>PyDMLabel</class>
+      <extends>QLabel</extends>
+      <header>pydm.widgets.label</header>
+    </customwidget>
+    <customwidget>
+      <class>PyDMEmbeddedDisplay</class>
+      <extends>QFrame</extends>
+      <header>pydm.widgets.embedded_display</header>
+    </customwidget>
+    <customwidget>
+      <class>PyDMRelatedDisplayButton</class>
+      <extends>QPushButton</extends>
+      <header>pydm.widgets.related_display_button</header>
+    </customwidget>
+  </customwidgets>
+</ui>
