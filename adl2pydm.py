@@ -92,6 +92,22 @@ PYDM_CUSTOM_WIDGETS = [
     ]
 
 
+def write_block(writer, parent, block):
+    if block.medm_block_type == "text update":
+        cls = "PyDMLineEdit"
+        nm = cls        # FIXME: must be unique in the file!
+        qw = writer.writeOpenTag(parent, "widget", cls=cls, name=nm)
+        # pv = "prj:m1.VAL"     # FIXME: get this from block.contents[0].contents[0].chan.value
+        pv = block.contents[0].contents[0].value   # FIXME: dynamically
+        
+        geo = block.geometry
+
+        write_geometry(writer, qw, geo.x, geo.y, geo.width, geo.height)
+        write_tooltip(writer, qw, "PV: " + pv)
+        propty = writer.writeProperty(qw, "readOnly", "true", tag="bool")
+        write_channel(writer, qw, pv)
+
+
 def write_channel(writer, parent, channel):
     propty = writer.writeOpenProperty(parent, "channel")
     propty.attrib["stdset"] = "0"      # TODO: what does this mean?
@@ -155,13 +171,14 @@ def write_pydm_ui(screen):
     propty = writer.writeOpenProperty(form, "windowTitle")
     writer.writeTaggedString(propty, value=title)
 
-    qw = writer.writeOpenTag(form, "widget", cls="PyDMLineEdit", name="PyDMLineEdit")
-    write_geometry(writer, qw, 40, 40, 127, 21)
-    write_tooltip(writer, qw, "")
-    write_channel(writer, qw, "prj:m1.VAL")
+    screen_blocks = screen.root.contents[3:]    # FIXME: dynamically
+    for block in screen_blocks:
+        # TODO: handle "block" if it describes a screen component
+        write_block(writer, form, block)
     
     # TODO: write widget <zorder/> elements here
 
+    # TODO: need to define ONLY for the widgets actually used
     write_customwidgets(writer, root, PYDM_CUSTOM_WIDGETS)
 
     # TODO: write <resources/> elements here
