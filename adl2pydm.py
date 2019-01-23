@@ -1,19 +1,24 @@
 
 """
 convert MEDM .adl screen file(s) to PyDM .ui format
+
+Only rely on packages in this project or from the standard Python distribution. 
 """
 
 from collections import namedtuple
 import logging
+import os
 
 from adl_parser import MEDM_Reader
 from output_handler import PYDM_Writer
 
 
-TEST_FILE = "/usr/local/epics/synApps_5_8/support/xxx-5-8-3/xxxApp/op/adl/xxx.adl"
-TEST_FILE = "/home/mintadmin/sandbox/synApps/support/xxx-R6-0/xxxApp/op/adl/xxx.adl"
-TEST_FILE = "/usr/local/epics/synApps_5_8/support/motor-6-9/motorApp/op/adl/motorx_all.adl"
-TEST_FILE = "/home/mintadmin/sandbox/screens/pydm/newDisplay.adl"
+# TEST_FILE = "/usr/local/epics/synApps_5_8/support/xxx-5-8-3/xxxApp/op/adl/xxx.adl"
+# TEST_FILE = "/home/mintadmin/sandbox/synApps/support/xxx-R6-0/xxxApp/op/adl/xxx.adl"
+# TEST_FILE = "/usr/local/epics/synApps_5_8/support/motor-6-9/motorApp/op/adl/motorx_all.adl"
+TEST_FILE = "medm/newDisplay.adl"
+
+SCREEN_FILE_EXTENSION = ".ui"
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -116,23 +121,51 @@ def write_tooltip(writer, parent, tip):
     writer.writeTaggedString(propty, value=tip)
 
 
-def write_pydm_ui(ui_filename):
+def write_pydm_ui(screen):
+    title = os.path.split(os.path.splitext(screen.filename)[0])[-1]
+    ui_filename = title + SCREEN_FILE_EXTENSION
     writer = PYDM_Writer(None)
     root = writer.openFile(ui_filename)
-    writer.writeTaggedString(root, "class", "Form")
+    writer.writeTaggedString(root, "class", title)
     form = writer.writeOpenTag(root, "widget", cls="QWidget", name="Form")
+    
+    def getDisplayBlock(base):
+        for item in base.contents:
+            if hasattr(item, "medm_block_type") and item.medm_block_type == "display": 
+                return item
+        # failure is not an option
+        raise ValueError("Did not find display block")
 
-    write_geometry(writer, form, 0, 0, 400, 300)
+    display = getDisplayBlock(screen.root)
+    geom = display.geometry
+    write_geometry(writer, form, geom.x, geom.y, geom.width, geom.height)
+
+    clr = display.color
+    bclr = display.background_color
+    style = ""
+    style += "%s#%s {\n" % (form.attrib["class"], form.attrib["name"])
+    style += "  %s: rgb(%d, %d, %d);\n" % ("color", clr.r, clr.g, clr.b)
+    style += "  %s: rgb(%d, %d, %d);\n" % ("background-color", bclr.r, bclr.g, bclr.b)
+    style += "  }"
+    propty = writer.writeOpenProperty(form, "styleSheet")
+    ss = writer.writeOpenTag(propty, "string")
+    ss.attrib["notr"] = "true"
+    ss.text = style
 
     propty = writer.writeOpenProperty(form, "windowTitle")
-    writer.writeTaggedString(propty, value="Form")
+    writer.writeTaggedString(propty, value=title)
 
     qw = writer.writeOpenTag(form, "widget", cls="PyDMLineEdit", name="PyDMLineEdit")
     write_geometry(writer, qw, 40, 40, 127, 21)
     write_tooltip(writer, qw, "")
     write_channel(writer, qw, "prj:m1.VAL")
     
+    # TODO: write widget <zorder/> elements here
+
     write_customwidgets(writer, root, PYDM_CUSTOM_WIDGETS)
+
+    # TODO: write <resources/> elements here
+    # TODO: write <connections/> elements here
 
     writer.closeFile()
 
@@ -140,7 +173,7 @@ def write_pydm_ui(ui_filename):
 def main(adl_filename):
     reader = MEDM_Reader(TEST_FILE)
     reader.parse()
-    write_pydm_ui("test.xml")
+    write_pydm_ui(reader)
 
 
 if __name__ == "__main__":
