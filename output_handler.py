@@ -1,6 +1,8 @@
 
 """
-write the screen in the new protocol
+write the screen in the new XML protocol
+
+Only rely on packages in the standard Python distribution. (rules out lxml)
 """
 
 from collections import namedtuple
