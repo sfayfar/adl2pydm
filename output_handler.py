@@ -120,16 +120,17 @@ class PYDM_Writer(object):
 
     def writeProperty(self, parent, name, value, tag="string"):
         prop = self.writeOpenTag(parent, "property", name=name)
-        self.writeTaggedString(prop, value, tag)
+        self.writeTaggedString(prop, tag, value)
         return prop
     
     def writeOpenProperty(self, parent, name):
-        prop = self.writeOpenTag(parent, "property", name=prop)
+        prop = self.writeOpenTag(parent, "property", name=name)
         return prop
     
-    def writeTaggedString(self, parent, value, tag="string"):
+    def writeTaggedString(self, parent, tag="string", value=None):
         element = ElementTree.SubElement(parent, tag)
-        element.text = value
+        if value is not None:
+            element.text = value
         return element
 
     def writeCloseProperty(self):
@@ -141,15 +142,16 @@ class PYDM_Writer(object):
         
         fmt = "\n\nQWidget#centralWidget {background: rgba(%d, %d, %d, %d;}\n\n"
         color = fmt % (r, g, b, 255)
-        self.writeTaggedString(prop, color)
+        self.writeTaggedString(prop, value=color)
 
     def writeOpenTag(self, parent, tag, cls="", name=""):
         if parent is None:
             msg = "writeOpenTag(): parent is None, cannot continue"
             raise ValueError(msg)
         element = ElementTree.SubElement(parent, tag)
-        if len(cls) > 0 and len(name)>0:
+        if len(cls) > 0:
             element.attrib["class"] = cls
+        if len(name) > 0:
             element.attrib["name"] = name
         return element
 
