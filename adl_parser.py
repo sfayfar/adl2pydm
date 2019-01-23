@@ -1,6 +1,9 @@
 
 """
-use the tokenizer to read the MEDM file
+read the MEDM .adl file into Python data structures
+
+Use Python's tokenizer package to analyze and parse.
+Only rely on packages in the standard Python distribution. 
 """
 
 from collections import namedtuple
