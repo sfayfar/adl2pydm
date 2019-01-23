@@ -37,8 +37,7 @@ example:
 """
 CustomWidget = namedtuple('CustomWidget', 'cls extends header')
 
-# TODO: build this from only the widgets in use
-# TODO: where is this information available?
+# TODO: build this from only the widgets in use (#4)
 PYDM_CUSTOM_WIDGETS = [
     CustomWidget("PyDMLineEdit", "QLineEdit", "pydm.widgets.line_edit"),
     CustomWidget("PyDMLabel",    "QLabel",    "pydm.widgets.label"),
