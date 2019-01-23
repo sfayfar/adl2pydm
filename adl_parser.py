@@ -221,22 +221,38 @@ class MEDM_Reader(object):
         return False
         
     def mapColors(self):
-        """walk the widget stack and convert clr & bclr to Color()"""
+        """
+        walk the widget stack and convert clr & bclr to Color()
+        
+        This has to be done after the entire .ald is parsed since the
+        color map does not appear until *after* the first color is used.
+        """
         clut = self.color_table     # Color LookUp Table from MEDM's "color map" block
         
-        def remap_colors(widget):
+        def remap_colors(prefix, widget):
+            prefix += "." + widget.medm_block_type
+            contents = []  # so we can remove clr & bclr from the contents list
+            mapping = dict(clr="color", bclr="background_color")
             for item in widget.contents:
                 if isinstance(item, Assignment):
-                    if item.key == "clr":
-                        widget.color = clut[int(item.value)]
-                        # TODO: pop that Assignment from the contents list
-                    elif item.key == "bclr":
-                        widget.background_color = clut[int(item.value)]
-                        # TODO: pop that Assignment from the contents list
+                    target = mapping.get(item.key)
+                    if target is not None:
+                        setattr(widget, target, clut[int(item.value)])
+                        msg = "mapping: %s: %s=%s to %s" % (
+                            prefix,
+                            item.key, 
+                            item.value, 
+                            str(getattr(widget, target)))
+                        logger.debug(msg)
+                    else:
+                        contents.append(item)
                 elif isinstance(widget, (MedmBlock, Medm_file, MedmGenericWidget)):
-                    remap_colors(item)
+                    remap_colors(prefix, item)
+                    contents.append(item)
+            widget.contents = contents  # revised list without clr or bclr
 
-        remap_colors(self.root)
+        for item in self.root.contents:
+            remap_colors(self.root.name, item)
 
     @property
     def numTokens(self):
