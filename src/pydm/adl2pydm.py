@@ -127,7 +127,7 @@ def write_pydm_ui(screen):
     propty = writer.writeOpenProperty(form, "windowTitle")
     writer.writeTaggedString(propty, value=title)
 
-    screen_blocks = screen.root.contents[3:]    # FIXME: dynamically
+    screen_blocks = screen.root.contents[3:]    # FIXME: dynamically (#8)
     for block in screen_blocks:
         # TODO: handle "block" if it describes a screen component (#6)
         write_block(writer, form, block)
