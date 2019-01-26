@@ -14,8 +14,8 @@ from output_handler import PYDM_Writer
 
 
 # TEST_FILE = "/usr/local/epics/synApps_5_8/support/xxx-5-8-3/xxxApp/op/adl/xxx.adl"
-# TEST_FILE = "/home/mintadmin/sandbox/synApps/support/xxx-R6-0/xxxApp/op/adl/xxx.adl"
-TEST_FILE = "/usr/local/epics/synApps_5_8/support/motor-6-9/motorApp/op/adl/motorx_all.adl"
+TEST_FILE = "/home/mintadmin/sandbox/synApps/support/xxx-R6-0/xxxApp/op/adl/xxx.adl"
+# TEST_FILE = "/usr/local/epics/synApps_5_8/support/motor-6-9/motorApp/op/adl/motorx_all.adl"
 # TEST_FILE = "screens/medm/newDisplay.adl"
 OUTPUT_PATH = "screens/pydm"
 
@@ -88,6 +88,7 @@ def write_block(writer, parent, block):
         qw = writer.writeOpenTag(parent, "widget", cls=cls, name=nm)
         write_geometry(writer, qw, block.geometry)
         write_colors(writer, qw, block)
+        write_tooltip(writer, qw, "TBA widget: " + nm)
 
 
 def write_channel(writer, parent, channel):
