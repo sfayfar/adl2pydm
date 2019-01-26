@@ -15,8 +15,8 @@ from output_handler import PYDM_Writer
 
 # TEST_FILE = "/usr/local/epics/synApps_5_8/support/xxx-5-8-3/xxxApp/op/adl/xxx.adl"
 # TEST_FILE = "/home/mintadmin/sandbox/synApps/support/xxx-R6-0/xxxApp/op/adl/xxx.adl"
-# TEST_FILE = "/usr/local/epics/synApps_5_8/support/motor-6-9/motorApp/op/adl/motorx_all.adl"
-TEST_FILE = "screens/medm/newDisplay.adl"
+TEST_FILE = "/usr/local/epics/synApps_5_8/support/motor-6-9/motorApp/op/adl/motorx_all.adl"
+# TEST_FILE = "screens/medm/newDisplay.adl"
 OUTPUT_PATH = "screens/pydm"
 
 SCREEN_FILE_EXTENSION = ".ui"
@@ -47,21 +47,47 @@ PYDM_CUSTOM_WIDGETS = [
     ]
 
 
+unique_widget_names = {}    # will not work right when second file is processed!
+
+
+def getUniqueName(suggestion):
+    unique = suggestion
+    
+    if unique in unique_widget_names:
+        knowns = unique_widget_names[suggestion]
+        unique = "%s_%d" % (suggestion, len(knowns))
+        if unique in unique_widget_names:
+            msg = "trouble getting a unique name from " + suggestion
+            msg += "\n  complicated:\n%s" % str(unique_widget_names)
+            raise ValueError(msg)
+    else:
+        unique = suggestion
+        unique_widget_names[suggestion] = []
+
+    # add this one to the list
+    unique_widget_names[suggestion].append(unique)
+    
+    return unique
+
+
 def write_block(writer, parent, block):
+    nm = getUniqueName(block.medm_block_type.replace(" ", "_"))
     if block.medm_block_type == "text update":
         cls = "PyDMLineEdit"
-        nm = cls        # FIXME: must be unique in the file!
         qw = writer.writeOpenTag(parent, "widget", cls=cls, name=nm)
         # pv = "prj:m1.VAL"     # FIXME: get this from block.contents[0].contents[0].chan.value
         pv = block.contents[0].contents[0].value   # FIXME: dynamically
-        
-        geo = block.geometry
 
-        write_geometry(writer, qw, geo.x, geo.y, geo.width, geo.height)
+        write_geometry(writer, qw, block.geometry)
         write_colors(writer, qw, block)
         write_tooltip(writer, qw, "PV: " + pv)
         propty = writer.writeProperty(qw, "readOnly", "true", tag="bool")
         write_channel(writer, qw, pv)
+    else:
+        cls = "QWidget"     # generic placeholder now
+        qw = writer.writeOpenTag(parent, "widget", cls=cls, name=nm)
+        write_geometry(writer, qw, block.geometry)
+        write_colors(writer, qw, block)
 
 
 def write_channel(writer, parent, channel):
@@ -98,13 +124,16 @@ def write_customwidgets(writer, parent, customwidgets):
         writer.writeTaggedString(cw, "header", item.header)
 
 
-def write_geometry(writer, parent, x, y, width, height):
+def write_geometry(writer, parent, geom):
     propty = writer.writeOpenProperty(parent, "geometry")
     rect = writer.writeOpenTag(propty, "rect")
-    writer.writeTaggedString(rect, "x", str(x))
-    writer.writeTaggedString(rect, "y", str(y))
-    writer.writeTaggedString(rect, "width", str(width))
-    writer.writeTaggedString(rect, "height", str(height))
+    if str(geom.x) == "-":
+        _debug_ = True
+    writer.writeTaggedString(rect, "x", str(geom.x))
+    writer.writeTaggedString(rect, "y", str(geom.y))
+    writer.writeTaggedString(rect, "width", str(geom.width))
+    writer.writeTaggedString(rect, "height", str(geom.height))
+
 
 def write_tooltip(writer, parent, tip):
     propty = writer.writeOpenProperty(parent, "toolTip")
@@ -120,25 +149,15 @@ def write_pydm_ui(screen):
     writer.writeTaggedString(root, "class", title)
     form = writer.writeOpenTag(root, "widget", cls="QWidget", name="Form")
     
-    def getDisplayBlock(base):
-        for item in base.contents:
-            if hasattr(item, "medm_block_type") and item.medm_block_type == "display": 
-                return item
-        # failure is not an option
-        raise ValueError("Did not find display block")
-
-    display = getDisplayBlock(screen.root)
-    geom = display.geometry
-    write_geometry(writer, form, geom.x, geom.y, geom.width, geom.height)
-    write_colors(writer, form, display)
+    write_geometry(writer, form, screen.root.geometry)
+    write_colors(writer, form, screen.root)
 
     propty = writer.writeOpenProperty(form, "windowTitle")
     writer.writeTaggedString(propty, value=title)
 
-    screen_blocks = screen.root.contents[3:]    # FIXME: dynamically (#8)
-    for block in screen_blocks:
-        # TODO: handle "block" if it describes a screen component (#6)
-        write_block(writer, form, block)
+    for widget in screen.root.widgets:
+        # TODO: handle "widget" if it describes a screen component (#6)
+        write_block(writer, form, widget)
     
     # TODO: write widget <zorder/> elements here (#7)
 

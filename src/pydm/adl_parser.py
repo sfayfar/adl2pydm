@@ -8,6 +8,7 @@ Only rely on packages in the standard Python distribution.
 
 from collections import namedtuple
 import logging
+import os
 import token
 import tokenize
 
@@ -156,6 +157,31 @@ class MEDM_Reader(object):
             self.tokenPos += 1
 
         self.mapColors()
+        self.root.widgets = []
+        # FIXME: geometry of composite blocks is wrong: Geometry(x='-', y='2147483496', width='1', height='1')
+        for item in self.root.contents:
+            if isinstance(item, Medm_file):
+                ref = {a.key: a.value for a in item.contents}
+                self.root.filename = ref["name"]
+                self.root.version = ref["version"]
+                self.root.name = os.path.splitext(os.path.split(ref["name"])[-1])[0]
+                # del item.contents
+            elif isinstance(item, MedmGenericWidget) and item.medm_block_type == "display":
+                self.root.geometry = item.geometry
+                self.root.color = item.color
+                self.root.background_color = item.background_color
+            elif isinstance(item, MedmGenericWidget) and item.medm_block_type == "color map":
+                pass
+            else:
+                self.root.widgets.append(item)
+        # del self.contents
+        _debug_ = True
+        # TODO: get the object block for most widgets (has geometry info)
+        # TODO: get the control block for some widgets (has PV channel info)
+        # TODO: get the monitor block for some widgets (has PV channel info)
+        # TODO: get the display[n] blocks for "related display" widgets
+        # TODO: get the "basic attribute" block for some widgets
+        # TODO: get the "dynamic attribute" block for some widgets
         
     def adjustLevel(self, tkn):
         if tkn.string == "{":
