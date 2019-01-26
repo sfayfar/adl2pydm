@@ -359,15 +359,16 @@ class MEDM_Reader(object):
 
     def parseObject(self, owner):
         """handle object (widget bounding box geometry) block"""
-        self.tokenPos += 1
         ref = {}
-
-        for _i in "x y width height".split():
-            self.tokenPos = self.getNextTokenPosByType(token.NAME)
-            key = self.getCurrentToken().string
-            value = self.getCurrentToken(2).string
+        self.tokenPos += 1
+        self.tokenPos = self.getNextTokenPosByType(tokenize.NL) + 1
+        tkn = self.getCurrentToken()
+        
+        while tkn.string != "}":
+            key, value = tkn.line.strip().split("=")
             ref[key] = value
-
+            self.tokenPos = self.getNextTokenPosByType(tokenize.NL) + 1
+            tkn = self.getCurrentToken()
         owner.geometry = Geometry(ref["x"], ref["y"], ref["width"], ref["height"])
         logger.debug(("geometry: %s" % str(owner.geometry)))
         self.tokenPos = self.getNextTokenPosByType(token.OP)-1
