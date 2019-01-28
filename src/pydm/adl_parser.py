@@ -158,7 +158,6 @@ class MEDM_Reader(object):
 
         self.mapColors()
         self.root.widgets = []
-        # FIXME: geometry of composite blocks is wrong: Geometry(x='-', y='2147483496', width='1', height='1')
         for item in self.root.contents:
             if isinstance(item, Medm_file):
                 ref = {a.key: a.value for a in item.contents}
@@ -258,27 +257,28 @@ class MEDM_Reader(object):
         """
         clut = self.color_table     # Color LookUp Table from MEDM's "color map" block
         
-        def remap_colors(prefix, widget):
-            prefix += "." + widget.medm_block_type
+        def remap_colors(prefix, block):
+            prefix += "." + block.medm_block_type
             contents = []  # so we can remove clr & bclr from the contents list
             mapping = dict(clr="color", bclr="background_color")
-            for item in widget.contents:
+            for item in block.contents:
                 if isinstance(item, Assignment):
                     target = mapping.get(item.key)
                     if target is not None:
-                        setattr(widget, target, clut[int(item.value)])
+                        setattr(block, target, clut[int(item.value)])
                         msg = "mapping: %s: %s=%s to %s" % (
                             prefix,
                             item.key, 
                             item.value, 
-                            str(getattr(widget, target)))
+                            str(getattr(block, target)))
                         logger.debug(msg)
+                        # TODO: Careful here!  Might be deleting non-color declarations such as channel or visibility.
                     else:
                         contents.append(item)
-                elif isinstance(widget, (MedmBlock, Medm_file, MedmGenericWidget)):
+                elif isinstance(block, (MedmBlock, Medm_file, MedmGenericWidget)):
                     remap_colors(prefix, item)
                     contents.append(item)
-            widget.contents = contents  # revised list without clr or bclr
+            block.contents = contents  # revised list without clr or bclr
 
         for item in self.root.contents:
             remap_colors(self.root.name, item)
