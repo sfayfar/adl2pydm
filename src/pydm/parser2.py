@@ -10,6 +10,8 @@ from collections import defaultdict, namedtuple
 import logging
 import os
 
+import adl_symbols
+
 
 TEST_FILES = [
     "screens/medm/xxx-R5-8-4.adl",
@@ -17,7 +19,7 @@ TEST_FILES = [
     "screens/medm/motorx-R6-10-1.adl",
     "screens/medm/motorx_all-R6-10-1.adl",
     "screens/medm/scanDetPlot-R2-11-1.adl",
-    "screens/medm/beamHistory_full-R3-5.adl",
+    # "screens/medm/beamHistory_full-R3-5.adl", # this .adl has problems
     "screens/medm/ADBase-R3-3-1.adl",
     "screens/medm/simDetector-R3-3-31.adl",
     ]
@@ -36,21 +38,6 @@ Geometry = namedtuple('Geometry', 'x y width height')
 Point = namedtuple('Point', 'x y')
 
 
-ATTRIBUTE_BLOCK_NAMES = [
-    "basic attribute",      #
-    "color map",            # color table
-    "colors",               # color specification
-    "control",              # PV and visibility of control (rw) widget
-    "display",              # parameters of main window
-    "dynamic attribute",    # calculated widget visibility
-    "file",                 # designer's file name and version
-    "limits",               #
-    "monitor",              # PV and visibility of monitor (ro) widget
-    "object",               # geometry
-    "points",               # widget vertices
-    ]
-
-
 class MEDM_Widget(object):
     """
     """
@@ -62,13 +49,21 @@ class MEDM_Widget(object):
         self.geometry = Geometry(0, 0, 0, 0)
         self.color = Color(0, 0, 0)
         self.background_color = Color(0, 0, 0)
+    
+    def __str__(self, *args, **kwargs):
+        return "%s(type=\"%s\", line=%d, adl_file=\"%s\")" % (
+            type(self).__name__, 
+            self.medm_widget,
+            self.starting_line,
+            self.adl_file_name,
+            )
 
 
-class MEDM_CompositeWidget(object):
+class MEDM_CompositeWidget(MEDM_Widget):
     """
     """
     
-    def __init__(self, widget_type, adl_file, line):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.children = []
 
@@ -82,6 +77,7 @@ class AdlFile(object):
         self.color_map = []
         self.attr = {}
         self.nesting = 0
+        self.widgets = []
 
     def parse(self, owner=None, level=0):
         owner = owner or self
@@ -97,10 +93,25 @@ class AdlFile(object):
                 if text.endswith("{"):
                     self.nesting += 1
                     key = text[:-1].strip().lstrip('"').rstrip('"')
-                    if key not in ATTRIBUTE_BLOCK_NAMES:
+                    if key in adl_symbols.widgets:
+                        if key == "composite":
+                            widget = MEDM_CompositeWidget(key, self.filename, line)
+                        else:
+                            widget = MEDM_Widget(key, self.filename, line)
+                        self.widgets.append(widget)
+                        logging.debug("%d : %s  - widget (nesting=%d)" % (line, key, self.nesting))
+                    elif key in adl_symbols.blocks:
                         object_catalog[key] += 1
-                    is_attr = str(key in ATTRIBUTE_BLOCK_NAMES)
-                    logging.debug("%d : %s  - open block (nesting=%d attribute=%s)" % (line, key, self.nesting, is_attr))
+                        logging.debug("%d : %s  - open block (nesting=%d)" % (line, key, self.nesting))
+                    else:
+                        key_start = key.split("[")[0] + "["
+                        if key_start in adl_symbols.block_lists:
+                            object_catalog[key] += 1
+                            logging.debug("%d : %s  - open block list (nesting=%d)" % (line, key, self.nesting))
+                        else:
+                            msg = "%d : %s  - not recognized (nesting=%d)" % (line, key, self.nesting)
+                            logger.warn(msg)
+                            raise RuntimeError(msg)
     
                 elif text.endswith("}"):
                     logging.debug("%d : close block (nesting=%d)" % (line, self.nesting))
@@ -155,6 +166,7 @@ class MedmCompositeWidget(object):
 
 
 if __name__ == "__main__":
-    adl = AdlFile(TEST_FILES[0])
-    adl.parse()
+    for fname in TEST_FILES:
+        adl = AdlFile(fname)
+        adl.parse()
     print("done")
