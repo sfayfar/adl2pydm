@@ -11,10 +11,11 @@ import logging
 import os
 
 
-TEST_FILE = "/usr/local/epics/synApps_5_8/support/xxx-5-8-3/xxxApp/op/adl/xxx.adl"
-TEST_FILE = "/home/mintadmin/sandbox/synApps/support/xxx-R6-0/xxxApp/op/adl/xxx.adl"
-TEST_FILE = "/usr/local/epics/synApps_5_8/support/motor-6-9/motorApp/op/adl/motorx_all.adl"
-TEST_FILE = "/home/mintadmin/sandbox/synApps/support/sscan-R2-11-1/sscanApp/op/adl/scanDetPlot.adl"
+TEST_FILE = "screens/medm/xxx-R5-8-4.adl"
+TEST_FILE = "screens/medm/xxx-R6-0.adl"
+TEST_FILE = "screens/medm/motorx-R6-10-1.adl"
+TEST_FILE = "screens/medm/motorx_all-R6-10-1.adl"
+TEST_FILE = "screens/medm/scanDetPlot-R2-11-1.adl"
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
