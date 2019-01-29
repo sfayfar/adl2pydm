@@ -18,6 +18,8 @@ TEST_FILES = [
     "screens/medm/motorx_all-R6-10-1.adl",
     "screens/medm/scanDetPlot-R2-11-1.adl",
     "screens/medm/beamHistory_full-R3-5.adl",
+    "screens/medm/ADBase-R3-3-1.adl",
+    "screens/medm/simDetector-R3-3-31.adl",
     ]
 
 logging.basicConfig(level=logging.DEBUG)
