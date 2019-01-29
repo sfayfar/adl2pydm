@@ -11,11 +11,14 @@ import logging
 import os
 
 
-TEST_FILE = "screens/medm/xxx-R5-8-4.adl"
-TEST_FILE = "screens/medm/xxx-R6-0.adl"
-TEST_FILE = "screens/medm/motorx-R6-10-1.adl"
-TEST_FILE = "screens/medm/motorx_all-R6-10-1.adl"
-TEST_FILE = "screens/medm/scanDetPlot-R2-11-1.adl"
+TEST_FILES = [
+    "screens/medm/xxx-R5-8-4.adl",
+    "screens/medm/xxx-R6-0.adl",
+    "screens/medm/motorx-R6-10-1.adl",
+    "screens/medm/motorx_all-R6-10-1.adl",
+    "screens/medm/scanDetPlot-R2-11-1.adl",
+    "screens/medm/beamHistory_full-R3-5.adl",
+    ]
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -124,6 +127,6 @@ class MedmCompositeWidget(object):
 
 
 if __name__ == "__main__":
-    adl = AdlFile(TEST_FILE)
+    adl = AdlFile(TEST_FILE[0])
     adl.parse()
     print("done")
