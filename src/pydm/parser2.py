@@ -127,6 +127,6 @@ class MedmCompositeWidget(object):
 
 
 if __name__ == "__main__":
-    adl = AdlFile(TEST_FILE[0])
+    adl = AdlFile(TEST_FILES[0])
     adl.parse()
     print("done")
