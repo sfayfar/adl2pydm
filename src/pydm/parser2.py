@@ -49,6 +49,28 @@ ATTRIBUTE_BLOCK_NAMES = [
     ]
 
 
+class MEDM_Widget(object):
+    """
+    """
+    
+    def __init__(self, widget_type, adl_file, line, *args, **kwargs):
+        self.medm_widget = widget_type
+        self.adl_file_name = adl_file
+        self.starting_line = line
+        self.geometry = Geometry(0, 0, 0, 0)
+        self.color = Color(0, 0, 0)
+        self.background_color = Color(0, 0, 0)
+
+
+class MEDM_CompositeWidget(object):
+    """
+    """
+    
+    def __init__(self, widget_type, adl_file, line):
+        super().__init__(*args, **kwargs)
+        self.children = []
+
+
 class AdlFile(object):
     """
     """
@@ -66,8 +88,10 @@ class AdlFile(object):
         var_catalog = defaultdict(int)
 
         with open(self.filename, "r") as fp:
-            for line, text in enumerate(fp.readlines()):
-                text = text.rstrip()
+            buf = fp.readlines()
+            line = 0
+            while line < len(buf):
+                text = buf[line].rstrip()
                 if text.endswith("{"):
                     self.nesting += 1
                     key = text[:-1].strip().lstrip('"').rstrip('"')
@@ -97,6 +121,8 @@ class AdlFile(object):
     
                 else:
                     logging.debug("%d : unrecognized: |%s|" % (line, text))
+
+                line += 1
     
         for catalog in (object_catalog, var_catalog):
             logger.debug("#"*40)
