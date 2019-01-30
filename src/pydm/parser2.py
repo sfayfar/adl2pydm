@@ -40,6 +40,7 @@ Point = namedtuple('Point', 'x y')
 
 class MEDM_Widget(object):
     """
+    describe one widget in the .adl file
     """
     
     def __init__(self, widget_type, adl_file, line, *args, **kwargs):
@@ -61,15 +62,17 @@ class MEDM_Widget(object):
 
 class MEDM_CompositeWidget(MEDM_Widget):
     """
+    container for a grouped list of widgets
     """
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.children = []
+        self.widgets = []
 
 
 class AdlFile(object):
     """
+    describes the root of the .adl file
     """
     
     def __init__(self, filename):
@@ -96,9 +99,10 @@ class AdlFile(object):
                     if key in adl_symbols.widgets:
                         if key == "composite":
                             widget = MEDM_CompositeWidget(key, self.filename, line)
+                            # TODO: self.parse(widget, level +1)
                         else:
                             widget = MEDM_Widget(key, self.filename, line)
-                        self.widgets.append(widget)
+                        owner.widgets.append(widget)
                         logging.debug("%d : %s  - widget (nesting=%d)" % (line, key, self.nesting))
                     elif key in adl_symbols.blocks:
                         object_catalog[key] += 1
