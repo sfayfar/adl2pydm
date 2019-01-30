@@ -137,6 +137,12 @@ class AdlFile(object):
 
                 line += 1
     
+        # TODO: refactor from MEDM into some standard forms
+        #     convert from colors index to Color() objects
+        #     object geometry
+        #     visibility
+        #     other attributes
+
         for catalog in (object_catalog, var_catalog):
             logger.debug("#"*40)
             for k, v in sorted(catalog.items()):
