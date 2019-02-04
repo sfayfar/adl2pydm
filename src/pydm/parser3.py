@@ -88,10 +88,37 @@ class MedmBaseWidget(object):
 class MedmMainWidget(MedmBaseWidget):
     
     def __init__(self):
-        super().__init__()
+        super(MedmBaseWidget, self).__init__()
         self.adl_filename = "unknown"    # file name given in the file
         self.adl_version = "unknown"     # file version given in the file
         self.widgets = []
+    
+    def parseAdlFile(self, parser):
+        with open(parser.given_filename, "r") as fp:
+            buf = fp.readlines()
+        
+        logger.debug("\n"*2)
+        logger.debug(parser.given_filename)
+        blocks = parser.locateBlocks(buf, 0)
+        logger.debug("\n".join(map(str,blocks)))
+
+        block = [b for b in blocks if b.symbol == "file"]
+        if len(block) > 0:
+            block = block[0]
+            self.parseFileBlock(buf[block.start+1:block.end])
+
+        block = [b for b in blocks if b.symbol == "display"]
+        if len(block) > 0:
+            block = block[0]
+            # self.parseDisplayBlock(buf[block.start+1:block.end])
+
+        block = [b for b in blocks if b.symbol == "color map"]
+        if len(block) > 0:
+            block = block[0]
+            # self.parseColorMapBlock(buf[block.start+1:block.end])
+#         
+#         for block in blocks:
+#             pass        # TODO: parse the widgets
     
     def parseFileBlock(self, buf):
         # TODO: keep original line numbers for debug purposes
@@ -131,33 +158,8 @@ class AdlFileParser(object):
             msg = "Could not find file: " + given_filename
         self.given_filename = given_filename
 
-        with open(self.given_filename, "r") as fp:
-            buf = fp.readlines()
-        
-        logger.debug("\n"*2)
-        logger.debug(self.given_filename)
-        blocks = self.locateBlocks(buf, 0)
-        logger.debug("\n".join(map(str,blocks)))
-        
         self.main = MedmMainWidget()
-
-        block = [b for b in blocks if b.symbol == "file"]
-        if len(block) > 0:
-            block = block[0]
-            self.main.parseFileBlock(buf[block.start+1:block.end])
-
-        block = [b for b in blocks if b.symbol == "display"]
-        if len(block) > 0:
-            block = block[0]
-            # self.main.parseDisplayBlock(buf[block.start+1:block.end])
-
-        block = [b for b in blocks if b.symbol == "color map"]
-        if len(block) > 0:
-            block = block[0]
-            # self.main.parseColorMapBlock(buf[block.start+1:block.end])
-#         
-#         for block in blocks:
-#             pass        # TODO: parse the widgets
+        self.main.parseAdlFile(self)
     
     def locateBlocks(self, buf, level):
         """
