@@ -191,6 +191,7 @@ class MedmMainWidget(MedmBaseWidget):
 
         block = self.getNamedBlock("colors", blocks)
         if block is not None:
+            # list of RGB 2-digit hex strings: RRGGBB
             def _parse_colors_(rgbhex):
                 r = int(rgbhex[:2], 16)
                 g = int(rgbhex[2:4], 16)
@@ -198,8 +199,8 @@ class MedmMainWidget(MedmBaseWidget):
                 return Color(r, g, b)
 
             text = "".join(buf[block.start+1:block.end])
-            clut = list(map(_parse_colors_, text.replace(",", " ").split()))
-            self.color_table = clut
+            clut = map(_parse_colors_, text.replace(",", " ").split())
+            self.color_table = list(clut)
         else:
             # dl_color blocks  contain assignments: r, g, b inten
             block = self.getNamedBlock("dl_color", blocks)
