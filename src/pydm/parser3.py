@@ -83,6 +83,10 @@ class MedmBaseWidget(object):
         self.background_color = None
         self.color = None
         self.geometry = None
+    
+    def parseAdlBuffer(self, parser, buf):
+        text = "".join(buf)
+        pass
 
 
 class MedmMainWidget(MedmBaseWidget):
@@ -93,6 +97,32 @@ class MedmMainWidget(MedmBaseWidget):
         self.adl_version = "unknown"    # file version given in the file
         self.color_table = []           # TODO: supply a default color table
         self.widgets = []
+    
+    def getNamedBlock(self, block_name, blocks):
+        """
+        """
+        block = [b for b in blocks if b.symbol == block_name]
+        if len(block) > 0:
+            return block[0]
+
+    def locateAssignments(self, buf):
+        """
+        identify and record the line number of all assignments in the buffer at this nesting level
+        """
+        assignments = {}
+        level = 0
+        nesting = level # remember nesting, identify assignments only at THIS level
+        for line, text in enumerate(buf):
+            p = text.find("=")
+            if text.rstrip().endswith(" {"):
+                nesting += 1
+            elif text.rstrip().endswith("}"):
+                nesting -= 1
+            elif nesting == level and p > 0:
+                key = text[:p].strip()
+                value = text[p+1:].strip().strip('"')
+                assignments[key] = value
+        return assignments
     
     def locateBlocks(self, buf):
         """
@@ -123,41 +153,35 @@ class MedmMainWidget(MedmBaseWidget):
         blocks = self.locateBlocks(buf)
         logger.debug("\n".join(map(str,blocks)))
         
-        def getNamedBlock(block_name):
-            block = [b for b in blocks if b.symbol == block_name]
-            if len(block) > 0:
-                return block[0]
-
-        block = getNamedBlock("file")
+        block = self.getNamedBlock("file", blocks)
         if block is not None:
             self.parseFileBlock(buf[block.start+1:block.end])
 
-        block = getNamedBlock("color map")
+        block = self.getNamedBlock("color map", blocks)
         if block is not None:
             self.parseColorMapBlock(buf[block.start+1:block.end])
 
-        block = getNamedBlock("display")
+        block = self.getNamedBlock("display", blocks)
         if block is not None:
             self.parseDisplayBlock(buf[block.start+1:block.end])
          
         for block in blocks:
-            if block.symbol == "composite":
-                pass
-            else:
-                pass        # TODO: parse the widgets
+            if block.symbol in adl_symbols.widgets:
+                if block.symbol == "composite":
+                    widget = MedmCompositeWidget()
+                else:
+                    widget = MedmGenericWidget(block.symbol)
+                widget.parseAdlBuffer(parser, buf[block.start+1:block.end])
     
     def parseFileBlock(self, buf):
         # TODO: keep original line numbers for debug purposes
-        for line, text in enumerate(buf):
-            text = text.strip()
-            p = text.find("=")
-            if p > 0:
-                key = text[:p]
-                value = text[p+1:]
-                if key == "name":
-                    self.adl_filename = text[p+1:].strip('"')
-                elif key == "version":
-                    self.adl_version = text[p+1:]
+        assignments = self.locateAssignments(buf)
+        value = assignments.get("name")
+        if value is not None:
+            self.adl_filename = value
+        value = assignments.get("version")
+        if value is not None:
+            self.adl_version = value
     
     def parseColorMapBlock(self, buf):
         # TODO: keep original line numbers for debug purposes
@@ -173,7 +197,7 @@ class MedmMainWidget(MedmBaseWidget):
 class MedmCompositeWidget(MedmBaseWidget):
     
     def __init__(self):
-        super().__init__()
+        super(MedmBaseWidget, self).__init__()
         self.symbol = "composite"
         self.widgets = []
 
@@ -181,7 +205,7 @@ class MedmCompositeWidget(MedmBaseWidget):
 class MedmGenericWidget(MedmBaseWidget):
     
     def __init__(self, symbol):
-        super().__init__()
+        super(MedmBaseWidget, self).__init__()
         self.symbol = symbol
 
 
