@@ -215,7 +215,26 @@ class MedmMainWidget(MedmBaseWidget):
         # TODO: keep original line numbers for debug purposes
         assignments = self.locateAssignments(buf)
         blocks = self.locateBlocks(buf)
-        pass
+
+        # assign certain items in named attributes
+        xref = dict(clr="color", bclr="background_color")
+        for k, sk in xref.items():
+            value = assignments.get(k)
+            if value is not None:
+                self.__setattr__(sk, self.color_table[int(value)])
+                del assignments[k]
+        # assign remaining attributes
+        for k, value in assignments.items():
+            self.__setattr__(k, value)
+
+        block = self.getNamedBlock("object", blocks)
+        if block is not None:
+            self.geometry = self.parseObjectBlock(buf[block.start+1:block.end])
+    
+    def parseObjectBlock(self, buf):
+        a = self.locateAssignments(buf)
+        arr = map(int, (a["x"], a["y"], a["width"], a["height"]))   # convert to int
+        return Geometry(*list(arr))
 
 
 class MedmCompositeWidget(MedmBaseWidget):
