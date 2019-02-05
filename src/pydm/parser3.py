@@ -231,8 +231,10 @@ class MedmMainWidget(MedmBaseWidget):
         block = self.getNamedBlock("object", blocks)
         if block is not None:
             self.geometry = self.parseObjectBlock(buf[block.start+1:block.end])
+        # ignore any other blocks
     
     def parseObjectBlock(self, buf):
+        """MEDM "object" block defines a Geometry for its parent"""
         a = self.locateAssignments(buf)
         arr = map(int, (a["x"], a["y"], a["width"], a["height"]))   # convert to int
         return Geometry(*list(arr))
