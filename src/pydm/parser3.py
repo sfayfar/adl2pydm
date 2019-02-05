@@ -84,15 +84,16 @@ class MedmBaseWidget(object):
         self.color = None
         self.geometry = None
     
-    def parseAdlBuffer(self, parser, buf):
+    def parseAdlBuffer(self, buf):
         text = "".join(buf)
         pass
 
 
 class MedmMainWidget(MedmBaseWidget):
     
-    def __init__(self):
+    def __init__(self, given_filename=None):
         super(MedmBaseWidget, self).__init__()
+        self.given_filename = given_filename    # file name as provided
         self.adl_filename = "unknown"   # file name given in the file
         self.adl_version = "unknown"    # file version given in the file
         self.color_table = []           # TODO: supply a default color table
@@ -145,12 +146,17 @@ class MedmMainWidget(MedmBaseWidget):
                     blocks.append(block)
         return blocks
     
-    def parseAdlFile(self, parser):
-        with open(parser.given_filename, "r") as fp:
-            buf = fp.readlines()
-        
+    def getAdlLines(self, fname=None):
+        fname = fname or self.given_filename
+        if not os.path.exists(fname):
+            msg = "Could not find file: " + fname
+            raise ValueError(msg)
+        with open(fname, "r") as fp:
+            return fp.readlines()
+
+    def parseAdlBuffer(self, buf):
         logger.debug("\n"*2)
-        logger.debug(parser.given_filename)
+        logger.debug(self.given_filename)
         blocks = self.locateBlocks(buf)
         logger.debug("\n".join(map(str,blocks)))
         
@@ -174,7 +180,7 @@ class MedmMainWidget(MedmBaseWidget):
                     widget = MedmCompositeWidget()
                 else:
                     widget = MedmGenericWidget(block.symbol)
-                widget.parseAdlBuffer(parser, buf[block.start+1:block.end])
+                widget.parseAdlBuffer(buf[block.start+1:block.end])
     
     def parseFileBlock(self, buf):
         # TODO: keep original line numbers for debug purposes
@@ -257,21 +263,9 @@ class MedmGenericWidget(MedmBaseWidget):
         self.symbol = symbol
 
 
-class AdlFileParser(object):
-    """
-    parse the file main blocks, recurse into composites
-    """
-    
-    def __init__(self, given_filename):
-        if not os.path.exists(given_filename):
-            msg = "Could not find file: " + given_filename
-        self.given_filename = given_filename
-
-        self.main = MedmMainWidget()
-        self.main.parseAdlFile(self)
-
-
 if __name__ == "__main__":
     for fname in TEST_FILES:
-        screen = AdlFileParser(fname)
+        screen = MedmMainWidget()
+        buf = screen.getAdlLines(fname)
+        screen.parseAdlBuffer(buf)
     print("done")
