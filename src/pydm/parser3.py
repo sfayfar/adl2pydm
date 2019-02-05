@@ -161,7 +161,7 @@ class MedmBaseWidget(object):
 class MedmMainWidget(MedmBaseWidget):
     
     def __init__(self, given_filename=None):
-        super(MedmBaseWidget, self).__init__()
+        MedmBaseWidget.__init__(self)
         self.given_filename = given_filename    # file name as provided
         self.adl_filename = "unknown"   # file name given in the file
         self.adl_version = "unknown"    # file version given in the file
