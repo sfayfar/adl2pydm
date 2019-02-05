@@ -44,7 +44,7 @@ TEST_FILES = [
     "screens/medm/motorx-R6-10-1.adl",
     "screens/medm/motorx_all-R6-10-1.adl",
     "screens/medm/scanDetPlot-R2-11-1.adl",
-    # "screens/medm/beamHistory_full-R3-5.adl", # this .adl has problems
+    "screens/medm/beamHistory_full-R3-5.adl", # this .adl has problems
     "screens/medm/ADBase-R3-3-1.adl",
     "screens/medm/simDetector-R3-3-31.adl",
     ]
@@ -176,21 +176,44 @@ class MedmMainWidget(MedmBaseWidget):
     
     def parseFileBlock(self, buf):
         # TODO: keep original line numbers for debug purposes
+        xref = dict(name="adl_filename", version="adl_version")
         assignments = self.locateAssignments(buf)
-        value = assignments.get("name")
-        if value is not None:
-            self.adl_filename = value
-        value = assignments.get("version")
-        if value is not None:
-            self.adl_version = value
+        for k, sk in xref.items():
+            value = assignments.get(k)
+            if value is not None:
+                self.__setattr__(sk, value)
     
     def parseColorMapBlock(self, buf):
+        """read the color_table (clut) from the "color map"""
         # TODO: keep original line numbers for debug purposes
+        assignments = self.locateAssignments(buf)   # ignore ncolors=
         blocks = self.locateBlocks(buf)
-        pass
+
+        block = self.getNamedBlock("colors", blocks)
+        if block is not None:
+            def _parse_colors_(rgbhex):
+                r = int(rgbhex[:2], 16)
+                g = int(rgbhex[2:4], 16)
+                b = int(rgbhex[4:6], 16)
+                return Color(r, g, b)
+
+            text = "".join(buf[block.start+1:block.end])
+            clut = list(map(_parse_colors_, text.replace(",", " ").split()))
+            self.color_table = clut
+        else:
+            # dl_color blocks  contain assignments: r, g, b inten
+            block = self.getNamedBlock("dl_color", blocks)
+            if block is not None:
+                clut = []
+                for block in blocks:
+                    a = self.locateAssignments(buf[block.start+1:block.end])
+                    color = Color(a["r"], a["g"], a["b"])   # ignore inten (default = 255)
+                    clut.append(color)
+                self.color_table = clut
     
     def parseDisplayBlock(self, buf):
         # TODO: keep original line numbers for debug purposes
+        assignments = self.locateAssignments(buf)
         blocks = self.locateBlocks(buf)
         pass
 
