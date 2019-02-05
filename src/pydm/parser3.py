@@ -19,8 +19,8 @@ symbol.
 
 The *contents* are a list of block(s) and assignment(s) or values.
 An *assignment* is structured:  ``symbol=value``
-A *value* is a number, text suorrounded by double quotes, 
-or list of values surrounded by parentheses.
+A *value* is a number, text surrounded by double quotes, 
+or a list of values surrounded by parentheses.
 
 Three special blocks come at the start of the MEDM file: 
 file, display, and "color map".  The remaining blocks at 
@@ -121,6 +121,7 @@ class MedmMainWidget(MedmBaseWidget):
             elif nesting == level and p > 0:
                 key = text[:p].strip()
                 value = text[p+1:].strip().strip('"')
+                # TODO: look for parentheses
                 assignments[key] = value
         return assignments
     
