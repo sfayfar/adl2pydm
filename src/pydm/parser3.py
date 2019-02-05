@@ -31,7 +31,7 @@ Other blocks are used to provide configuration for their
 parent GUI widget.
 """
 
-from collections import defaultdict, namedtuple
+from collections import defaultdict, namedtuple, OrderedDict
 import logging
 import os
 
@@ -109,7 +109,7 @@ class MedmMainWidget(MedmBaseWidget):
         """
         identify and record the line number of all assignments in the buffer at this nesting level
         """
-        assignments = {}
+        assignments = OrderedDict()
         level = 0
         nesting = level # remember nesting, identify assignments only at THIS level
         for line, text in enumerate(buf):
@@ -154,20 +154,22 @@ class MedmMainWidget(MedmBaseWidget):
         blocks = self.locateBlocks(buf)
         logger.debug("\n".join(map(str,blocks)))
         
-        block = self.getNamedBlock("file", blocks)
-        if block is not None:
-            self.parseFileBlock(buf[block.start+1:block.end])
-
-        block = self.getNamedBlock("color map", blocks)
-        if block is not None:
-            self.parseColorMapBlock(buf[block.start+1:block.end])
-
-        block = self.getNamedBlock("display", blocks)
-        if block is not None:
-            self.parseDisplayBlock(buf[block.start+1:block.end])
+        xref = OrderedDict([
+            ("file", self.parseFileBlock),
+            ("color map", self.parseColorMapBlock), # must BEFORE display
+            ("display", self.parseDisplayBlock),
+        ])
+        for symbol, handler in xref.items():
+            block = self.getNamedBlock(symbol, blocks)
+            if block is None:
+                logger.warn("Did not find %s block" % symbol)
+            else:
+                logger.debug("Processing %s block" % symbol)
+                handler(buf[block.start+1:block.end])
          
         for block in blocks:
             if block.symbol in adl_symbols.widgets:
+                logger.debug("Processing %s block" % block.symbol)
                 if block.symbol == "composite":
                     widget = MedmCompositeWidget()
                 else:
