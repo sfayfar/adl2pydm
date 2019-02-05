@@ -84,21 +84,6 @@ class MedmBaseWidget(object):
         self.color = None
         self.geometry = None
     
-    def parseAdlBuffer(self, buf):
-        text = "".join(buf)
-        pass
-
-
-class MedmMainWidget(MedmBaseWidget):
-    
-    def __init__(self, given_filename=None):
-        super(MedmBaseWidget, self).__init__()
-        self.given_filename = given_filename    # file name as provided
-        self.adl_filename = "unknown"   # file name given in the file
-        self.adl_version = "unknown"    # file version given in the file
-        self.color_table = []           # TODO: supply a default color table
-        self.widgets = []
-    
     def getNamedBlock(self, block_name, blocks):
         """
         """
@@ -145,6 +130,28 @@ class MedmMainWidget(MedmBaseWidget):
                     block.end = line
                     blocks.append(block)
         return blocks
+    
+    def parseAdlBuffer(self, buf):
+        assignments = self.locateAssignments(buf)
+        blocks = self.locateBlocks(buf)
+        text = "".join(buf)
+    
+    def parseObjectBlock(self, buf):
+        """MEDM "object" block defines a Geometry for its parent"""
+        a = self.locateAssignments(buf)
+        arr = map(int, (a["x"], a["y"], a["width"], a["height"]))   # convert to int
+        return Geometry(*list(arr))
+
+
+class MedmMainWidget(MedmBaseWidget):
+    
+    def __init__(self, given_filename=None):
+        super(MedmBaseWidget, self).__init__()
+        self.given_filename = given_filename    # file name as provided
+        self.adl_filename = "unknown"   # file name given in the file
+        self.adl_version = "unknown"    # file version given in the file
+        self.color_table = []           # TODO: supply a default color table
+        self.widgets = []
     
     def getAdlLines(self, fname=None):
         fname = fname or self.given_filename
@@ -240,12 +247,6 @@ class MedmMainWidget(MedmBaseWidget):
         if block is not None:
             self.geometry = self.parseObjectBlock(buf[block.start+1:block.end])
         # ignore any other blocks
-    
-    def parseObjectBlock(self, buf):
-        """MEDM "object" block defines a Geometry for its parent"""
-        a = self.locateAssignments(buf)
-        arr = map(int, (a["x"], a["y"], a["width"], a["height"]))   # convert to int
-        return Geometry(*list(arr))
 
 
 class MedmCompositeWidget(MedmBaseWidget):
