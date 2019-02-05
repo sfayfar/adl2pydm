@@ -89,9 +89,30 @@ class MedmMainWidget(MedmBaseWidget):
     
     def __init__(self):
         super(MedmBaseWidget, self).__init__()
-        self.adl_filename = "unknown"    # file name given in the file
-        self.adl_version = "unknown"     # file version given in the file
+        self.adl_filename = "unknown"   # file name given in the file
+        self.adl_version = "unknown"    # file version given in the file
+        self.color_table = []           # TODO: supply a default color table
         self.widgets = []
+    
+    def locateBlocks(self, buf):
+        """
+        identify and record the start and end of all blocks at this nesting level in the buffer
+        """
+        blocks = []
+        level = 0
+        nesting = level
+        for line, text in enumerate(buf):
+            if text.rstrip().endswith(" {"):
+                if nesting == level:
+                    symbol = text.strip()[:-2]
+                    block = Block(line, None, nesting, symbol.strip('"'))
+                nesting += 1
+            elif text.rstrip().endswith("}"):
+                nesting -= 1
+                if nesting == level:
+                    block.end = line
+                    blocks.append(block)
+        return blocks
     
     def parseAdlFile(self, parser):
         with open(parser.given_filename, "r") as fp:
@@ -99,26 +120,31 @@ class MedmMainWidget(MedmBaseWidget):
         
         logger.debug("\n"*2)
         logger.debug(parser.given_filename)
-        blocks = parser.locateBlocks(buf, 0)
+        blocks = self.locateBlocks(buf)
         logger.debug("\n".join(map(str,blocks)))
+        
+        def getNamedBlock(block_name):
+            block = [b for b in blocks if b.symbol == block_name]
+            if len(block) > 0:
+                return block[0]
 
-        block = [b for b in blocks if b.symbol == "file"]
-        if len(block) > 0:
-            block = block[0]
+        block = getNamedBlock("file")
+        if block is not None:
             self.parseFileBlock(buf[block.start+1:block.end])
 
-        block = [b for b in blocks if b.symbol == "display"]
-        if len(block) > 0:
-            block = block[0]
-            # self.parseDisplayBlock(buf[block.start+1:block.end])
+        block = getNamedBlock("color map")
+        if block is not None:
+            self.parseColorMapBlock(buf[block.start+1:block.end])
 
-        block = [b for b in blocks if b.symbol == "color map"]
-        if len(block) > 0:
-            block = block[0]
-            # self.parseColorMapBlock(buf[block.start+1:block.end])
-#         
-#         for block in blocks:
-#             pass        # TODO: parse the widgets
+        block = getNamedBlock("display")
+        if block is not None:
+            self.parseDisplayBlock(buf[block.start+1:block.end])
+         
+        for block in blocks:
+            if block.symbol == "composite":
+                pass
+            else:
+                pass        # TODO: parse the widgets
     
     def parseFileBlock(self, buf):
         # TODO: keep original line numbers for debug purposes
@@ -132,6 +158,17 @@ class MedmMainWidget(MedmBaseWidget):
                     self.adl_filename = text[p+1:].strip('"')
                 elif key == "version":
                     self.adl_version = text[p+1:]
+    
+    def parseColorMapBlock(self, buf):
+        # TODO: keep original line numbers for debug purposes
+        blocks = self.locateBlocks(buf)
+        pass
+    
+    def parseDisplayBlock(self, buf):
+        # TODO: keep original line numbers for debug purposes
+        blocks = self.locateBlocks(buf)
+        pass
+
 
 class MedmCompositeWidget(MedmBaseWidget):
     
@@ -160,25 +197,6 @@ class AdlFileParser(object):
 
         self.main = MedmMainWidget()
         self.main.parseAdlFile(self)
-    
-    def locateBlocks(self, buf, level):
-        """
-        identify and record the start and end of all blocks at this nesting level in the buffer
-        """
-        blocks = []
-        nesting = level
-        for line, text in enumerate(buf):
-            if text.rstrip().endswith(" {"):
-                if nesting == level:
-                    symbol = text.strip()[:-2]
-                    block = Block(line, None, nesting, symbol.strip('"'))
-                nesting += 1
-            elif text.rstrip().endswith("}"):
-                nesting -= 1
-                if nesting == level:
-                    block.end = line
-                    blocks.append(block)
-        return blocks
 
 
 if __name__ == "__main__":
