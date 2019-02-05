@@ -132,9 +132,24 @@ class MedmBaseWidget(object):
         return blocks
     
     def parseAdlBuffer(self, buf):
+        """generic handling, override as needed"""
         assignments = self.locateAssignments(buf)
         blocks = self.locateBlocks(buf)
         text = "".join(buf)
+
+        # assign certain items in named attributes
+        xref = dict(clr="color", bclr="background_color")
+        clut = self.main.color_table    # Color LookUp Table
+        for k, sk in xref.items():
+            value = assignments.get(k)
+            if value is not None:
+                self.__setattr__(sk, clut[int(value)])
+                del assignments[k]
+
+        # all widget blocks have an "object"
+        block = self.getNamedBlock("object", blocks)
+        if block is not None:
+            self.geometry = self.parseObjectBlock(buf[block.start+1:block.end])
     
     def parseObjectBlock(self, buf):
         """MEDM "object" block defines a Geometry for its parent"""
@@ -184,9 +199,9 @@ class MedmMainWidget(MedmBaseWidget):
             if block.symbol in adl_symbols.widgets:
                 logger.debug("Processing %s block" % block.symbol)
                 if block.symbol == "composite":
-                    widget = MedmCompositeWidget()
+                    widget = MedmCompositeWidget(self)
                 else:
-                    widget = MedmGenericWidget(block.symbol)
+                    widget = MedmGenericWidget(self, block.symbol)
                 widget.parseAdlBuffer(buf[block.start+1:block.end])
     
     def parseFileBlock(self, buf):
@@ -251,17 +266,27 @@ class MedmMainWidget(MedmBaseWidget):
 
 class MedmCompositeWidget(MedmBaseWidget):
     
-    def __init__(self):
-        super(MedmBaseWidget, self).__init__()
+    def __init__(self, main):
+        MedmBaseWidget.__init__(self)
+        self.main = main
         self.symbol = "composite"
         self.widgets = []
+
+    def parseAdlBuffer(self, buf):
+        MedmBaseWidget.parseAdlBuffer(self, buf)
+        pass
 
 
 class MedmGenericWidget(MedmBaseWidget):
     
-    def __init__(self, symbol):
-        super(MedmBaseWidget, self).__init__()
+    def __init__(self, main, symbol):
+        MedmBaseWidget.__init__(self)
+        self.main = main
         self.symbol = symbol
+
+    def parseAdlBuffer(self, buf):
+        MedmBaseWidget.parseAdlBuffer(self, buf)
+        pass
 
 
 if __name__ == "__main__":
