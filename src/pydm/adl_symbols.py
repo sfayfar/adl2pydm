@@ -41,6 +41,7 @@ block_lists = {     # key starts the line
     "display[" : dict(type="nested"),
     "info[" : dict(type="nested"),
     "pen[" : dict(type="nested"),
+    "rulechan[" : dict(type="nested"),  # in monitor block
     "trace[" : dict(type="nested"),
     }
 
