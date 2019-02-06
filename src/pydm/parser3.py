@@ -83,6 +83,18 @@ class MedmBaseWidget(object):
         self.background_color = None
         self.color = None
         self.geometry = None
+        self.line_offset = 0
+        self.symbol = None
+    
+    def __str__(self):
+        fmt = "Widget(%s)"
+        args = []
+        if self.symbol is None:
+            args.append("")
+        else:
+            args.append("symbol=\"%s\"" % str(self.symbol))
+        args.append("line=%d" % self.line_offset)
+        return fmt % ", ".join(args)
     
     def getNamedBlock(self, block_name, blocks):
         """
@@ -199,9 +211,9 @@ class MedmMainWidget(MedmBaseWidget):
             if block.symbol in adl_symbols.widgets:
                 logger.debug("Processing %s block" % block.symbol)
                 if block.symbol == "composite":
-                    widget = MedmCompositeWidget(self)
+                    widget = MedmCompositeWidget(block.start, self)
                 else:
-                    widget = MedmGenericWidget(self, block.symbol)
+                    widget = MedmGenericWidget(block.start, self, block.symbol)
                 widget.parseAdlBuffer(buf[block.start+1:block.end])
     
     def parseFileBlock(self, buf):
@@ -266,8 +278,9 @@ class MedmMainWidget(MedmBaseWidget):
 
 class MedmCompositeWidget(MedmBaseWidget):
     
-    def __init__(self, main):
+    def __init__(self, line, main):
         MedmBaseWidget.__init__(self)
+        self.line_offset = line
         self.main = main
         self.symbol = "composite"
         self.widgets = []
@@ -279,8 +292,9 @@ class MedmCompositeWidget(MedmBaseWidget):
 
 class MedmGenericWidget(MedmBaseWidget):
     
-    def __init__(self, main, symbol):
+    def __init__(self, line, main, symbol):
         MedmBaseWidget.__init__(self)
+        self.line_offset = line
         self.main = main
         self.symbol = symbol
 
