@@ -42,7 +42,7 @@ TEST_FILES = [
     "screens/medm/xxx-R5-8-4.adl",
     "screens/medm/xxx-R6-0.adl",
     "screens/medm/calc-3-4-2-1-FuncGen_full.adl",    # strip chart
-    #"screens/medm/calc-R3-7-1-FuncGen_full.adl",    # strip chart
+    "screens/medm/calc-R3-7-1-FuncGen_full.adl",    # strip chart
     "screens/medm/motorx-R6-10-1.adl",
     "screens/medm/motorx_all-R6-10-1.adl",
     "screens/medm/scanDetPlot-R2-11-1.adl",
