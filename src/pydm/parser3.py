@@ -179,6 +179,8 @@ class MedmBaseWidget(object):
             "embedded display" : MedmEmbeddedDisplayWidget,
             "menu" : MedmMenuWidget,
             "message button" : MedmMessageButtonWidget,
+            "polyline" : MedmPolylineWidget,
+            "rectangle" : MedmRectangleWidget,
             "related display" : MedmRelatedDisplayWidget,
             "text" : MedmTextWidget,
             "text entry" : MedmTextEntryWidget,
@@ -375,6 +377,51 @@ class MedmMessageButtonWidget(MedmGenericWidget):
             self.contents["control"] = aa
 
 
+class MedmRectangleWidget(MedmGenericWidget):
+
+    def parseAdlBuffer(self, buf):
+        assignments, blocks = MedmBaseWidget.parseAdlBuffer(self, buf)
+
+        block = self.getNamedBlock("basic attribute", blocks)
+        if block is not None:
+            aa = self.locateAssignments(buf[block.start+1:block.end])
+            aa = self.parseColorAssignments(aa)
+            self.contents["basic attribute"] = aa
+
+        block = self.getNamedBlock("dynamic attribute", blocks)
+        if block is not None:
+            aa = self.locateAssignments(buf[block.start+1:block.end])
+            self.contents["dynamic attribute"] = aa
+
+        _text = "".join(buf)
+        pass
+
+
+class MedmPolylineWidget(MedmGenericWidget):
+
+    def parseAdlBuffer(self, buf):
+        assignments, blocks = MedmBaseWidget.parseAdlBuffer(self, buf)
+
+        block = self.getNamedBlock("basic attribute", blocks)
+        if block is not None:
+            aa = self.locateAssignments(buf[block.start+1:block.end])
+            aa = self.parseColorAssignments(aa)
+            self.contents["basic attribute"] = aa
+
+        block = self.getNamedBlock("dynamic attribute", blocks)
+        if block is not None:
+            aa = self.locateAssignments(buf[block.start+1:block.end])
+            self.contents["dynamic attribute"] = aa
+
+        block = self.getNamedBlock("points", blocks)
+        if block is not None:
+            points = []
+            for pair in buf[block.start+1:block.end]:
+                x, y = map(int, pair.replace("(", "").replace(")", "").split(","))
+                points.append(Point(x, y))
+            self.points = points
+
+
 class MedmRelatedDisplayWidget(MedmGenericWidget):
     
     def __init__(self, line, main, symbol):
@@ -418,8 +465,6 @@ class MedmTextWidget(MedmGenericWidget):
         if block is not None:
             aa = self.locateAssignments(buf[block.start+1:block.end])
             self.contents["dynamic attribute"] = aa
-
-        pass    # TODO: more to parse here
 
 
 class MedmTextEntryWidget(MedmGenericWidget):
