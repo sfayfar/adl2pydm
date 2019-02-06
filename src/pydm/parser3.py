@@ -176,6 +176,7 @@ class MedmBaseWidget(object):
         xref = {
             "arc" : MedmGenericWidget,
             "composite" : MedmCompositeWidget,
+            "menu" : MedmMenuWidget,
             "related display" : MedmRelatedDisplayWidget,
             "text" : MedmTextWidget,
             "text entry" : MedmTextEntryWidget,
@@ -309,6 +310,19 @@ class MedmMainWidget(MedmBaseWidget):
         # ignore any other blocks
 
 
+class MedmGenericWidget(MedmBaseWidget):
+    
+    def __init__(self, line, main, symbol):
+        MedmBaseWidget.__init__(self)
+        self.line_offset = line
+        self.main = main
+        self.symbol = symbol
+
+    def parseAdlBuffer(self, buf):
+        assignments, blocks = MedmBaseWidget.parseAdlBuffer(self, buf)
+        pass
+
+
 class MedmCompositeWidget(MedmBaseWidget):
     
     def __init__(self, line, main, symbol):
@@ -330,17 +344,16 @@ class MedmCompositeWidget(MedmBaseWidget):
             pass
 
 
-class MedmGenericWidget(MedmBaseWidget):
-    
-    def __init__(self, line, main, symbol):
-        MedmBaseWidget.__init__(self)
-        self.line_offset = line
-        self.main = main
-        self.symbol = symbol
+class MedmMenuWidget(MedmGenericWidget):
 
     def parseAdlBuffer(self, buf):
         assignments, blocks = MedmBaseWidget.parseAdlBuffer(self, buf)
-        pass
+
+        block = self.getNamedBlock("control", blocks)
+        if block is not None:
+            aa = self.locateAssignments(buf[block.start+1:block.end])
+            aa = self.parseColorAssignments(aa)
+            self.contents["control"] = aa
 
 
 class MedmRelatedDisplayWidget(MedmGenericWidget):
@@ -400,8 +413,6 @@ class MedmTextEntryWidget(MedmGenericWidget):
             aa = self.parseColorAssignments(aa)
             self.contents["control"] = aa
 
-        pass
-
 
 class MedmTextUpdateWidget(MedmGenericWidget):
 
@@ -413,8 +424,6 @@ class MedmTextUpdateWidget(MedmGenericWidget):
             aa = self.locateAssignments(buf[block.start+1:block.end])
             aa = self.parseColorAssignments(aa)
             self.contents["monitor"] = aa
-
-        pass
 
 
 if __name__ == "__main__":
