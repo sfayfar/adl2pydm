@@ -99,6 +99,8 @@ def write_block(writer, parent, block):
         for k in ("chan", "rdbk"):
             if k in block.contents["monitor"]:
                 pv = block.contents["monitor"][k]
+        if pv is not None:
+            pv = pv.replace("(", "{").replace(")", "}")
 
         write_geometry(writer, qw, block.geometry)
         write_colors(writer, qw, block)
