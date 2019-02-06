@@ -174,10 +174,12 @@ class MedmBaseWidget(object):
     
     def parseChildren(self, main, blocks, buf):
         xref = {
+            "arc" : MedmGenericWidget,
             "composite" : MedmCompositeWidget,
             "related display" : MedmRelatedDisplayWidget,
             "text" : MedmTextWidget,
-            "text entry" : MedmGenericWidget,
+            "text entry" : MedmTextEntryWidget,
+            "text update" : MedmTextUpdateWidget,
             }
         for block in blocks:
             if block.symbol in adl_symbols.widgets:
@@ -344,10 +346,7 @@ class MedmGenericWidget(MedmBaseWidget):
 class MedmRelatedDisplayWidget(MedmGenericWidget):
     
     def __init__(self, line, main, symbol):
-        MedmBaseWidget.__init__(self)
-        self.line_offset = line
-        self.main = main
-        self.symbol = symbol
+        MedmGenericWidget.__init__(self, line, main, symbol)
         self.displays = []
 
     def parseAdlBuffer(self, buf):
@@ -369,12 +368,6 @@ class MedmRelatedDisplayWidget(MedmGenericWidget):
 
 
 class MedmTextWidget(MedmGenericWidget):
-    
-    def __init__(self, line, main, symbol):
-        MedmBaseWidget.__init__(self)
-        self.line_offset = line
-        self.main = main
-        self.symbol = symbol
 
     def parseAdlBuffer(self, buf):
         assignments, blocks = MedmBaseWidget.parseAdlBuffer(self, buf)
@@ -393,7 +386,35 @@ class MedmTextWidget(MedmGenericWidget):
             aa = self.locateAssignments(buf[block.start+1:block.end])
             self.contents["dynamic attribute"] = aa
 
-        pass    # TODO: parse more
+        pass    # TODO: more to parse here
+
+
+class MedmTextEntryWidget(MedmGenericWidget):
+
+    def parseAdlBuffer(self, buf):
+        assignments, blocks = MedmBaseWidget.parseAdlBuffer(self, buf)
+
+        block = self.getNamedBlock("control", blocks)
+        if block is not None:
+            aa = self.locateAssignments(buf[block.start+1:block.end])
+            aa = self.parseColorAssignments(aa)
+            self.contents["control"] = aa
+
+        pass
+
+
+class MedmTextUpdateWidget(MedmGenericWidget):
+
+    def parseAdlBuffer(self, buf):
+        assignments, blocks = MedmBaseWidget.parseAdlBuffer(self, buf)
+
+        block = self.getNamedBlock("monitor", blocks)
+        if block is not None:
+            aa = self.locateAssignments(buf[block.start+1:block.end])
+            aa = self.parseColorAssignments(aa)
+            self.contents["monitor"] = aa
+
+        pass
 
 
 if __name__ == "__main__":
