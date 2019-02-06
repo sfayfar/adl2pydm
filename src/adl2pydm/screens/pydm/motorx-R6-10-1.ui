@@ -1,0 +1,634 @@
+<?xml version="1.0" ?>
+<ui version="4.0">
+  <class>motorx-R6-10-1</class>
+  <widget class="QWidget" name="screen">
+    <property name="geometry">
+      <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>116</width>
+        <height>200</height>
+      </rect>
+    </property>
+    <property name="styleSheet">
+      <string notr="true">QWidget#screen {
+  color: rgb(0, 0, 0);
+  background-color: rgb(200, 200, 200);
+  }</string>
+    </property>
+    <property name="windowTitle">
+      <string>motorx-R6-10-1</string>
+    </property>
+    <widget class="QWidget" name="text_52">
+      <property name="geometry">
+        <rect>
+          <x>1</x>
+          <y>139</y>
+          <width>45</width>
+          <height>16</height>
+        </rect>
+      </property>
+      <property name="styleSheet">
+        <string notr="true">QWidget#text_52 {
+  color: rgb(0, 0, 0);
+  }</string>
+      </property>
+      <property name="toolTip">
+        <string>TBA widget: text_52</string>
+      </property>
+    </widget>
+    <widget class="QWidget" name="text_53">
+      <property name="geometry">
+        <rect>
+          <x>0</x>
+          <y>138</y>
+          <width>45</width>
+          <height>16</height>
+        </rect>
+      </property>
+      <property name="styleSheet">
+        <string notr="true">QWidget#text_53 {
+  color: rgb(251, 243, 74);
+  }</string>
+      </property>
+      <property name="toolTip">
+        <string>TBA widget: text_53</string>
+      </property>
+    </widget>
+    <widget class="PyDMLineEdit" name="text_update_16">
+      <property name="geometry">
+        <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>116</width>
+          <height>20</height>
+        </rect>
+      </property>
+      <property name="styleSheet">
+        <string notr="true">PyDMLineEdit#text_update_16 {
+  color: rgb(10, 0, 184);
+  background-color: rgb(255, 255, 255);
+  }</string>
+      </property>
+      <property name="toolTip">
+        <string>PV: ${P}${M}.DESC</string>
+      </property>
+      <property name="readOnly">
+        <bool>true</bool>
+      </property>
+      <property name="channel" stdset="0">
+        <string>ca://${P}${M}.DESC</string>
+      </property>
+    </widget>
+    <widget class="QWidget" name="rectangle_5">
+      <property name="geometry">
+        <rect>
+          <x>6</x>
+          <y>66</y>
+          <width>104</width>
+          <height>31</height>
+        </rect>
+      </property>
+      <property name="styleSheet">
+        <string notr="true">QWidget#rectangle_5 {
+  color: rgb(115, 255, 107);
+  }</string>
+      </property>
+      <property name="toolTip">
+        <string>TBA widget: rectangle_5</string>
+      </property>
+    </widget>
+    <widget class="QWidget" name="rectangle_6">
+      <property name="geometry">
+        <rect>
+          <x>6</x>
+          <y>66</y>
+          <width>104</width>
+          <height>31</height>
+        </rect>
+      </property>
+      <property name="styleSheet">
+        <string notr="true">QWidget#rectangle_6 {
+  color: rgb(251, 243, 74);
+  }</string>
+      </property>
+      <property name="toolTip">
+        <string>TBA widget: rectangle_6</string>
+      </property>
+    </widget>
+    <widget class="QWidget" name="rectangle_7">
+      <property name="geometry">
+        <rect>
+          <x>6</x>
+          <y>66</y>
+          <width>104</width>
+          <height>31</height>
+        </rect>
+      </property>
+      <property name="styleSheet">
+        <string notr="true">QWidget#rectangle_7 {
+  color: rgb(0, 0, 0);
+  }</string>
+      </property>
+      <property name="toolTip">
+        <string>TBA widget: rectangle_7</string>
+      </property>
+    </widget>
+    <widget class="QWidget" name="rectangle_8">
+      <property name="geometry">
+        <rect>
+          <x>0</x>
+          <y>97</y>
+          <width>116</width>
+          <height>40</height>
+        </rect>
+      </property>
+      <property name="styleSheet">
+        <string notr="true">QWidget#rectangle_8 {
+  color: rgb(0, 0, 0);
+  }</string>
+      </property>
+      <property name="toolTip">
+        <string>TBA widget: rectangle_8</string>
+      </property>
+    </widget>
+    <widget class="QWidget" name="text_54">
+      <property name="geometry">
+        <rect>
+          <x>28</x>
+          <y>121</y>
+          <width>60</width>
+          <height>15</height>
+        </rect>
+      </property>
+      <property name="styleSheet">
+        <string notr="true">QWidget#text_54 {
+  color: rgb(115, 255, 107);
+  }</string>
+      </property>
+      <property name="toolTip">
+        <string>TBA widget: text_54</string>
+      </property>
+    </widget>
+    <widget class="QWidget" name="text_55">
+      <property name="geometry">
+        <rect>
+          <x>28</x>
+          <y>127</y>
+          <width>60</width>
+          <height>10</height>
+        </rect>
+      </property>
+      <property name="styleSheet">
+        <string notr="true">QWidget#text_55 {
+  color: rgb(251, 243, 74);
+  }</string>
+      </property>
+      <property name="toolTip">
+        <string>TBA widget: text_55</string>
+      </property>
+    </widget>
+    <widget class="QWidget" name="message_button_6">
+      <property name="geometry">
+        <rect>
+          <x>74</x>
+          <y>178</y>
+          <width>40</width>
+          <height>20</height>
+        </rect>
+      </property>
+      <property name="styleSheet">
+        <string notr="true">QWidget#message_button_6 {
+  color: rgb(251, 243, 74);
+  background-color: rgb(253, 0, 0);
+  }</string>
+      </property>
+      <property name="toolTip">
+        <string>TBA widget: message_button_6</string>
+      </property>
+    </widget>
+    <widget class="QWidget" name="message_button_7">
+      <property name="geometry">
+        <rect>
+          <x>52</x>
+          <y>178</y>
+          <width>21</width>
+          <height>20</height>
+        </rect>
+      </property>
+      <property name="styleSheet">
+        <string notr="true">QWidget#message_button_7 {
+  color: rgb(0, 0, 0);
+  background-color: rgb(115, 223, 255);
+  }</string>
+      </property>
+      <property name="toolTip">
+        <string>TBA widget: message_button_7</string>
+      </property>
+    </widget>
+    <widget class="QWidget" name="rectangle_9">
+      <property name="geometry">
+        <rect>
+          <x>0</x>
+          <y>176</y>
+          <width>116</width>
+          <height>24</height>
+        </rect>
+      </property>
+      <property name="styleSheet">
+        <string notr="true">QWidget#rectangle_9 {
+  color: rgb(0, 0, 0);
+  }</string>
+      </property>
+      <property name="toolTip">
+        <string>TBA widget: rectangle_9</string>
+      </property>
+    </widget>
+    <widget class="QWidget" name="text_56">
+      <property name="geometry">
+        <rect>
+          <x>0</x>
+          <y>182</y>
+          <width>30</width>
+          <height>13</height>
+        </rect>
+      </property>
+      <property name="styleSheet">
+        <string notr="true">QWidget#text_56 {
+  color: rgb(0, 216, 0);
+  }</string>
+      </property>
+      <property name="toolTip">
+        <string>TBA widget: text_56</string>
+      </property>
+    </widget>
+    <widget class="QWidget" name="message_button_8">
+      <property name="geometry">
+        <rect>
+          <x>30</x>
+          <y>178</y>
+          <width>21</width>
+          <height>20</height>
+        </rect>
+      </property>
+      <property name="styleSheet">
+        <string notr="true">QWidget#message_button_8 {
+  color: rgb(0, 0, 0);
+  background-color: rgb(115, 223, 255);
+  }</string>
+      </property>
+      <property name="toolTip">
+        <string>TBA widget: message_button_8</string>
+      </property>
+    </widget>
+    <widget class="QWidget" name="message_button_9">
+      <property name="geometry">
+        <rect>
+          <x>60</x>
+          <y>156</y>
+          <width>53</width>
+          <height>20</height>
+        </rect>
+      </property>
+      <property name="styleSheet">
+        <string notr="true">QWidget#message_button_9 {
+  color: rgb(249, 218, 60);
+  background-color: rgb(253, 0, 0);
+  }</string>
+      </property>
+      <property name="toolTip">
+        <string>TBA widget: message_button_9</string>
+      </property>
+    </widget>
+    <widget class="QWidget" name="related_display_116">
+      <property name="geometry">
+        <rect>
+          <x>5</x>
+          <y>156</y>
+          <width>40</width>
+          <height>20</height>
+        </rect>
+      </property>
+      <property name="styleSheet">
+        <string notr="true">QWidget#related_display_116 {
+  color: rgb(255, 255, 255);
+  background-color: rgb(51, 153, 0);
+  }</string>
+      </property>
+      <property name="toolTip">
+        <string>TBA widget: related_display_116</string>
+      </property>
+    </widget>
+    <widget class="QWidget" name="message_button_10">
+      <property name="geometry">
+        <rect>
+          <x>2</x>
+          <y>99</y>
+          <width>25</width>
+          <height>36</height>
+        </rect>
+      </property>
+      <property name="styleSheet">
+        <string notr="true">QWidget#message_button_10 {
+  color: rgb(0, 0, 0);
+  background-color: rgb(115, 223, 255);
+  }</string>
+      </property>
+      <property name="toolTip">
+        <string>TBA widget: message_button_10</string>
+      </property>
+    </widget>
+    <widget class="QWidget" name="text_entry_42">
+      <property name="geometry">
+        <rect>
+          <x>28</x>
+          <y>99</y>
+          <width>60</width>
+          <height>20</height>
+        </rect>
+      </property>
+      <property name="styleSheet">
+        <string notr="true">QWidget#text_entry_42 {
+  color: rgb(0, 0, 0);
+  background-color: rgb(115, 223, 255);
+  }</string>
+      </property>
+      <property name="toolTip">
+        <string>TBA widget: text_entry_42</string>
+      </property>
+    </widget>
+    <widget class="QWidget" name="message_button_11">
+      <property name="geometry">
+        <rect>
+          <x>89</x>
+          <y>99</y>
+          <width>25</width>
+          <height>36</height>
+        </rect>
+      </property>
+      <property name="styleSheet">
+        <string notr="true">QWidget#message_button_11 {
+  color: rgb(0, 0, 0);
+  background-color: rgb(115, 223, 255);
+  }</string>
+      </property>
+      <property name="toolTip">
+        <string>TBA widget: message_button_11</string>
+      </property>
+    </widget>
+    <widget class="QWidget" name="text_entry_43">
+      <property name="geometry">
+        <rect>
+          <x>9</x>
+          <y>69</y>
+          <width>98</width>
+          <height>25</height>
+        </rect>
+      </property>
+      <property name="styleSheet">
+        <string notr="true">QWidget#text_entry_43 {
+  color: rgb(0, 0, 0);
+  background-color: rgb(115, 223, 255);
+  }</string>
+      </property>
+      <property name="toolTip">
+        <string>TBA widget: text_entry_43</string>
+      </property>
+    </widget>
+    <widget class="QWidget" name="rectangle_10">
+      <property name="geometry">
+        <rect>
+          <x>0</x>
+          <y>45</y>
+          <width>6</width>
+          <height>50</height>
+        </rect>
+      </property>
+      <property name="styleSheet">
+        <string notr="true">QWidget#rectangle_10 {
+  color: rgb(253, 0, 0);
+  }</string>
+      </property>
+      <property name="toolTip">
+        <string>TBA widget: rectangle_10</string>
+      </property>
+    </widget>
+    <widget class="QWidget" name="rectangle_11">
+      <property name="geometry">
+        <rect>
+          <x>110</x>
+          <y>45</y>
+          <width>6</width>
+          <height>50</height>
+        </rect>
+      </property>
+      <property name="styleSheet">
+        <string notr="true">QWidget#rectangle_11 {
+  color: rgb(253, 0, 0);
+  }</string>
+      </property>
+      <property name="toolTip">
+        <string>TBA widget: rectangle_11</string>
+      </property>
+    </widget>
+    <widget class="PyDMLineEdit" name="text_update_17">
+      <property name="geometry">
+        <rect>
+          <x>0</x>
+          <y>32</y>
+          <width>116</width>
+          <height>12</height>
+        </rect>
+      </property>
+      <property name="styleSheet">
+        <string notr="true">PyDMLineEdit#text_update_17 {
+  color: rgb(10, 0, 184);
+  background-color: rgb(200, 200, 200);
+  }</string>
+      </property>
+      <property name="toolTip">
+        <string>PV: ${P}${M}.EGU</string>
+      </property>
+      <property name="readOnly">
+        <bool>true</bool>
+      </property>
+      <property name="channel" stdset="0">
+        <string>ca://${P}${M}.EGU</string>
+      </property>
+    </widget>
+    <widget class="QWidget" name="rectangle_12">
+      <property name="geometry">
+        <rect>
+          <x>0</x>
+          <y>20</y>
+          <width>116</width>
+          <height>12</height>
+        </rect>
+      </property>
+      <property name="styleSheet">
+        <string notr="true">QWidget#rectangle_12 {
+  color: rgb(10, 0, 184);
+  }</string>
+      </property>
+      <property name="toolTip">
+        <string>TBA widget: rectangle_12</string>
+      </property>
+    </widget>
+    <widget class="QWidget" name="text_57">
+      <property name="geometry">
+        <rect>
+          <x>0</x>
+          <y>21</y>
+          <width>116</width>
+          <height>10</height>
+        </rect>
+      </property>
+      <property name="styleSheet">
+        <string notr="true">QWidget#text_57 {
+  color: rgb(255, 255, 255);
+  }</string>
+      </property>
+      <property name="toolTip">
+        <string>TBA widget: text_57</string>
+      </property>
+    </widget>
+    <widget class="QWidget" name="rectangle_13">
+      <property name="geometry">
+        <rect>
+          <x>7</x>
+          <y>41</y>
+          <width>102</width>
+          <height>26</height>
+        </rect>
+      </property>
+      <property name="styleSheet">
+        <string notr="true">QWidget#rectangle_13 {
+  color: rgb(0, 0, 0);
+  }</string>
+      </property>
+      <property name="toolTip">
+        <string>TBA widget: rectangle_13</string>
+      </property>
+    </widget>
+    <widget class="QWidget" name="rectangle_14">
+      <property name="geometry">
+        <rect>
+          <x>9</x>
+          <y>43</y>
+          <width>98</width>
+          <height>21</height>
+        </rect>
+      </property>
+      <property name="styleSheet">
+        <string notr="true">QWidget#rectangle_14 {
+  color: rgb(251, 243, 74);
+  }</string>
+      </property>
+      <property name="toolTip">
+        <string>TBA widget: rectangle_14</string>
+      </property>
+    </widget>
+    <widget class="PyDMLineEdit" name="text_update_18">
+      <property name="geometry">
+        <rect>
+          <x>11</x>
+          <y>45</y>
+          <width>94</width>
+          <height>17</height>
+        </rect>
+      </property>
+      <property name="styleSheet">
+        <string notr="true">PyDMLineEdit#text_update_18 {
+  color: rgb(10, 0, 184);
+  background-color: rgb(200, 200, 200);
+  }</string>
+      </property>
+      <property name="toolTip">
+        <string>PV: ${P}${M}.RBV</string>
+      </property>
+      <property name="readOnly">
+        <bool>true</bool>
+      </property>
+      <property name="channel" stdset="0">
+        <string>ca://${P}${M}.RBV</string>
+      </property>
+    </widget>
+    <widget class="QWidget" name="text_58">
+      <property name="geometry">
+        <rect>
+          <x>28</x>
+          <y>119</y>
+          <width>60</width>
+          <height>10</height>
+        </rect>
+      </property>
+      <property name="styleSheet">
+        <string notr="true">QWidget#text_58 {
+  color: rgb(251, 243, 74);
+  }</string>
+      </property>
+      <property name="toolTip">
+        <string>TBA widget: text_58</string>
+      </property>
+    </widget>
+    <widget class="QWidget" name="rectangle_15">
+      <property name="geometry">
+        <rect>
+          <x>6</x>
+          <y>66</y>
+          <width>104</width>
+          <height>31</height>
+        </rect>
+      </property>
+      <property name="styleSheet">
+        <string notr="true">QWidget#rectangle_15 {
+  color: rgb(253, 0, 0);
+  }</string>
+      </property>
+      <property name="toolTip">
+        <string>TBA widget: rectangle_15</string>
+      </property>
+    </widget>
+    <widget class="QWidget" name="choice_button_10">
+      <property name="geometry">
+        <rect>
+          <x>45</x>
+          <y>137</y>
+          <width>71</width>
+          <height>20</height>
+        </rect>
+      </property>
+      <property name="styleSheet">
+        <string notr="true">QWidget#choice_button_10 {
+  color: rgb(0, 0, 0);
+  background-color: rgb(115, 223, 255);
+  }</string>
+      </property>
+      <property name="toolTip">
+        <string>TBA widget: choice_button_10</string>
+      </property>
+    </widget>
+  </widget>
+  <customwidgets>
+    <customwidget>
+      <class>PyDMLineEdit</class>
+      <extends>QLineEdit</extends>
+      <header>pydm.widgets.line_edit</header>
+    </customwidget>
+    <customwidget>
+      <class>PyDMLabel</class>
+      <extends>QLabel</extends>
+      <header>pydm.widgets.label</header>
+    </customwidget>
+    <customwidget>
+      <class>PyDMEmbeddedDisplay</class>
+      <extends>QFrame</extends>
+      <header>pydm.widgets.embedded_display</header>
+    </customwidget>
+    <customwidget>
+      <class>PyDMRelatedDisplayButton</class>
+      <extends>QPushButton</extends>
+      <header>pydm.widgets.related_display_button</header>
+    </customwidget>
+  </customwidgets>
+</ui>

@@ -1,0 +1,185 @@
+<?xml version="1.0" ?>
+<ui version="4.0">
+  <class>ADBase-R3-3-1</class>
+  <widget class="QWidget" name="screen">
+    <property name="geometry">
+      <rect>
+        <x>670</x>
+        <y>172</y>
+        <width>715</width>
+        <height>970</height>
+      </rect>
+    </property>
+    <property name="styleSheet">
+      <string notr="true">QWidget#screen {
+  color: rgb(0, 0, 0);
+  background-color: rgb(187, 187, 187);
+  }</string>
+    </property>
+    <property name="windowTitle">
+      <string>ADBase-R3-3-1</string>
+    </property>
+    <widget class="QWidget" name="rectangle_79">
+      <property name="geometry">
+        <rect>
+          <x>0</x>
+          <y>4</y>
+          <width>715</width>
+          <height>25</height>
+        </rect>
+      </property>
+      <property name="styleSheet">
+        <string notr="true">QWidget#rectangle_79 {
+  color: rgb(218, 218, 218);
+  }</string>
+      </property>
+      <property name="toolTip">
+        <string>TBA widget: rectangle_79</string>
+      </property>
+    </widget>
+    <widget class="QWidget" name="composite_33">
+      <property name="geometry">
+        <rect>
+          <x>6</x>
+          <y>35</y>
+          <width>350</width>
+          <height>340</height>
+        </rect>
+      </property>
+      <property name="toolTip">
+        <string>TBA widget: composite_33</string>
+      </property>
+    </widget>
+    <widget class="QWidget" name="composite_34">
+      <property name="geometry">
+        <rect>
+          <x>360</x>
+          <y>35</y>
+          <width>350</width>
+          <height>165</height>
+        </rect>
+      </property>
+      <property name="toolTip">
+        <string>TBA widget: composite_34</string>
+      </property>
+    </widget>
+    <widget class="QWidget" name="composite_35">
+      <property name="geometry">
+        <rect>
+          <x>360</x>
+          <y>855</y>
+          <width>350</width>
+          <height>110</height>
+        </rect>
+      </property>
+      <property name="toolTip">
+        <string>TBA widget: composite_35</string>
+      </property>
+    </widget>
+    <widget class="QWidget" name="composite_36">
+      <property name="geometry">
+        <rect>
+          <x>5</x>
+          <y>850</y>
+          <width>350</width>
+          <height>60</height>
+        </rect>
+      </property>
+      <property name="toolTip">
+        <string>TBA widget: composite_36</string>
+      </property>
+    </widget>
+    <widget class="QWidget" name="composite_37">
+      <property name="geometry">
+        <rect>
+          <x>5</x>
+          <y>465</y>
+          <width>350</width>
+          <height>380</height>
+        </rect>
+      </property>
+      <property name="toolTip">
+        <string>TBA widget: composite_37</string>
+      </property>
+    </widget>
+    <widget class="QWidget" name="composite_38">
+      <property name="geometry">
+        <rect>
+          <x>360</x>
+          <y>205</y>
+          <width>350</width>
+          <height>480</height>
+        </rect>
+      </property>
+      <property name="toolTip">
+        <string>TBA widget: composite_38</string>
+      </property>
+    </widget>
+    <widget class="QWidget" name="composite_39">
+      <property name="geometry">
+        <rect>
+          <x>5</x>
+          <y>380</y>
+          <width>350</width>
+          <height>80</height>
+        </rect>
+      </property>
+      <property name="toolTip">
+        <string>TBA widget: composite_39</string>
+      </property>
+    </widget>
+    <widget class="QWidget" name="composite_40">
+      <property name="geometry">
+        <rect>
+          <x>360</x>
+          <y>690</y>
+          <width>350</width>
+          <height>160</height>
+        </rect>
+      </property>
+      <property name="toolTip">
+        <string>TBA widget: composite_40</string>
+      </property>
+    </widget>
+    <widget class="QWidget" name="text_193">
+      <property name="geometry">
+        <rect>
+          <x>0</x>
+          <y>5</y>
+          <width>715</width>
+          <height>25</height>
+        </rect>
+      </property>
+      <property name="styleSheet">
+        <string notr="true">QWidget#text_193 {
+  color: rgb(10, 0, 184);
+  }</string>
+      </property>
+      <property name="toolTip">
+        <string>TBA widget: text_193</string>
+      </property>
+    </widget>
+  </widget>
+  <customwidgets>
+    <customwidget>
+      <class>PyDMLineEdit</class>
+      <extends>QLineEdit</extends>
+      <header>pydm.widgets.line_edit</header>
+    </customwidget>
+    <customwidget>
+      <class>PyDMLabel</class>
+      <extends>QLabel</extends>
+      <header>pydm.widgets.label</header>
+    </customwidget>
+    <customwidget>
+      <class>PyDMEmbeddedDisplay</class>
+      <extends>QFrame</extends>
+      <header>pydm.widgets.embedded_display</header>
+    </customwidget>
+    <customwidget>
+      <class>PyDMRelatedDisplayButton</class>
+      <extends>QPushButton</extends>
+      <header>pydm.widgets.related_display_button</header>
+    </customwidget>
+  </customwidgets>
+</ui>

@@ -1,0 +1,268 @@
+<?xml version="1.0" ?>
+<ui version="4.0">
+  <class>optics-R2-13-1-CoarseFineMotorShow</class>
+  <widget class="QWidget" name="screen">
+    <property name="geometry">
+      <rect>
+        <x>375</x>
+        <y>268</y>
+        <width>470</width>
+        <height>100</height>
+      </rect>
+    </property>
+    <property name="styleSheet">
+      <string notr="true">QWidget#screen {
+  color: rgb(0, 0, 0);
+  background-color: rgb(218, 218, 218);
+  }</string>
+    </property>
+    <property name="windowTitle">
+      <string>optics-R2-13-1-CoarseFineMotorShow</string>
+    </property>
+    <widget class="QWidget" name="menu_4">
+      <property name="geometry">
+        <rect>
+          <x>5</x>
+          <y>45</y>
+          <width>95</width>
+          <height>20</height>
+        </rect>
+      </property>
+      <property name="styleSheet">
+        <string notr="true">QWidget#menu_4 {
+  color: rgb(0, 0, 0);
+  background-color: rgb(115, 223, 255);
+  }</string>
+      </property>
+      <property name="toolTip">
+        <string>TBA widget: menu_4</string>
+      </property>
+    </widget>
+    <widget class="QWidget" name="text_124">
+      <property name="geometry">
+        <rect>
+          <x>5</x>
+          <y>25</y>
+          <width>100</width>
+          <height>20</height>
+        </rect>
+      </property>
+      <property name="styleSheet">
+        <string notr="true">QWidget#text_124 {
+  color: rgb(0, 0, 0);
+  }</string>
+      </property>
+      <property name="toolTip">
+        <string>TBA widget: text_124</string>
+      </property>
+    </widget>
+    <widget class="QWidget" name="rectangle_30">
+      <property name="geometry">
+        <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>130</width>
+          <height>23</height>
+        </rect>
+      </property>
+      <property name="styleSheet">
+        <string notr="true">QWidget#rectangle_30 {
+  color: rgb(255, 255, 255);
+  }</string>
+      </property>
+      <property name="toolTip">
+        <string>TBA widget: rectangle_30</string>
+      </property>
+    </widget>
+    <widget class="QWidget" name="text_125">
+      <property name="geometry">
+        <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>130</width>
+          <height>20</height>
+        </rect>
+      </property>
+      <property name="styleSheet">
+        <string notr="true">QWidget#text_125 {
+  color: rgb(0, 0, 0);
+  }</string>
+      </property>
+      <property name="toolTip">
+        <string>TBA widget: text_125</string>
+      </property>
+    </widget>
+    <widget class="QWidget" name="related_display_119">
+      <property name="geometry">
+        <rect>
+          <x>102</x>
+          <y>35</y>
+          <width>25</width>
+          <height>30</height>
+        </rect>
+      </property>
+      <property name="styleSheet">
+        <string notr="true">QWidget#related_display_119 {
+  color: rgb(255, 255, 255);
+  background-color: rgb(40, 147, 21);
+  }</string>
+      </property>
+      <property name="toolTip">
+        <string>TBA widget: related_display_119</string>
+      </property>
+    </widget>
+    <widget class="QWidget" name="indicator">
+      <property name="geometry">
+        <rect>
+          <x>178</x>
+          <y>52</y>
+          <width>250</width>
+          <height>25</height>
+        </rect>
+      </property>
+      <property name="styleSheet">
+        <string notr="true">QWidget#indicator {
+  color: rgb(0, 0, 0);
+  background-color: rgb(115, 223, 255);
+  }</string>
+      </property>
+      <property name="toolTip">
+        <string>TBA widget: indicator</string>
+      </property>
+    </widget>
+    <widget class="QWidget" name="indicator_1">
+      <property name="geometry">
+        <rect>
+          <x>228</x>
+          <y>24</y>
+          <width>150</width>
+          <height>25</height>
+        </rect>
+      </property>
+      <property name="styleSheet">
+        <string notr="true">QWidget#indicator_1 {
+  color: rgb(0, 0, 0);
+  background-color: rgb(115, 223, 255);
+  }</string>
+      </property>
+      <property name="toolTip">
+        <string>TBA widget: indicator_1</string>
+      </property>
+    </widget>
+    <widget class="QWidget" name="text_126">
+      <property name="geometry">
+        <rect>
+          <x>213</x>
+          <y>27</y>
+          <width>10</width>
+          <height>20</height>
+        </rect>
+      </property>
+      <property name="styleSheet">
+        <string notr="true">QWidget#text_126 {
+  color: rgb(0, 0, 0);
+  }</string>
+      </property>
+      <property name="toolTip">
+        <string>TBA widget: text_126</string>
+      </property>
+    </widget>
+    <widget class="QWidget" name="text_127">
+      <property name="geometry">
+        <rect>
+          <x>163</x>
+          <y>57</y>
+          <width>10</width>
+          <height>20</height>
+        </rect>
+      </property>
+      <property name="styleSheet">
+        <string notr="true">QWidget#text_127 {
+  color: rgb(0, 0, 0);
+  }</string>
+      </property>
+      <property name="toolTip">
+        <string>TBA widget: text_127</string>
+      </property>
+    </widget>
+    <widget class="QWidget" name="related_display_120">
+      <property name="geometry">
+        <rect>
+          <x>430</x>
+          <y>85</y>
+          <width>40</width>
+          <height>15</height>
+        </rect>
+      </property>
+      <property name="styleSheet">
+        <string notr="true">QWidget#related_display_120 {
+  color: rgb(105, 105, 105);
+  background-color: rgb(218, 218, 218);
+  }</string>
+      </property>
+      <property name="toolTip">
+        <string>TBA widget: related_display_120</string>
+      </property>
+    </widget>
+    <widget class="QWidget" name="related_display_121">
+      <property name="geometry">
+        <rect>
+          <x>5</x>
+          <y>75</y>
+          <width>55</width>
+          <height>20</height>
+        </rect>
+      </property>
+      <property name="styleSheet">
+        <string notr="true">QWidget#related_display_121 {
+  color: rgb(255, 255, 255);
+  background-color: rgb(40, 147, 21);
+  }</string>
+      </property>
+      <property name="toolTip">
+        <string>TBA widget: related_display_121</string>
+      </property>
+    </widget>
+    <widget class="QWidget" name="related_display_122">
+      <property name="geometry">
+        <rect>
+          <x>90</x>
+          <y>75</y>
+          <width>40</width>
+          <height>20</height>
+        </rect>
+      </property>
+      <property name="styleSheet">
+        <string notr="true">QWidget#related_display_122 {
+  color: rgb(255, 255, 255);
+  background-color: rgb(51, 153, 0);
+  }</string>
+      </property>
+      <property name="toolTip">
+        <string>TBA widget: related_display_122</string>
+      </property>
+    </widget>
+  </widget>
+  <customwidgets>
+    <customwidget>
+      <class>PyDMLineEdit</class>
+      <extends>QLineEdit</extends>
+      <header>pydm.widgets.line_edit</header>
+    </customwidget>
+    <customwidget>
+      <class>PyDMLabel</class>
+      <extends>QLabel</extends>
+      <header>pydm.widgets.label</header>
+    </customwidget>
+    <customwidget>
+      <class>PyDMEmbeddedDisplay</class>
+      <extends>QFrame</extends>
+      <header>pydm.widgets.embedded_display</header>
+    </customwidget>
+    <customwidget>
+      <class>PyDMRelatedDisplayButton</class>
+      <extends>QPushButton</extends>
+      <header>pydm.widgets.related_display_button</header>
+    </customwidget>
+  </customwidgets>
+</ui>
