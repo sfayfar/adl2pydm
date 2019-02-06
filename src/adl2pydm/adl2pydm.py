@@ -57,10 +57,11 @@ CustomWidget = namedtuple('CustomWidget', 'cls extends header')
 
 # TODO: build this from only the widgets in use (#4)
 PYDM_CUSTOM_WIDGETS = [
-    CustomWidget("PyDMLineEdit", "QLineEdit", "pydm.widgets.line_edit"),
+    CustomWidget("PyDMFrame", "QFrame", "pydm.widgets.frame"),
     CustomWidget("PyDMLabel",    "QLabel",    "pydm.widgets.label"),
     CustomWidget("PyDMEmbeddedDisplay", "QFrame", "pydm.widgets.embedded_display"),
-    # not in MEDM : CustomWidget("PyDMImageView", "QWidget", "pydm.widgets.image"),
+    CustomWidget("PyDMLineEdit", "QLineEdit", "pydm.widgets.line_edit"),
+    # MEDM image widget : CustomWidget("PyDMImageView", "QWidget", "pydm.widgets.image"),
     CustomWidget("PyDMRelatedDisplayButton", "QPushButton", "pydm.widgets.related_display_button"),
     ]
 
@@ -107,6 +108,16 @@ def write_block(writer, parent, block):
         write_tooltip(writer, qw, "PV: " + pv)
         propty = writer.writeProperty(qw, "readOnly", "true", tag="bool")
         write_channel(writer, qw, pv)
+
+    elif block.symbol == "related display":
+        cls = widget_info["pydm_widget"]
+        qw = writer.writeOpenTag(parent, "widget", cls=cls, name=nm)
+
+        write_geometry(writer, qw, block.geometry)
+        write_colors(writer, qw, block)
+        write_tooltip(writer, qw, block.title or nm)
+        writer.writeProperty(qw, "text", block.title or nm, tag="string")
+
     else:
         cls = "PyDMFrame"     # generic placeholder now
         qw = writer.writeOpenTag(parent, "widget", cls=cls, name=nm)
