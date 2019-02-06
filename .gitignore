@@ -105,4 +105,4 @@ venv.bak/
 /test.xml
 
 # development screens
-src/pydm/screens/pydm/*.ui
+src/adl2pydm/screens/pydm/*.ui
