@@ -68,7 +68,7 @@ widgets = {
     "strip chart" : dict(type="monitor", pydm_widget="PyDMTimePlot"),
     "text" : dict(type="static", pydm_widget="PyDMLabel"),
     "text entry" : dict(type="controller", pydm_widget="PyDMLineEdit"),
-    "text update" : dict(type="monitor", pydm_widget="PyDMLineEdit + readOnly=True"),
+    "text update" : dict(type="monitor", pydm_widget="PyDMLineEdit"),   #  + readOnly=True
     "valuator" : dict(type="controller", pydm_widget=""),
     "wheel switch" : dict(type="controller", pydm_widget=""),
     }
