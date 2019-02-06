@@ -39,15 +39,24 @@ import adl_symbols
 
 
 TEST_FILES = [
-    "screens/medm/xxx-R5-8-4.adl",
+    "screens/medm/xxx-R5-8-4.adl",                  # related display
     "screens/medm/xxx-R6-0.adl",
-    "screens/medm/calc-3-4-2-1-FuncGen_full.adl",    # strip chart
+    # FIXME: needs more work here (unusual structure, possibly stress test):  "screens/medm/base-3.15.5-caServerApp-test.adl",# info[, "<<color rules>>", "<<color map>>"
+    "screens/medm/calc-3-4-2-1-FuncGen_full.adl",   # strip chart
     "screens/medm/calc-R3-7-1-FuncGen_full.adl",    # strip chart
+    "screens/medm/calc-R3-7-userCalcMeter.adl",     # meter
+    "screens/medm/mca-R7-7-mca.adl",                # bar
     "screens/medm/motorx-R6-10-1.adl",
     "screens/medm/motorx_all-R6-10-1.adl",
-    "screens/medm/scanDetPlot-R2-11-1.adl",
-    "screens/medm/beamHistory_full-R3-5.adl", # this .adl has problems
-    "screens/medm/ADBase-R3-3-1.adl",
+    "screens/medm/optics-R2-13-1-CoarseFineMotorShow.adl",  # indicator
+    "screens/medm/optics-R2-13-1-kohzuGraphic.adl", # image
+    "screens/medm/optics-R2-13-1-pf4more.adl",      # byte
+    "screens/medm/optics-R2-13-xiahsc.adl",         # valuator
+    "screens/medm/scanDetPlot-R2-11-1.adl",         # cartesian plot, strip
+    "screens/medm/sscan-R2-11-1-scanAux.adl",       # shell command
+    "screens/medm/std-R3-5-ID_ctrl.adl",            # param
+    # "screens/medm/beamHistory_full-R3-5.adl", # dl_color -- this .adl has content errors
+    "screens/medm/ADBase-R3-3-1.adl",               # composite
     "screens/medm/simDetector-R3-3-31.adl",
     ]
 
@@ -176,7 +185,7 @@ class MedmBaseWidget(object):
             self.title = assignments["label"]
             del self.contents["label"], assignments["label"]
 
-        for symbol in ("basic attribute", "dynamic attribute", "control", "monitor"):
+        for symbol in ("basic attribute", "dynamic attribute", "control", "monitor", "param"):
             block = self.getNamedBlock(symbol, blocks)
             if block is not None:
                 aa = self.locateAssignments(buf[block.start+1:block.end])
@@ -208,7 +217,6 @@ class MedmBaseWidget(object):
             "message button" : MedmMessageButtonWidget,
             "meter" : MedmMeterWidget,
             "oval" : MedmOvalWidget,
-            "param" : MedmParamWidget,
             "polygon" : MedmPolygonWidget,
             "polyline" : MedmPolylineWidget,
             "rectangle" : MedmRectangleWidget,
@@ -239,7 +247,7 @@ class MedmBaseWidget(object):
         for k, sk in xref.items():
             value = assignments.get(k)
             if value is not None:
-                self.__setattr__(sk, clut[int(value)])
+                self.__setattr__(sk, clut[int(value)])  # FIXME: caServerApp/test.adl fails here with IndexError
                 del assignments[k]
         return assignments
     
@@ -366,8 +374,8 @@ class MedmGenericWidget(MedmBaseWidget):
 
 
 class MedmArcWidget(MedmGenericWidget): pass
-class MedmBarWidget(MedmGenericWidget): debug = True
-class MedmByteWidget(MedmGenericWidget): debug = True
+class MedmBarWidget(MedmGenericWidget): pass
+class MedmByteWidget(MedmGenericWidget): pass
 
 
 class MedmCartesianPlotWidget(MedmGenericWidget):
@@ -421,14 +429,13 @@ class MedmCompositeWidget(MedmBaseWidget):
 
 
 class MedmEmbeddedDisplayWidget(MedmGenericWidget): debug = True # TODO: need example in .adl file!
-class MedmImageWidget(MedmGenericWidget): debug = True
-class MedmIndicatorWidget(MedmGenericWidget): debug = True
+class MedmImageWidget(MedmGenericWidget): pass
+class MedmIndicatorWidget(MedmGenericWidget): pass
 class MedmMenuWidget(MedmGenericWidget): pass
 class MedmMessageButtonWidget(MedmGenericWidget): pass
-class MedmMeterWidget(MedmGenericWidget): debug = True
-class MedmOvalWidget(MedmGenericWidget): debug = True
-class MedmParamWidget(MedmGenericWidget): debug = True
-class MedmPolygonWidget(MedmGenericWidget): debug = True
+class MedmMeterWidget(MedmGenericWidget): pass
+class MedmOvalWidget(MedmGenericWidget): pass
+class MedmPolygonWidget(MedmGenericWidget): pass
 class MedmPolylineWidget(MedmGenericWidget): pass
 class MedmRectangleWidget(MedmGenericWidget): pass
 
@@ -444,6 +451,8 @@ class MedmRelatedDisplayWidget(MedmGenericWidget):
 
         displays = {}
         for block in blocks:
+            if not block.symbol.startswith("display["):
+                continue
             del self.contents[block.symbol]
             aa = self.locateAssignments(buf[block.start+1:block.end])
             row = block.symbol.replace("[", " ").replace("]", "").split()[-1]
@@ -454,7 +463,27 @@ class MedmRelatedDisplayWidget(MedmGenericWidget):
         self.displays = [displays[k] for k in sorted(displays.keys(), key=sorter)]
 
 
-class MedmShellCommandWidget(MedmGenericWidget): debug = True
+class MedmShellCommandWidget(MedmGenericWidget):
+    
+    def __init__(self, line, main, symbol):
+        MedmGenericWidget.__init__(self, line, main, symbol)
+        self.commands = []
+
+    def parseAdlBuffer(self, buf):
+        assignments, blocks = MedmBaseWidget.parseAdlBuffer(self, buf)
+
+        commands = {}
+        for block in blocks:
+            if not block.symbol.startswith("command["):
+                continue
+            del self.contents[block.symbol]
+            aa = self.locateAssignments(buf[block.start+1:block.end])
+            row = block.symbol.replace("[", " ").replace("]", "").split()[-1]
+            commands[row] = aa
+        
+        def sorter(value):
+            return int(value)
+        self.commands = [commands[k] for k in sorted(commands.keys(), key=sorter)]
 
 
 class MedmStripChartWidget(MedmGenericWidget):
@@ -495,8 +524,8 @@ class MedmTextWidget(MedmGenericWidget):
 
 class MedmTextEntryWidget(MedmGenericWidget): pass
 class MedmTextUpdateWidget(MedmGenericWidget): pass
-class MedmValuatorWidget(MedmGenericWidget): debug = True
-class MedmWheelSwitchWidget(MedmGenericWidget): debug = True
+class MedmValuatorWidget(MedmGenericWidget): pass
+class MedmWheelSwitchWidget(MedmGenericWidget): debug = True # TODO: need example in .adl file!
 
 
 if __name__ == "__main__":
