@@ -176,7 +176,9 @@ class MedmBaseWidget(object):
         xref = {
             "arc" : MedmGenericWidget,
             "composite" : MedmCompositeWidget,
+            "embedded display" : MedmEmbeddedDisplayWidget,
             "menu" : MedmMenuWidget,
+            "message button" : MedmMessageButtonWidget,
             "related display" : MedmRelatedDisplayWidget,
             "text" : MedmTextWidget,
             "text entry" : MedmTextEntryWidget,
@@ -339,15 +341,32 @@ class MedmCompositeWidget(MedmBaseWidget):
         if block is not None:
             aa = self.locateAssignments(buf[block.start+1:block.end])
             bb = self.locateBlocks(buf[block.start+1:block.end])
-            # FIXME: line numbers off by +1: 
             self.parseChildren(self.main, bb, buf[block.start+1:block.end])
-            pass
+
+
+class MedmEmbeddedDisplayWidget(MedmGenericWidget): pass # TODO: need example in .adl file!
 
 
 class MedmMenuWidget(MedmGenericWidget):
 
     def parseAdlBuffer(self, buf):
         assignments, blocks = MedmBaseWidget.parseAdlBuffer(self, buf)
+
+        block = self.getNamedBlock("control", blocks)
+        if block is not None:
+            aa = self.locateAssignments(buf[block.start+1:block.end])
+            aa = self.parseColorAssignments(aa)
+            self.contents["control"] = aa
+
+
+class MedmMessageButtonWidget(MedmGenericWidget):
+
+    def parseAdlBuffer(self, buf):
+        assignments, blocks = MedmBaseWidget.parseAdlBuffer(self, buf)
+
+        if "label" in assignments:
+            self.title = assignments["label"]
+            del self.contents["label"], assignments["label"]
 
         block = self.getNamedBlock("control", blocks)
         if block is not None:
@@ -364,6 +383,7 @@ class MedmRelatedDisplayWidget(MedmGenericWidget):
 
     def parseAdlBuffer(self, buf):
         assignments, blocks = MedmBaseWidget.parseAdlBuffer(self, buf)
+
         if "label" in assignments:
             self.title = assignments["label"]
             del self.contents["label"], assignments["label"]
