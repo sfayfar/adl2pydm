@@ -228,6 +228,7 @@ class MedmMainWidget(MedmBaseWidget):
                 widget_handler = xref.get(block.symbol, MedmGenericWidget)
                 widget = widget_handler(block.start, self, block.symbol)
                 widget.parseAdlBuffer(buf[block.start+1:block.end])
+                self.widgets.append(widget)
     
     def parseFileBlock(self, buf):
         # TODO: keep original line numbers for debug purposes
