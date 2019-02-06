@@ -103,3 +103,6 @@ venv.bak/
 # mypy
 .mypy_cache/
 /test.xml
+
+# development screens
+src/pydm/screens/pydm/*.ui
