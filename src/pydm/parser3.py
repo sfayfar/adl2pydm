@@ -41,6 +41,7 @@ import adl_symbols
 TEST_FILES = [
     "screens/medm/xxx-R5-8-4.adl",
     "screens/medm/xxx-R6-0.adl",
+    "screens/medm/calc-R3-7-1-FuncGen_full.adl",    # strip chart
     "screens/medm/motorx-R6-10-1.adl",
     "screens/medm/motorx_all-R6-10-1.adl",
     "screens/medm/scanDetPlot-R2-11-1.adl",
@@ -193,7 +194,9 @@ class MedmBaseWidget(object):
     
     def parseChildren(self, main, blocks, buf):
         xref = {
-            "arc" : MedmGenericWidget,
+            "arc" : MedmArcWidget,
+            "cartesian plot" : MedmCartesianPlotWidget,
+            "choice button" : MedmChoiceButtonWidget,
             "composite" : MedmCompositeWidget,
             "embedded display" : MedmEmbeddedDisplayWidget,
             "menu" : MedmMenuWidget,
@@ -201,6 +204,7 @@ class MedmBaseWidget(object):
             "polyline" : MedmPolylineWidget,
             "rectangle" : MedmRectangleWidget,
             "related display" : MedmRelatedDisplayWidget,
+            "strip chart" : MedmStripChartWidget,
             "text" : MedmTextWidget,
             "text entry" : MedmTextEntryWidget,
             "text update" : MedmTextUpdateWidget,
@@ -335,6 +339,8 @@ class MedmMainWidget(MedmBaseWidget):
 
 class MedmGenericWidget(MedmBaseWidget):
     
+    debug = False
+    
     def __init__(self, line, main, symbol):
         MedmBaseWidget.__init__(self)
         self.line_offset = line
@@ -343,7 +349,43 @@ class MedmGenericWidget(MedmBaseWidget):
 
     def parseAdlBuffer(self, buf):
         assignments, blocks = MedmBaseWidget.parseAdlBuffer(self, buf)
-        pass
+        if self.debug:
+            _debug = self.debug
+
+
+class MedmArcWidget(MedmGenericWidget): pass
+class MedmBarWidget(MedmGenericWidget): debug = True
+class MedmByteWidget(MedmGenericWidget): debug = True
+
+
+class MedmCartesianPlotWidget(MedmGenericWidget):
+    
+    def __init__(self, line, main, symbol):
+        MedmGenericWidget.__init__(self, line, main, symbol)
+        self.traces = []
+
+    def parseAdlBuffer(self, buf):
+        assignments, blocks = MedmBaseWidget.parseAdlBuffer(self, buf)
+
+        traces = {}
+        for block in blocks:
+            if not block.symbol.startswith("trace["):
+                continue
+            del self.contents[block.symbol]
+            aa = self.locateAssignments(buf[block.start+1:block.end])
+            clr = aa.get("data_clr")
+            if clr is not None:
+                del aa["data_clr"]
+                aa["color"] = self.main.color_table[int(clr)]
+            row = block.symbol.replace("[", " ").replace("]", "").split()[-1]
+            traces[row] = aa
+        
+        def sorter(value):
+            return int(value)
+        self.traces = [traces[k] for k in sorted(traces.keys(), key=sorter)]
+
+
+class MedmChoiceButtonWidget(MedmGenericWidget): pass
 
 
 class MedmCompositeWidget(MedmBaseWidget):
@@ -365,22 +407,10 @@ class MedmCompositeWidget(MedmBaseWidget):
             self.parseChildren(self.main, bb, buf[block.start+1:block.end])
 
 
-class MedmEmbeddedDisplayWidget(MedmGenericWidget): pass # TODO: need example in .adl file!
-
-
+class MedmEmbeddedDisplayWidget(MedmGenericWidget): debug = True # TODO: need example in .adl file!
 class MedmMenuWidget(MedmGenericWidget): pass
 class MedmMessageButtonWidget(MedmGenericWidget): pass
-
-
-class MedmRectangleWidget(MedmGenericWidget):
-
-    def parseAdlBuffer(self, buf):
-        assignments, blocks = MedmBaseWidget.parseAdlBuffer(self, buf)
-
-        _text = "".join(buf)
-        pass
-
-
+class MedmRectangleWidget(MedmGenericWidget): pass
 class MedmPolylineWidget(MedmGenericWidget): pass
 
 
@@ -393,10 +423,6 @@ class MedmRelatedDisplayWidget(MedmGenericWidget):
     def parseAdlBuffer(self, buf):
         assignments, blocks = MedmBaseWidget.parseAdlBuffer(self, buf)
 
-        if "label" in assignments:
-            self.title = assignments["label"]
-            del self.contents["label"], assignments["label"]
-
         displays = {}
         for block in blocks:
             del self.contents[block.symbol]
@@ -407,6 +433,33 @@ class MedmRelatedDisplayWidget(MedmGenericWidget):
         def sorter(value):
             return int(value)
         self.displays = [displays[k] for k in sorted(displays.keys(), key=sorter)]
+
+
+class MedmStripChartWidget(MedmGenericWidget):
+    
+    def __init__(self, line, main, symbol):
+        MedmGenericWidget.__init__(self, line, main, symbol)
+        self.pens = []
+
+    def parseAdlBuffer(self, buf):
+        assignments, blocks = MedmBaseWidget.parseAdlBuffer(self, buf)
+
+        pens = {}
+        for block in blocks:
+            if not block.symbol.startswith("pen["):
+                continue
+            del self.contents[block.symbol]
+            aa = self.locateAssignments(buf[block.start+1:block.end])
+            clr = aa.get("clr")
+            if clr is not None:
+                del aa["clr"]
+                aa["color"] = self.main.color_table[int(clr)]
+            row = block.symbol.replace("[", " ").replace("]", "").split()[-1]
+            pens[row] = aa
+        
+        def sorter(value):
+            return int(value)
+        self.pens = [pens[k] for k in sorted(pens.keys(), key=sorter)]
 
 
 class MedmTextWidget(MedmGenericWidget):
