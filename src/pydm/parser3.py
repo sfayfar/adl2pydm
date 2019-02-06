@@ -174,28 +174,12 @@ class MedmBaseWidget(object):
             self.title = assignments["label"]
             del self.contents["label"], assignments["label"]
 
-        block = self.getNamedBlock("basic attribute", blocks)
-        if block is not None:
-            aa = self.locateAssignments(buf[block.start+1:block.end])
-            aa = self.parseColorAssignments(aa)
-            self.contents["basic attribute"] = aa
-
-        block = self.getNamedBlock("dynamic attribute", blocks)
-        if block is not None:
-            aa = self.locateAssignments(buf[block.start+1:block.end])
-            self.contents["dynamic attribute"] = aa
-
-        block = self.getNamedBlock("control", blocks)
-        if block is not None:
-            aa = self.locateAssignments(buf[block.start+1:block.end])
-            aa = self.parseColorAssignments(aa)
-            self.contents["control"] = aa
-
-        block = self.getNamedBlock("monitor", blocks)
-        if block is not None:
-            aa = self.locateAssignments(buf[block.start+1:block.end])
-            aa = self.parseColorAssignments(aa)
-            self.contents["monitor"] = aa
+        for symbol in ("basic attribute", "dynamic attribute", "control", "monitor"):
+            block = self.getNamedBlock(symbol, blocks)
+            if block is not None:
+                aa = self.locateAssignments(buf[block.start+1:block.end])
+                aa = self.parseColorAssignments(aa)
+                self.contents[symbol] = aa
 
         block = self.getNamedBlock("points", blocks)
         if block is not None:
