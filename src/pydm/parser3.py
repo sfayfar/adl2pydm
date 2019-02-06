@@ -41,7 +41,8 @@ import adl_symbols
 TEST_FILES = [
     "screens/medm/xxx-R5-8-4.adl",
     "screens/medm/xxx-R6-0.adl",
-    "screens/medm/calc-R3-7-1-FuncGen_full.adl",    # strip chart
+    "screens/medm/calc-3-4-2-1-FuncGen_full.adl",    # strip chart
+    #"screens/medm/calc-R3-7-1-FuncGen_full.adl",    # strip chart
     "screens/medm/motorx-R6-10-1.adl",
     "screens/medm/motorx_all-R6-10-1.adl",
     "screens/medm/scanDetPlot-R2-11-1.adl",
@@ -195,19 +196,30 @@ class MedmBaseWidget(object):
     def parseChildren(self, main, blocks, buf):
         xref = {
             "arc" : MedmArcWidget,
+            "bar" : MedmBarWidget,
+            "byte" : MedmByteWidget,
             "cartesian plot" : MedmCartesianPlotWidget,
             "choice button" : MedmChoiceButtonWidget,
             "composite" : MedmCompositeWidget,
             "embedded display" : MedmEmbeddedDisplayWidget,
+            "image" : MedmImageWidget,
+            "indicator" : MedmIndicatorWidget,
             "menu" : MedmMenuWidget,
             "message button" : MedmMessageButtonWidget,
+            "meter" : MedmMeterWidget,
+            "oval" : MedmOvalWidget,
+            "param" : MedmParamWidget,
+            "polygon" : MedmPolygonWidget,
             "polyline" : MedmPolylineWidget,
             "rectangle" : MedmRectangleWidget,
             "related display" : MedmRelatedDisplayWidget,
+            "shell command" : MedmShellCommandWidget,
             "strip chart" : MedmStripChartWidget,
             "text" : MedmTextWidget,
             "text entry" : MedmTextEntryWidget,
             "text update" : MedmTextUpdateWidget,
+            "valuator" : MedmValuatorWidget,
+            "wheel switch" : MedmWheelSwitchWidget,
             }
         for block in blocks:
             if block.symbol in adl_symbols.widgets:
@@ -389,6 +401,7 @@ class MedmChoiceButtonWidget(MedmGenericWidget): pass
 
 
 class MedmCompositeWidget(MedmBaseWidget):
+    """contains other widgets or an entire .adl screen"""
     
     def __init__(self, line, main, symbol):
         MedmBaseWidget.__init__(self)
@@ -408,10 +421,16 @@ class MedmCompositeWidget(MedmBaseWidget):
 
 
 class MedmEmbeddedDisplayWidget(MedmGenericWidget): debug = True # TODO: need example in .adl file!
+class MedmImageWidget(MedmGenericWidget): debug = True
+class MedmIndicatorWidget(MedmGenericWidget): debug = True
 class MedmMenuWidget(MedmGenericWidget): pass
 class MedmMessageButtonWidget(MedmGenericWidget): pass
-class MedmRectangleWidget(MedmGenericWidget): pass
+class MedmMeterWidget(MedmGenericWidget): debug = True
+class MedmOvalWidget(MedmGenericWidget): debug = True
+class MedmParamWidget(MedmGenericWidget): debug = True
+class MedmPolygonWidget(MedmGenericWidget): debug = True
 class MedmPolylineWidget(MedmGenericWidget): pass
+class MedmRectangleWidget(MedmGenericWidget): pass
 
 
 class MedmRelatedDisplayWidget(MedmGenericWidget):
@@ -433,6 +452,9 @@ class MedmRelatedDisplayWidget(MedmGenericWidget):
         def sorter(value):
             return int(value)
         self.displays = [displays[k] for k in sorted(displays.keys(), key=sorter)]
+
+
+class MedmShellCommandWidget(MedmGenericWidget): debug = True
 
 
 class MedmStripChartWidget(MedmGenericWidget):
@@ -473,6 +495,8 @@ class MedmTextWidget(MedmGenericWidget):
 
 class MedmTextEntryWidget(MedmGenericWidget): pass
 class MedmTextUpdateWidget(MedmGenericWidget): pass
+class MedmValuatorWidget(MedmGenericWidget): debug = True
+class MedmWheelSwitchWidget(MedmGenericWidget): debug = True
 
 
 if __name__ == "__main__":
