@@ -39,6 +39,7 @@ import adl_symbols
 
 
 TEST_FILES = [
+    "screens/medm/newDisplay.adl",                  # simple display
     "screens/medm/xxx-R5-8-4.adl",                  # related display
     "screens/medm/xxx-R6-0.adl",
     # FIXME: needs more work here (unusual structure, possibly stress test):  "screens/medm/base-3.15.5-caServerApp-test.adl",# info[, "<<color rules>>", "<<color map>>"
@@ -335,7 +336,8 @@ class MedmMainWidget(MedmBaseWidget):
                 clut = []
                 for block in blocks:
                     a = self.locateAssignments(buf[block.start+1:block.end])
-                    color = Color(a["r"], a["g"], a["b"])   # ignore inten (default = 255)
+                    arr = map(int, (a["r"], a["g"], a["b"]))
+                    color = Color(*list(arr))   # ignore inten (default = 255)
                     clut.append(color)
                 self.color_table = clut
     

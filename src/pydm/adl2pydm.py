@@ -9,17 +9,35 @@ from collections import namedtuple
 import logging
 import os
 
-from adl_parser import MEDM_Reader
+from adl_parser import MedmMainWidget
+import adl_symbols
 from output_handler import PYDM_Writer
 
 
-# TEST_FILE = "/usr/local/epics/synApps_5_8/support/xxx-5-8-3/xxxApp/op/adl/xxx.adl"
-TEST_FILE = "/home/mintadmin/sandbox/synApps/support/xxx-R6-0/xxxApp/op/adl/xxx.adl"
-# TEST_FILE = "/usr/local/epics/synApps_5_8/support/motor-6-9/motorApp/op/adl/motorx_all.adl"
-# TEST_FILE = "screens/medm/newDisplay.adl"
 OUTPUT_PATH = "screens/pydm"
-
 SCREEN_FILE_EXTENSION = ".ui"
+TEST_FILES = [
+    "screens/medm/newDisplay.adl",                  # simple display
+    "screens/medm/xxx-R5-8-4.adl",                  # related display
+    "screens/medm/xxx-R6-0.adl",
+    # FIXME: needs more work here (unusual structure, possibly stress test):  "screens/medm/base-3.15.5-caServerApp-test.adl",# info[, "<<color rules>>", "<<color map>>"
+    "screens/medm/calc-3-4-2-1-FuncGen_full.adl",   # strip chart
+    "screens/medm/calc-R3-7-1-FuncGen_full.adl",    # strip chart
+    "screens/medm/calc-R3-7-userCalcMeter.adl",     # meter
+    "screens/medm/mca-R7-7-mca.adl",                # bar
+    "screens/medm/motorx-R6-10-1.adl",
+    "screens/medm/motorx_all-R6-10-1.adl",
+    "screens/medm/optics-R2-13-1-CoarseFineMotorShow.adl",  # indicator
+    "screens/medm/optics-R2-13-1-kohzuGraphic.adl", # image
+    "screens/medm/optics-R2-13-1-pf4more.adl",      # byte
+    "screens/medm/optics-R2-13-xiahsc.adl",         # valuator
+    "screens/medm/scanDetPlot-R2-11-1.adl",         # cartesian plot, strip
+    "screens/medm/sscan-R2-11-1-scanAux.adl",       # shell command
+    "screens/medm/std-R3-5-ID_ctrl.adl",            # param
+    # "screens/medm/beamHistory_full-R3-5.adl", # dl_color -- this .adl has content errors
+    "screens/medm/ADBase-R3-3-1.adl",               # composite
+    "screens/medm/simDetector-R3-3-31.adl",
+    ]
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -71,12 +89,16 @@ def getUniqueName(suggestion):
 
 
 def write_block(writer, parent, block):
-    nm = getUniqueName(block.medm_block_type.replace(" ", "_"))
-    if block.medm_block_type == "text update":
-        cls = "PyDMLineEdit"
+    nm = getUniqueName(block.symbol.replace(" ", "_"))
+    widget_info = adl_symbols.widgets.get(block.symbol)
+    if block.symbol == "text update":
+        cls = widget_info["pydm_widget"]
         qw = writer.writeOpenTag(parent, "widget", cls=cls, name=nm)
-        # pv = "prj:m1.VAL"     # FIXME: get this from block.contents[0].contents[0].chan.value
-        pv = block.contents[0].contents[0].value   # FIXME: dynamically
+
+        pv = None
+        for k in ("chan", "rdbk"):
+            if k in block.contents["monitor"]:
+                pv = block.contents["monitor"][k]
 
         write_geometry(writer, qw, block.geometry)
         write_colors(writer, qw, block)
@@ -93,7 +115,7 @@ def write_block(writer, parent, block):
 
 def write_channel(writer, parent, channel):
     propty = writer.writeOpenProperty(parent, "channel")
-    propty.attrib["stdset"] = "0"      # TODO: what does this mean? (#5)
+    propty.attrib["stdset"] = "0"      # indicates this attribute is from PyDM, not Qt widget
     writer.writeTaggedString(propty, value="ca://" + channel)
 
 
@@ -142,21 +164,21 @@ def write_tooltip(writer, parent, tip):
 
 
 def write_pydm_ui(screen):
-    title = os.path.split(os.path.splitext(screen.filename)[0])[-1]
+    title = screen.title or os.path.split(os.path.splitext(screen.given_filename)[0])[-1]
     ui_filename = os.path.join(OUTPUT_PATH, title + SCREEN_FILE_EXTENSION)
     writer = PYDM_Writer(None)
     root = writer.openFile(ui_filename)
     logging.info("writing screen file: " + ui_filename)
     writer.writeTaggedString(root, "class", title)
-    form = writer.writeOpenTag(root, "widget", cls="QWidget", name="Form")
+    form = writer.writeOpenTag(root, "widget", cls="QWidget", name="screen")
     
-    write_geometry(writer, form, screen.root.geometry)
-    write_colors(writer, form, screen.root)
+    write_geometry(writer, form, screen.geometry)
+    write_colors(writer, form, screen)
 
     propty = writer.writeOpenProperty(form, "windowTitle")
     writer.writeTaggedString(propty, value=title)
 
-    for widget in screen.root.widgets:
+    for widget in screen.widgets:
         # TODO: handle "widget" if it describes a screen component (#6)
         write_block(writer, form, widget)
     
@@ -172,10 +194,13 @@ def write_pydm_ui(screen):
 
 
 def main(adl_filename):
-    reader = MEDM_Reader(TEST_FILE)
-    reader.parse()
+    reader = MedmMainWidget(adl_filename)
+    buf = reader.getAdlLines(adl_filename)
+    reader.parseAdlBuffer(buf)
     write_pydm_ui(reader)
 
 
 if __name__ == "__main__":
-    main(TEST_FILE)
+    for fname in TEST_FILES:
+        main(fname)
+    print("done")
