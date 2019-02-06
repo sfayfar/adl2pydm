@@ -170,7 +170,11 @@ class MedmBaseWidget(object):
                     break
             del blocks[i]
         
-        # TODO: handle other content in blocks
+        # stash remaining contents
+        contents = dict(**assignments)
+        for block in blocks:            # TODO: improve
+            contents[block.symbol] = "".join(buf[block.start+1:block.end])
+        self.contents = contents
 
         return assignments, blocks
     
@@ -344,7 +348,20 @@ class MedmRelatedDisplayWidget(MedmGenericWidget):
 
     def parseAdlBuffer(self, buf):
         assignments, blocks = MedmBaseWidget.parseAdlBuffer(self, buf)
-        pass
+        if "label" in assignments:
+            self.title = assignments["label"]
+            del self.contents["label"], assignments["label"]
+
+        displays = {}
+        for block in blocks:
+            del self.contents[block.symbol]
+            aa = self.locateAssignments(buf[block.start+1:block.end])
+            row = block.symbol.replace("[", " ").replace("]", "").split()[-1]
+            displays[row] = aa
+        
+        def sorter(value):
+            return int(value)
+        self.displays = [displays[k] for k in sorted(displays.keys(), key=sorter)]
 
 
 class MedmTextWidget(MedmGenericWidget): pass
