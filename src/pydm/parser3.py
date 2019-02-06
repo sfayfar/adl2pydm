@@ -151,13 +151,7 @@ class MedmBaseWidget(object):
         text = "".join(buf)
 
         # assign certain items in named attributes
-        xref = dict(clr="color", bclr="background_color")
-        clut = self.main.color_table    # Color LookUp Table
-        for k, sk in xref.items():
-            value = assignments.get(k)
-            if value is not None:
-                self.__setattr__(sk, clut[int(value)])
-                del assignments[k]
+        assignments = self.parseColorAssignments(assignments)
 
         # all widget blocks have an "object"
         block = self.getNamedBlock("object", blocks)
@@ -192,6 +186,17 @@ class MedmBaseWidget(object):
                 widget = widget_handler(self.line_offset+block.start, main, block.symbol)
                 widget.parseAdlBuffer(buf[block.start+1:block.end])
                 self.widgets.append(widget)
+    
+    def parseColorAssignments(self, assignments):
+        # assign certain items in named attributes
+        xref = dict(clr="color", bclr="background_color")
+        clut = self.main.color_table    # Color LookUp Table
+        for k, sk in xref.items():
+            value = assignments.get(k)
+            if value is not None:
+                self.__setattr__(sk, clut[int(value)])
+                del assignments[k]
+        return assignments
     
     def parseObjectBlock(self, buf):
         """MEDM "object" block defines a Geometry for its parent"""
@@ -364,7 +369,32 @@ class MedmRelatedDisplayWidget(MedmGenericWidget):
         self.displays = [displays[k] for k in sorted(displays.keys(), key=sorter)]
 
 
-class MedmTextWidget(MedmGenericWidget): pass
+class MedmTextWidget(MedmGenericWidget):
+    
+    def __init__(self, line, main, symbol):
+        MedmBaseWidget.__init__(self)
+        self.line_offset = line
+        self.main = main
+        self.symbol = symbol
+
+    def parseAdlBuffer(self, buf):
+        assignments, blocks = MedmBaseWidget.parseAdlBuffer(self, buf)
+        if "textix" in assignments:
+            self.title = assignments["textix"]
+            del self.contents["textix"], assignments["textix"]
+
+        block = self.getNamedBlock("basic attribute", blocks)
+        if block is not None:
+            aa = self.locateAssignments(buf[block.start+1:block.end])
+            aa = self.parseColorAssignments(aa)
+            self.contents["basic attribute"] = aa
+
+        block = self.getNamedBlock("dynamic attribute", blocks)
+        if block is not None:
+            aa = self.locateAssignments(buf[block.start+1:block.end])
+            self.contents["dynamic attribute"] = aa
+
+        pass    # TODO: parse more
 
 
 if __name__ == "__main__":
