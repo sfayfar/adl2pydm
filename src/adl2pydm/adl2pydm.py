@@ -108,11 +108,16 @@ def write_block(writer, parent, block):
         propty = writer.writeProperty(qw, "readOnly", "true", tag="bool")
         write_channel(writer, qw, pv)
     else:
-        cls = "QWidget"     # generic placeholder now
+        cls = "PyDMFrame"     # generic placeholder now
         qw = writer.writeOpenTag(parent, "widget", cls=cls, name=nm)
         write_geometry(writer, qw, block.geometry)
         write_colors(writer, qw, block)
         write_tooltip(writer, qw, "TBA widget: " + nm)
+        # what styling is effective?
+        #writer.writeProperty(qw, "frameShape", "QFrame::StyledPanel", tag="enum")
+        #writer.writeProperty(qw, "frameShadow", "QFrame::Raised", tag="enum")
+        #writer.writeProperty(qw, "lineWidth", "2", tag="number")
+        #writer.writeProperty(qw, "midLineWidth", "2", tag="number")
 
 
 def write_channel(writer, parent, channel):
