@@ -190,7 +190,10 @@ class MedmBaseWidget(object):
     def parseColorAssignments(self, assignments):
         # assign certain items in named attributes
         xref = dict(clr="color", bclr="background_color")
-        clut = self.main.color_table    # Color LookUp Table
+        if hasattr(self, "color_table"):
+            clut = self.color_table
+        else:
+            clut = self.main.color_table    # Color LookUp Table
         for k, sk in xref.items():
             value = assignments.get(k)
             if value is not None:
@@ -292,12 +295,8 @@ class MedmMainWidget(MedmBaseWidget):
         blocks = self.locateBlocks(buf)
 
         # assign certain items in named attributes
-        xref = dict(clr="color", bclr="background_color")
-        for k, sk in xref.items():
-            value = assignments.get(k)
-            if value is not None:
-                self.__setattr__(sk, self.color_table[int(value)])
-                del assignments[k]
+        assignments = self.parseColorAssignments(assignments)
+
         # assign remaining attributes
         for k, value in assignments.items():
             self.__setattr__(k, value)
