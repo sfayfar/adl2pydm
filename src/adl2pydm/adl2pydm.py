@@ -61,7 +61,7 @@ PYDM_CUSTOM_WIDGETS = [
     CustomWidget("PyDMLabel",    "QLabel",    "pydm.widgets.label"),
     CustomWidget("PyDMEmbeddedDisplay", "QFrame", "pydm.widgets.embedded_display"),
     CustomWidget("PyDMLineEdit", "QLineEdit", "pydm.widgets.line_edit"),
-    # MEDM image widget : CustomWidget("PyDMImageView", "QWidget", "pydm.widgets.image"),
+    CustomWidget("PyDMImageView", "QWidget", "pydm.widgets.image"),
     CustomWidget("PyDMRelatedDisplayButton", "QPushButton", "pydm.widgets.related_display_button"),
     ]
 
