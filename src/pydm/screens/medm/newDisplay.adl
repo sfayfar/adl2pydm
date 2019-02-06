@@ -95,7 +95,7 @@ display {
 		height=31
 	}
 	monitor {
-		chan="S:SRcurrentAI.VAL"
+		chan="$(P)"
 		clr=14
 		bclr=4
 	}
