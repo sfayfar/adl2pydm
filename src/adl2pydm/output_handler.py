@@ -120,13 +120,17 @@ class PYDM_Writer(object):
         with open(self.outFile, "w") as f:
             f.write(xmlstr)
 
-    def writeProperty(self, parent, name, value, tag="string"):
+    def writeProperty(self, parent, name, value, tag="string", **kwargs):
         prop = self.writeOpenTag(parent, "property", name=name)
         self.writeTaggedString(prop, tag, value)
+        for k, v in kwargs.items():
+            prop.attrib[k] = v
         return prop
     
-    def writeOpenProperty(self, parent, name):
+    def writeOpenProperty(self, parent, name, **kwargs):
         prop = self.writeOpenTag(parent, "property", name=name)
+        for k, v in kwargs.items():
+            prop.attrib[k] = v
         return prop
     
     def writeTaggedString(self, parent, tag="string", value=None):
@@ -146,7 +150,7 @@ class PYDM_Writer(object):
     #     color = fmt % (r, g, b, 255)
     #     self.writeTaggedString(prop, value=color)
 
-    def writeOpenTag(self, parent, tag, cls="", name=""):
+    def writeOpenTag(self, parent, tag, cls="", name="", **kwargs):
         if parent is None:
             msg = "writeOpenTag(): parent is None, cannot continue"
             raise ValueError(msg)
@@ -155,6 +159,8 @@ class PYDM_Writer(object):
             element.attrib["class"] = cls
         if len(name) > 0:
             element.attrib["name"] = name
+        for k, v in kwargs.items():
+            element.attrib[k] = v
         return element
 
     def writeCloseTag(self, tag):
