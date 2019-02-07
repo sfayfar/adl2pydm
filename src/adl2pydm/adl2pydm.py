@@ -111,17 +111,23 @@ def write_block(writer, parent, block):
         write_geometry(writer, qw, block.geometry)
         write_colors(writer, qw, block)
         write_tooltip(writer, qw, "PV: " + pv)
-        propty = writer.writeProperty(qw, "readOnly", "true", tag="bool")
+        writer.writeProperty(qw, "readOnly", "true", tag="bool")
         write_channel(writer, qw, pv)
 
     elif block.symbol == "related display":
         cls = widget_info["pydm_widget"]
         qw = writer.writeOpenTag(parent, "widget", cls=cls, name=nm)
+        
+        text = block.title or nm
+        showIcon = not text.startswith("-")
+        text = text.lstrip("-")
 
         write_geometry(writer, qw, block.geometry)
         write_colors(writer, qw, block)
-        write_tooltip(writer, qw, block.title or nm)
-        writer.writeProperty(qw, "text", block.title or nm, tag="string")
+        write_tooltip(writer, qw, text)
+        writer.writeProperty(qw, "text", text, tag="string")
+        if not showIcon:
+            writer.writeProperty(qw, "showIcon", "false", tag="bool", stdset="0")
 
     else:
         cls = "PyDMFrame"     # generic placeholder now
@@ -137,8 +143,8 @@ def write_block(writer, parent, block):
 
 
 def write_channel(writer, parent, channel):
-    propty = writer.writeOpenProperty(parent, "channel")
-    propty.attrib["stdset"] = "0"      # indicates this attribute is from PyDM, not Qt widget
+    propty = writer.writeOpenProperty(parent, "channel", stdset="0")
+    # stdset=0 signals this attribute is from PyDM, not Qt widget
     writer.writeTaggedString(propty, value="ca://" + channel)
 
 
@@ -156,8 +162,7 @@ def write_colors(writer, parent, block):
 
     if clr is not None or bclr is not None:
         propty = writer.writeOpenProperty(parent, "styleSheet")
-        ss = writer.writeOpenTag(propty, "string")
-        ss.attrib["notr"] = "true"
+        ss = writer.writeOpenTag(propty, "string", notr="true")
         ss.text = style
 
 
