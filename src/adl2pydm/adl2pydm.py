@@ -54,9 +54,12 @@ example:
     "header",    "pydm.widgets.line_edit"
 
 """
+
 CustomWidget = namedtuple('CustomWidget', 'cls extends header')
 
 # TODO: build this from only the widgets in use (#4)
+# replace with .pydm_symbols.pydm_custom_widgets
+
 PYDM_CUSTOM_WIDGETS = [
     CustomWidget("PyDMFrame", "QFrame", "pydm.widgets.frame"),
     CustomWidget("PyDMLabel",    "QLabel",    "pydm.widgets.label"),
@@ -93,6 +96,7 @@ def getUniqueName(suggestion):
 def write_block(writer, parent, block):
     nm = getUniqueName(block.symbol.replace(" ", "_"))
     widget_info = adl_symbols.widgets.get(block.symbol)
+    # TODO: generalize
     if block.symbol == "text update":
         cls = widget_info["pydm_widget"]
         qw = writer.writeOpenTag(parent, "widget", cls=cls, name=nm)
@@ -216,7 +220,7 @@ def main(adl_filename):
     reader = MedmMainWidget(adl_filename)
     buf = reader.getAdlLines(adl_filename)
     reader.parseAdlBuffer(buf)
-    write_pydm_ui(reader)
+    write_pydm_ui(reader)       # refactor into a class
 
 
 if __name__ == "__main__":
