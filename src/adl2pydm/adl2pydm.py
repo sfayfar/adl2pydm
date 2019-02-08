@@ -118,6 +118,8 @@ class PydmSupport(object):
     
         # TODO: write .ui file <resources/> elements here (#9)
         # TODO: write .ui file <connections/> elements here (#10)
+        
+        self.writer.closeFile()
 
     def write_block(self, parent, block):
         handlers = {
