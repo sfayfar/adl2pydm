@@ -56,20 +56,6 @@ example:
 
 """
 
-CustomWidget = namedtuple('CustomWidget', 'cls extends header')
-
-# TODO: build this from only the widgets in use (#4)
-# replace with .pydm_symbols.pydm_custom_widgets
-
-PYDM_CUSTOM_WIDGETS = [
-    CustomWidget("PyDMFrame", "QFrame", "pydm.widgets.frame"),
-    CustomWidget("PyDMLabel",    "QLabel",    "pydm.widgets.label"),
-    CustomWidget("PyDMEmbeddedDisplay", "QFrame", "pydm.widgets.embedded_display"),
-    CustomWidget("PyDMLineEdit", "QLineEdit", "pydm.widgets.line_edit"),
-    CustomWidget("PyDMImageView", "QWidget", "pydm.widgets.image"),
-    CustomWidget("PyDMRelatedDisplayButton", "QPushButton", "pydm.widgets.related_display_button"),
-    ]
-
 
 class PydmSupport(object):
     """
@@ -128,7 +114,6 @@ class PydmSupport(object):
         
         # TODO: self.write widget <zorder/> elements here (#7)
     
-        # TODO: need to define ONLY for the widgets actually used (#4)
         self.write_customwidgets(root)
     
         # TODO: write .ui file <resources/> elements here (#9)
