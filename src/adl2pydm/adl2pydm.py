@@ -71,35 +71,40 @@ PYDM_CUSTOM_WIDGETS = [
     ]
 
 
-unique_widget_names = {}    # will not work right when second file is processed!
-
-
-def getUniqueName(suggestion):
-    unique = suggestion
-    
-    if unique in unique_widget_names:
-        knowns = unique_widget_names[suggestion]
-        unique = "%s_%d" % (suggestion, len(knowns))
-        if unique in unique_widget_names:
-            msg = "trouble getting a unique name from " + suggestion
-            msg += "\n  complicated:\n%s" % str(unique_widget_names)
-            raise ValueError(msg)
-    else:
-        unique = suggestion
-        unique_widget_names[suggestion] = []
-
-    # add this one to the list
-    unique_widget_names[suggestion].append(unique)
-    
-    return unique
-
-
 class PydmSupport(object):
     """
     """
     
     def __init__(self):
         self.custom_widgets = []
+        self.unique_widget_names = {}
+    
+    def getUniqueName(self, suggestion):
+        """
+        return a widget name that is not already in use
+        
+        Qt requires that all widgets have a unique name.
+        This algorithm keeps track of all widget names in use 
+        (basedon the suggested name) and, if the suggested name
+        exists, generates a new name with an index number suffixed.
+        """
+        unique = suggestion
+        
+        if unique in self.unique_widget_names:
+            knowns = self.unique_widget_names[suggestion]
+            unique = "%s_%d" % (suggestion, len(knowns))
+            if unique in self.unique_widget_names:
+                msg = "trouble getting a unique name from " + suggestion
+                msg += "\n  complicated:\n%s" % str(unique_widget_names)
+                raise ValueError(msg)
+        else:
+            unique = suggestion
+            self.unique_widget_names[suggestion] = []
+    
+        # add this one to the list
+        self.unique_widget_names[suggestion].append(unique)
+        
+        return unique
     
     def write_ui(self, screen):
         title = screen.title or os.path.split(os.path.splitext(screen.given_filename)[0])[-1]
@@ -137,7 +142,7 @@ class PydmSupport(object):
             "text update" : self.write_block_text_update,
             }
 
-        nm = getUniqueName(block.symbol.replace(" ", "_"))
+        nm = self.getUniqueName(block.symbol.replace(" ", "_"))
         widget_info = adl_symbols.widgets.get(block.symbol)
         if widget_info is not None:
             cls = widget_info["pydm_widget"]
