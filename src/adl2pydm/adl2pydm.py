@@ -146,7 +146,7 @@ class PydmSupport(object):
         widget_info = adl_symbols.widgets.get(block.symbol)
         if widget_info is not None:
             cls = widget_info["pydm_widget"]
-            if cls not in self.custom_widgets and cls.strip() != "":
+            if cls not in self.custom_widgets:
                 self.custom_widgets.append(cls)
         
         handler = handlers.get(block.symbol, self.write_block_default)
