@@ -136,27 +136,27 @@ class PydmSupport(object):
         handlers = {
             #"arc" : dict(type="static", pydm_widget="PyDMDrawingArc"),
             #"bar" : dict(type="monitor", pydm_widget="PyDMDrawingRectangle"),
-            #"byte" : dict(type="monitor", pydm_widget="PyDMByteIndicator"),
-            #"cartesian plot" : dict(type="monitor", pydm_widget="PyDMScatterPlot"),
-            #"choice button" : dict(type="controller", pydm_widget="PyDMEnumComboBox"),
-            #"composite" : dict(type="static", pydm_widget="PyDMFrame"),
+            "byte" : self.write_block_byte_indicator,
+            "cartesian plot" : self.write_block_cartesian_plot,
+            "choice button" : self.write_block_choice_button,
+            "composite" : self.write_block_composite,
             #"embedded display" : dict(type="static", pydm_widget="PyDMEmbeddedDisplay"),
             "image" : self.write_block_image,
-            #"indicator" : dict(type="monitor", pydm_widget="PyDMLineEdit"),
-            #"menu" : dict(type="controller", pydm_widget="PyDMEnumButton"),
+            "indicator" : self.write_block_indicator,
+            "menu" : self.write_block_menu,
             "message button" : self.write_block_message_button,
-            #"meter" : dict(type="monitor", pydm_widget="PyDMScaleIndicator"),
+            "meter" : self.write_block_meter,
             #"oval" : dict(type="static", pydm_widget="PyDMDrawingEllipse"),
             #"polygon" : dict(type="static", pydm_widget="PyDMDrawingPolygon"),
-            #"polyline" : dict(type="static", pydm_widget="PyDMDrawingPolygon"),
-            #"rectangle" : dict(type="static", pydm_widget="PyDMDrawingRectangle"),
+            "polyline" : self.write_block_polyline,
+            "rectangle" : self.write_block_rectangle,
             "related display" : self.write_block_related_display,
-            #"shell command" : dict(type="static", pydm_widget="PyDMShellCommand"),
-            #"strip chart" : dict(type="monitor", pydm_widget="PyDMTimePlot"),
+            "shell command" : self.write_block_shell_command,
+            "strip chart" : self.write_block_strip_chart,
             "text" : self.write_block_text,
             "text entry" : self.write_block_text_entry,
             "text update" : self.write_block_text_update,
-            #"valuator" : dict(type="controller", pydm_widget="PyDMLineEdit"),
+            "valuator" : self.write_block_valuator,
             #"wheel switch" : dict(type="controller", pydm_widget="PyDMSpinbox"),
             }
 
@@ -168,103 +168,135 @@ class PydmSupport(object):
                 self.custom_widgets.append(cls)
         
         handler = handlers.get(block.symbol, self.write_block_default)
-        handler(parent, block, nm, widget_info)
-        
-    def write_block_default(self, parent, block, nm, widget_info):
-        cls = "PyDMFrame"     # generic placeholder now
         cls = widget_info["pydm_widget"]
+        if block.symbol.find("chart") >= 0:
+            pass
+        # TODO: PyDMDrawingMMM (Line, Polygon, Oval, ...) need more decisions here 
         qw = self.writer.writeOpenTag(parent, "widget", cls=cls, name=nm)
         self.write_geometry(qw, block.geometry)
         self.write_colors(qw, block)
+        handler(parent, block, nm, qw)
+    
+    # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+        
+    def write_block_default(self, parent, block, nm, qw):
         self.write_tooltip(qw, "TBA widget: " + nm)
         # what styling is effective?
         #self.writer.writeProperty(qw, "frameShape", "QFrame::StyledPanel", tag="enum")
         #self.writer.writeProperty(qw, "frameShadow", "QFrame::Raised", tag="enum")
         #self.writer.writeProperty(qw, "lineWidth", "2", tag="number")
         #self.writer.writeProperty(qw, "midLineWidth", "2", tag="number")
-    
-    def write_block_image(self, parent, block, nm, widget_info):
-        cls = widget_info["pydm_widget"]
-        qw = self.writer.writeOpenTag(parent, "widget", cls=cls, name=nm)
-
-        image_name = block.contents.get("image name")
-        if image_name is None:
-            pass
         
-        self.writer.writeProperty(qw, "filename", image_name, tag="string", stdset="0")
-
-        self.write_geometry(qw, block.geometry)
-        self.write_colors(qw, block)
+    def write_block_byte_indicator(self, parent, block, nm, qw):
         self.write_tooltip(qw, nm)
+        # TODO: block.contents["direction"]
+        # TODO: block.contents["ebit"]
+        # TODO: block.contents["sbit"]
         
-    def write_block_message_button(self, parent, block, nm, widget_info):
-        cls = widget_info["pydm_widget"]
-        qw = self.writer.writeOpenTag(parent, "widget", cls=cls, name=nm)
-
+    def write_block_choice_button(self, parent, block, nm, qw):
         pv = self.get_channel(block.contents["control"])
+        self.write_tooltip(qw, pv)
+        self.write_channel(qw, pv)
         
-        self.writer.writeProperty(qw, "text", block.title, tag="string")
-
-        self.write_geometry(qw, block.geometry)
-        self.write_colors(qw, block)
+    def write_block_cartesian_plot(self, parent, block, nm, qw):
         self.write_tooltip(qw, nm)
-        self.write_channel(qw, pv)  # TODO:block.contents["press_msg"]
-    
-    def write_block_related_display(self, parent, block, nm, widget_info):
-        cls = widget_info["pydm_widget"]
-        qw = self.writer.writeOpenTag(parent, "widget", cls=cls, name=nm)
+        # TODO: block.traces
+        # TODO: much unparsed content in block.contents
         
+    def write_block_composite(self, parent, block, nm, qw):
+        self.write_tooltip(qw, nm)
+        # TODO: special handling needed
+        # might have block.contents["dynamic attribute"] dict with chan, calc, and vis
+        # might have block.contents["chan"] and block.contents["vis"]
+        # might have block.contents["composite file"] and block.contents["composite name"]
+        #    note that composite file is a list delimited by ";"
+
+        # FIXME: can't see these widgets yet
+        for widget in block.widgets:
+            self.write_block(qw, widget)
+    
+    def write_block_image(self, parent, block, nm, qw):
+        image_name = block.contents.get("image name")
+        self.writer.writeProperty(qw, "filename", image_name, tag="string", stdset="0")
+        self.write_tooltip(qw, nm)
+        
+    def write_block_indicator(self, parent, block, nm, qw):
+        pv = self.get_channel(block.contents["monitor"])
+        self.write_channel(qw, pv)
+        self.write_tooltip(qw, nm)
+        self.writer.writeProperty(qw, "text", block.title, tag="string")
+        
+    def write_block_menu(self, parent, block, nm, qw):
+        pv = self.get_channel(block.contents["control"])
+        self.write_channel(qw, pv)
+        self.write_tooltip(qw, pv)
+        
+    def write_block_message_button(self, parent, block, nm, qw):
+        pv = self.get_channel(block.contents["control"])
+        self.writer.writeProperty(qw, "text", block.title, tag="string")
+        self.write_tooltip(qw, pv)
+        self.write_channel(qw, pv)  # TODO:block.contents["press_msg"]
+        
+    def write_block_meter(self, parent, block, nm, qw):
+        pv = self.get_channel(block.contents["monitor"])
+        self.write_channel(qw, pv)
+        self.write_tooltip(qw, pv)
+        
+    def write_block_polyline(self, parent, block, nm, qw):
+        # TODO: PyDM widget choice needs help here
+        # this gets interesting because of the number points required for each PyDMDrawingMMM widget
+        self.write_tooltip(qw, nm)
+        
+    def write_block_rectangle(self, parent, block, nm, qw):
+        self.write_tooltip(qw, nm)
+    
+    def write_block_related_display(self, parent, block, nm, qw):
         text = block.title or nm
         showIcon = not text.startswith("-")
         text = text.lstrip("-")
-
-        self.write_geometry(qw, block.geometry)
-        self.write_colors(qw, block)
         self.write_tooltip(qw, text)
         self.writer.writeProperty(qw, "text", text, tag="string")
         if not showIcon:
             self.writer.writeProperty(qw, "showIcon", "false", tag="bool", stdset="0")
-    
-    def write_block_text(self, parent, block, nm, widget_info):
-        cls = widget_info["pydm_widget"]
-        qw = self.writer.writeOpenTag(parent, "widget", cls=cls, name=nm)
-
-        # block.contents["align"] = horiz. right
         
+    def write_block_shell_command(self, parent, block, nm, qw):
+        self.write_tooltip(qw, nm)
+        # TODO: block.commands is a list
+        
+    def write_block_strip_chart(self, parent, block, nm, qw):
+        self.write_tooltip(qw, nm)
+        # TODO: block.pens
+        # TODO: block.contents["period"]
+        # TODO: much unparsed content in block.contents
+    
+    def write_block_text(self, parent, block, nm, qw):
+        # block.contents["align"] = horiz. right
         self.writer.writeProperty(qw, "text", block.title, tag="string")
-
-        self.write_geometry(qw, block.geometry)
-        self.write_colors(qw, block)
         self.write_tooltip(qw, nm)
     
-    def write_block_text_entry(self, parent, block, nm, widget_info):
-        cls = widget_info["pydm_widget"]
-        qw = self.writer.writeOpenTag(parent, "widget", cls=cls, name=nm)
-
+    def write_block_text_entry(self, parent, block, nm, qw):
         pv = self.get_channel(block.contents["control"])    # TODO: format = string | compact
-
-        self.write_geometry(qw, block.geometry)
-        self.write_colors(qw, block)
-        self.write_tooltip(qw, "PV: " + pv)
         self.write_channel(qw, pv)
+        self.write_tooltip(qw, pv)
     
-    def write_block_text_update(self, parent, block, nm, widget_info):
-        cls = widget_info["pydm_widget"]
-        qw = self.writer.writeOpenTag(parent, "widget", cls=cls, name=nm)
-
+    def write_block_text_update(self, parent, block, nm, qw):
         pv = self.get_channel(block.contents["monitor"])
-
-        self.write_geometry(qw, block.geometry)
-        self.write_colors(qw, block)
         self.write_tooltip(qw, "PV: " + pv)
         self.writer.writeProperty(qw, "readOnly", "true", tag="bool")
         self.write_channel(qw, pv)
+        
+    def write_block_valuator(self, parent, block, nm, qw):
+        pv = self.get_channel(block.contents["control"])
+        self.write_channel(qw, pv)
+        self.write_tooltip(qw, pv)
+        # TODO: block.contents["dPrecision"]
     
+    # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
     def write_channel(self, parent, channel):
         propty = self.writer.writeOpenProperty(parent, "channel", stdset="0")
         # stdset=0 signals this attribute is from PyDM, not Qt widget
         self.writer.writeTaggedString(propty, value="ca://" + channel)
-    
     
     def write_colors(self, parent, block):
         clr = block.color
@@ -283,7 +315,6 @@ class PydmSupport(object):
             ss = self.writer.writeOpenTag(propty, "string", notr="true")
             ss.text = style
     
-    
     def write_customwidgets(self, parent):
         cw_set = self.writer.writeOpenTag(parent, "customwidgets")
         for widget in self.custom_widgets:
@@ -294,7 +325,6 @@ class PydmSupport(object):
             self.writer.writeTaggedString(cw, "class", item.cls)
             self.writer.writeTaggedString(cw, "extends", item.extends)
             self.writer.writeTaggedString(cw, "header", item.header)
-    
     
     def write_geometry(self, parent, geom):
         propty = self.writer.writeOpenProperty(parent, "geometry")
