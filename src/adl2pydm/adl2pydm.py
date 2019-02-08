@@ -65,7 +65,7 @@ class PydmSupport(object):
         self.custom_widgets = []
         self.unique_widget_names = {}
     
-    def getUniqueName(self, suggestion):
+    def get_unique_widget_name(self, suggestion):
         """
         return a widget name that is not already in use
         
@@ -92,7 +92,18 @@ class PydmSupport(object):
         
         return unique
     
+    def get_channel(self, contents):
+        """return the PV channel described in the MEDM widget"""
+        pv = None
+        for k in ("chan", "rdbk", "ctrl"):
+            if k in contents:
+                pv = contents[k]
+        if pv is not None:
+            pv = pv.replace("(", "{").replace(")", "}")
+        return pv
+    
     def write_ui(self, screen):
+        """main entry point to write the .ui file"""
         title = screen.title or os.path.split(os.path.splitext(screen.given_filename)[0])[-1]
         ui_filename = os.path.join(OUTPUT_PATH, title + SCREEN_FILE_EXTENSION)
         self.writer = PYDM_Writer(None)
@@ -123,13 +134,33 @@ class PydmSupport(object):
 
     def write_block(self, parent, block):
         handlers = {
+            #"arc" : dict(type="static", pydm_widget="PyDMDrawingArc"),
+            #"bar" : dict(type="monitor", pydm_widget="PyDMDrawingRectangle"),
+            #"byte" : dict(type="monitor", pydm_widget="PyDMByteIndicator"),
+            #"cartesian plot" : dict(type="monitor", pydm_widget="PyDMScatterPlot"),
+            #"choice button" : dict(type="controller", pydm_widget="PyDMEnumComboBox"),
+            #"composite" : dict(type="static", pydm_widget="PyDMFrame"),
+            #"embedded display" : dict(type="static", pydm_widget="PyDMEmbeddedDisplay"),
+            "image" : self.write_block_image,
+            #"indicator" : dict(type="monitor", pydm_widget="PyDMLineEdit"),
+            #"menu" : dict(type="controller", pydm_widget="PyDMEnumButton"),
+            "message button" : self.write_block_message_button,
+            #"meter" : dict(type="monitor", pydm_widget="PyDMScaleIndicator"),
+            #"oval" : dict(type="static", pydm_widget="PyDMDrawingEllipse"),
+            #"polygon" : dict(type="static", pydm_widget="PyDMDrawingPolygon"),
+            #"polyline" : dict(type="static", pydm_widget="PyDMDrawingPolygon"),
+            #"rectangle" : dict(type="static", pydm_widget="PyDMDrawingRectangle"),
             "related display" : self.write_block_related_display,
+            #"shell command" : dict(type="static", pydm_widget="PyDMShellCommand"),
+            #"strip chart" : dict(type="monitor", pydm_widget="PyDMTimePlot"),
             "text" : self.write_block_text,
-            #"text entry" : self.write_block_text_entry,
+            "text entry" : self.write_block_text_entry,
             "text update" : self.write_block_text_update,
+            #"valuator" : dict(type="controller", pydm_widget="PyDMLineEdit"),
+            #"wheel switch" : dict(type="controller", pydm_widget="PyDMSpinbox"),
             }
 
-        nm = self.getUniqueName(block.symbol.replace(" ", "_"))
+        nm = self.get_unique_widget_name(block.symbol.replace(" ", "_"))
         widget_info = adl_symbols.widgets.get(block.symbol)
         if widget_info is not None:
             cls = widget_info["pydm_widget"]
@@ -151,6 +182,33 @@ class PydmSupport(object):
         #self.writer.writeProperty(qw, "frameShadow", "QFrame::Raised", tag="enum")
         #self.writer.writeProperty(qw, "lineWidth", "2", tag="number")
         #self.writer.writeProperty(qw, "midLineWidth", "2", tag="number")
+    
+    def write_block_image(self, parent, block, nm, widget_info):
+        cls = widget_info["pydm_widget"]
+        qw = self.writer.writeOpenTag(parent, "widget", cls=cls, name=nm)
+
+        image_name = block.contents.get("image name")
+        if image_name is None:
+            pass
+        
+        self.writer.writeProperty(qw, "filename", image_name, tag="string", stdset="0")
+
+        self.write_geometry(qw, block.geometry)
+        self.write_colors(qw, block)
+        self.write_tooltip(qw, nm)
+        
+    def write_block_message_button(self, parent, block, nm, widget_info):
+        cls = widget_info["pydm_widget"]
+        qw = self.writer.writeOpenTag(parent, "widget", cls=cls, name=nm)
+
+        pv = self.get_channel(block.contents["control"])
+        
+        self.writer.writeProperty(qw, "text", block.title, tag="string")
+
+        self.write_geometry(qw, block.geometry)
+        self.write_colors(qw, block)
+        self.write_tooltip(qw, nm)
+        self.write_channel(qw, pv)  # TODO:block.contents["press_msg"]
     
     def write_block_related_display(self, parent, block, nm, widget_info):
         cls = widget_info["pydm_widget"]
@@ -179,16 +237,22 @@ class PydmSupport(object):
         self.write_colors(qw, block)
         self.write_tooltip(qw, nm)
     
+    def write_block_text_entry(self, parent, block, nm, widget_info):
+        cls = widget_info["pydm_widget"]
+        qw = self.writer.writeOpenTag(parent, "widget", cls=cls, name=nm)
+
+        pv = self.get_channel(block.contents["control"])    # TODO: format = string | compact
+
+        self.write_geometry(qw, block.geometry)
+        self.write_colors(qw, block)
+        self.write_tooltip(qw, "PV: " + pv)
+        self.write_channel(qw, pv)
+    
     def write_block_text_update(self, parent, block, nm, widget_info):
         cls = widget_info["pydm_widget"]
         qw = self.writer.writeOpenTag(parent, "widget", cls=cls, name=nm)
 
-        pv = None
-        for k in ("chan", "rdbk"):
-            if k in block.contents["monitor"]:
-                pv = block.contents["monitor"][k]
-        if pv is not None:
-            pv = pv.replace("(", "{").replace(")", "}")
+        pv = self.get_channel(block.contents["monitor"])
 
         self.write_geometry(qw, block.geometry)
         self.write_colors(qw, block)

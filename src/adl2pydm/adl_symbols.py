@@ -54,7 +54,7 @@ widgets = {
     "choice button" : dict(type="controller", pydm_widget="PyDMEnumComboBox"),
     "composite" : dict(type="static", pydm_widget="PyDMFrame"),
     "embedded display" : dict(type="static", pydm_widget="PyDMEmbeddedDisplay"),
-    "image" : dict(type="monitor", pydm_widget="PyDMImageView"),
+    "image" : dict(type="monitor", pydm_widget="PyDMDrawingImage"),
     "indicator" : dict(type="monitor", pydm_widget="PyDMLineEdit"),
     "menu" : dict(type="controller", pydm_widget="PyDMEnumButton"),
     "message button" : dict(type="controller", pydm_widget="PyDMPushButton"),

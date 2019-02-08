@@ -130,7 +130,7 @@ class MedmBaseWidget(object):
             elif text.rstrip().endswith("}"):
                 nesting -= 1
             elif nesting == level and p > 0:
-                key = text[:p].strip()
+                key = text[:p].strip().strip('"')
                 value = text[p+1:].strip().strip('"')
                 # TODO: look for parentheses
                 assignments[key] = value
