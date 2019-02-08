@@ -141,6 +141,7 @@ class PydmSupport(object):
         
     def write_block_default(self, parent, block, nm, widget_info):
         cls = "PyDMFrame"     # generic placeholder now
+        cls = widget_info["pydm_widget"]
         qw = self.writer.writeOpenTag(parent, "widget", cls=cls, name=nm)
         self.write_geometry(qw, block.geometry)
         self.write_colors(qw, block)
