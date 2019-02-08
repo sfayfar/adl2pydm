@@ -13,6 +13,7 @@ import os
 from adl_parser import MedmMainWidget
 import adl_symbols
 from output_handler import PYDM_Writer
+import pydm_symbols
 
 
 OUTPUT_PATH = "screens/pydm"
@@ -97,6 +98,9 @@ class PydmSupport(object):
     """
     """
     
+    def __init__(self):
+        self.custom_widgets = []
+    
     def write_ui(self, screen):
         title = screen.title or os.path.split(os.path.splitext(screen.given_filename)[0])[-1]
         ui_filename = os.path.join(OUTPUT_PATH, title + SCREEN_FILE_EXTENSION)
@@ -120,59 +124,84 @@ class PydmSupport(object):
         # TODO: self.write widget <zorder/> elements here (#7)
     
         # TODO: need to define ONLY for the widgets actually used (#4)
-        self.write_customwidgets(root, PYDM_CUSTOM_WIDGETS)
+        self.write_customwidgets(root)
     
         # TODO: write .ui file <resources/> elements here (#9)
         # TODO: write .ui file <connections/> elements here (#10)
 
     def write_block(self, parent, block):
+        handlers = {
+            "related display" : self.write_block_related_display,
+            "text" : self.write_block_text,
+            #"text entry" : self.write_block_text_entry,
+            "text update" : self.write_block_text_update,
+            }
+
         nm = getUniqueName(block.symbol.replace(" ", "_"))
         widget_info = adl_symbols.widgets.get(block.symbol)
-        # TODO: generalize
-        if block.symbol == "text update":
+        if widget_info is not None:
             cls = widget_info["pydm_widget"]
-            qw = self.writer.writeOpenTag(parent, "widget", cls=cls, name=nm)
+            if cls not in self.custom_widgets and cls.strip() != "":
+                self.custom_widgets.append(cls)
+        
+        handler = handlers.get(block.symbol, self.write_block_default)
+        handler(parent, block, nm, widget_info)
+        
+    def write_block_default(self, parent, block, nm, widget_info):
+        cls = "PyDMFrame"     # generic placeholder now
+        qw = self.writer.writeOpenTag(parent, "widget", cls=cls, name=nm)
+        self.write_geometry(qw, block.geometry)
+        self.write_colors(qw, block)
+        self.write_tooltip(qw, "TBA widget: " + nm)
+        # what styling is effective?
+        #self.writer.writeProperty(qw, "frameShape", "QFrame::StyledPanel", tag="enum")
+        #self.writer.writeProperty(qw, "frameShadow", "QFrame::Raised", tag="enum")
+        #self.writer.writeProperty(qw, "lineWidth", "2", tag="number")
+        #self.writer.writeProperty(qw, "midLineWidth", "2", tag="number")
     
-            pv = None
-            for k in ("chan", "rdbk"):
-                if k in block.contents["monitor"]:
-                    pv = block.contents["monitor"][k]
-            if pv is not None:
-                pv = pv.replace("(", "{").replace(")", "}")
+    def write_block_related_display(self, parent, block, nm, widget_info):
+        cls = widget_info["pydm_widget"]
+        qw = self.writer.writeOpenTag(parent, "widget", cls=cls, name=nm)
+        
+        text = block.title or nm
+        showIcon = not text.startswith("-")
+        text = text.lstrip("-")
+
+        self.write_geometry(qw, block.geometry)
+        self.write_colors(qw, block)
+        self.write_tooltip(qw, text)
+        self.writer.writeProperty(qw, "text", text, tag="string")
+        if not showIcon:
+            self.writer.writeProperty(qw, "showIcon", "false", tag="bool", stdset="0")
     
-            self.write_geometry(qw, block.geometry)
-            self.write_colors(qw, block)
-            self.write_tooltip(qw, "PV: " + pv)
-            self.writer.writeProperty(qw, "readOnly", "true", tag="bool")
-            self.write_channel(qw, pv)
+    def write_block_text(self, parent, block, nm, widget_info):
+        cls = widget_info["pydm_widget"]
+        qw = self.writer.writeOpenTag(parent, "widget", cls=cls, name=nm)
+
+        # block.contents["align"] = horiz. right
+        
+        self.writer.writeProperty(qw, "text", block.title, tag="string")
+
+        self.write_geometry(qw, block.geometry)
+        self.write_colors(qw, block)
+        self.write_tooltip(qw, nm)
     
-        elif block.symbol == "related display":
-            cls = widget_info["pydm_widget"]
-            qw = self.writer.writeOpenTag(parent, "widget", cls=cls, name=nm)
-            
-            text = block.title or nm
-            showIcon = not text.startswith("-")
-            text = text.lstrip("-")
-    
-            self.write_geometry(qw, block.geometry)
-            self.write_colors(qw, block)
-            self.write_tooltip(qw, text)
-            self.writer.writeProperty(qw, "text", text, tag="string")
-            if not showIcon:
-                self.writer.writeProperty(qw, "showIcon", "false", tag="bool", stdset="0")
-    
-        else:
-            cls = "PyDMFrame"     # generic placeholder now
-            qw = self.writer.writeOpenTag(parent, "widget", cls=cls, name=nm)
-            self.write_geometry(qw, block.geometry)
-            self.write_colors(qw, block)
-            self.write_tooltip(qw, "TBA widget: " + nm)
-            # what styling is effective?
-            #writer.writeProperty(qw, "frameShape", "QFrame::StyledPanel", tag="enum")
-            #writer.writeProperty(qw, "frameShadow", "QFrame::Raised", tag="enum")
-            #writer.writeProperty(qw, "lineWidth", "2", tag="number")
-            #writer.writeProperty(qw, "midLineWidth", "2", tag="number")
-    
+    def write_block_text_update(self, parent, block, nm, widget_info):
+        cls = widget_info["pydm_widget"]
+        qw = self.writer.writeOpenTag(parent, "widget", cls=cls, name=nm)
+
+        pv = None
+        for k in ("chan", "rdbk"):
+            if k in block.contents["monitor"]:
+                pv = block.contents["monitor"][k]
+        if pv is not None:
+            pv = pv.replace("(", "{").replace(")", "}")
+
+        self.write_geometry(qw, block.geometry)
+        self.write_colors(qw, block)
+        self.write_tooltip(qw, "PV: " + pv)
+        self.writer.writeProperty(qw, "readOnly", "true", tag="bool")
+        self.write_channel(qw, pv)
     
     def write_channel(self, parent, channel):
         propty = self.writer.writeOpenProperty(parent, "channel", stdset="0")
@@ -198,9 +227,12 @@ class PydmSupport(object):
             ss.text = style
     
     
-    def write_customwidgets(self, parent, customwidgets):
+    def write_customwidgets(self, parent):
         cw_set = self.writer.writeOpenTag(parent, "customwidgets")
-        for item in customwidgets:
+        for widget in self.custom_widgets:
+            item = pydm_symbols.pydm_custom_widgets.get(widget)
+            if item is None:
+                continue
             cw = self.writer.writeOpenTag(cw_set, "customwidget")
             self.writer.writeTaggedString(cw, "class", item.cls)
             self.writer.writeTaggedString(cw, "extends", item.extends)

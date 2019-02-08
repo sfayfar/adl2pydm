@@ -15,6 +15,8 @@ example:
 
 """
 
+from collections import namedtuple
+
 CustomWidget = namedtuple('CustomWidget', 'cls extends header')
 
 pydm_custom_widgets = dict(
