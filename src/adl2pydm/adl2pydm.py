@@ -109,7 +109,7 @@ class PydmSupport(object):
         self.writer.writeTaggedString(propty, value=title)
     
         for widget in screen.widgets:
-            # TODO: handle "widget" if it describes a screen component (#6)
+            # handle "widget" if it is a known screen component
             self.write_block(form, widget)
         
         # TODO: self.write widget <zorder/> elements here (#7)
