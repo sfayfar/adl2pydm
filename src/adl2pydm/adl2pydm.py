@@ -36,6 +36,7 @@ TEST_FILES = [
     "screens/medm/scanDetPlot-R2-11-1.adl",         # cartesian plot, strip
     "screens/medm/sscan-R2-11-1-scanAux.adl",       # shell command
     "screens/medm/std-R3-5-ID_ctrl.adl",            # param
+    "screens/medm/wheel_switch.adl",                # wheel switch
     # "screens/medm/beamHistory_full-R3-5.adl", # dl_color -- this .adl has content errors
     "screens/medm/ADBase-R3-3-1.adl",               # composite
     "screens/medm/simDetector-R3-3-31.adl",
