@@ -95,7 +95,7 @@ display {
 		height=48
 	}
 	control {
-		chan="float"
+		chan="$(P)$(M)"
 		clr=54
 		bclr=50
 	}

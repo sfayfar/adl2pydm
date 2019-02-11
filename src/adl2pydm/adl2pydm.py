@@ -158,7 +158,7 @@ class PydmSupport(object):
             "text entry" : self.write_block_text_entry,
             "text update" : self.write_block_text_update,
             "valuator" : self.write_block_valuator,
-            #"wheel switch" : dict(type="controller", pydm_widget="PyDMSpinbox"),
+            "wheel switch" : self.write_block_wheel_switch,
             }
 
         nm = self.get_unique_widget_name(block.symbol.replace(" ", "_"))
@@ -291,6 +291,11 @@ class PydmSupport(object):
         self.write_channel(qw, pv)
         self.write_tooltip(qw, pv)
         # TODO: block.contents["dPrecision"]
+        
+    def write_block_wheel_switch(self, parent, block, nm, qw):
+        pv = self.get_channel(block.contents["control"])
+        self.write_channel(qw, pv)
+        self.write_tooltip(qw, pv)
     
     # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
