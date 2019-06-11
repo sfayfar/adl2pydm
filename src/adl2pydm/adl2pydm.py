@@ -6,7 +6,7 @@ convert MEDM .adl screen file(s) to PyDM .ui format
 Only rely on packages in this project or from the standard Python distribution. 
 """
 
-from collections import namedtuple
+# from collections import namedtuple
 import logging
 import os
 
@@ -335,8 +335,8 @@ class PydmSupport(object):
     def write_geometry(self, parent, geom):
         propty = self.writer.writeOpenProperty(parent, "geometry")
         rect = self.writer.writeOpenTag(propty, "rect")
-        if str(geom.x) == "-":
-            _debug_ = True
+        # if str(geom.x) == "-":
+        #     _debug_ = True
         self.writer.writeTaggedString(rect, "x", str(geom.x))
         self.writer.writeTaggedString(rect, "y", str(geom.y))
         self.writer.writeTaggedString(rect, "width", str(geom.width))

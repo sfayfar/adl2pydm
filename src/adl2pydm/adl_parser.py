@@ -31,7 +31,7 @@ Other blocks are used to provide configuration for their
 parent GUI widget.
 """
 
-from collections import defaultdict, namedtuple, OrderedDict
+from collections import namedtuple, OrderedDict
 import logging
 import os
 
@@ -160,7 +160,7 @@ class MedmBaseWidget(object):
         """generic handling, override as needed"""
         assignments = self.locateAssignments(buf)
         blocks = self.locateBlocks(buf)
-        text = "".join(buf)
+        # text = "".join(buf)
 
         # assign certain items in named attributes
         assignments = self.parseColorAssignments(assignments)
@@ -314,7 +314,7 @@ class MedmMainWidget(MedmBaseWidget):
     def parseColorMapBlock(self, buf):
         """read the color_table (clut) from the "color map"""
         # TODO: keep original line numbers for debug purposes
-        assignments = self.locateAssignments(buf)   # ignore ncolors=
+        # assignments = self.locateAssignments(buf)   # ignore ncolors=
         blocks = self.locateBlocks(buf)
 
         block = self.getNamedBlock("colors", blocks)
@@ -370,9 +370,10 @@ class MedmGenericWidget(MedmBaseWidget):
         self.symbol = symbol
 
     def parseAdlBuffer(self, buf):
-        assignments, blocks = MedmBaseWidget.parseAdlBuffer(self, buf)
-        if self.debug:
-            _debug = self.debug
+        # assignments, blocks = MedmBaseWidget.parseAdlBuffer(self, buf)
+        # if self.debug:
+        #     _debug = self.debug
+        pass
 
 
 class MedmArcWidget(MedmGenericWidget): pass
@@ -425,7 +426,7 @@ class MedmCompositeWidget(MedmBaseWidget):
         
         block = self.getNamedBlock("children", blocks)
         if block is not None:
-            aa = self.locateAssignments(buf[block.start+1:block.end])
+            # aa = self.locateAssignments(buf[block.start+1:block.end])
             bb = self.locateBlocks(buf[block.start+1:block.end])
             self.parseChildren(self.main, bb, buf[block.start+1:block.end])
 
