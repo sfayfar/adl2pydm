@@ -386,7 +386,7 @@ class MedmCartesianPlotWidget(MedmGenericWidget):
         MedmGenericWidget.__init__(self, line, main, symbol)
         self.traces = []
 
-    def parseAdlBuffer(self, buf):
+    def parseAdlBuffer(self, buf):          # lgtm [py/similar-function] 
         assignments, blocks = MedmBaseWidget.parseAdlBuffer(self, buf)
 
         traces = {}
@@ -448,7 +448,7 @@ class MedmRelatedDisplayWidget(MedmGenericWidget):
         MedmGenericWidget.__init__(self, line, main, symbol)
         self.displays = []
 
-    def parseAdlBuffer(self, buf):
+    def parseAdlBuffer(self, buf):          # lgtm [py/similar-function] 
         assignments, blocks = MedmBaseWidget.parseAdlBuffer(self, buf)
 
         displays = {}
@@ -471,7 +471,7 @@ class MedmShellCommandWidget(MedmGenericWidget):
         MedmGenericWidget.__init__(self, line, main, symbol)
         self.commands = []
 
-    def parseAdlBuffer(self, buf):
+    def parseAdlBuffer(self, buf):          # lgtm [py/similar-function] 
         assignments, blocks = MedmBaseWidget.parseAdlBuffer(self, buf)
 
         commands = {}
@@ -494,7 +494,7 @@ class MedmStripChartWidget(MedmGenericWidget):
         MedmGenericWidget.__init__(self, line, main, symbol)
         self.pens = []
 
-    def parseAdlBuffer(self, buf):
+    def parseAdlBuffer(self, buf):          # lgtm [py/similar-function] 
         assignments, blocks = MedmBaseWidget.parseAdlBuffer(self, buf)
 
         pens = {}
