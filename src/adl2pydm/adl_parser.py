@@ -31,7 +31,7 @@ Other blocks are used to provide configuration for their
 parent GUI widget.
 """
 
-from collections import defaultdict, namedtuple, OrderedDict
+from collections import namedtuple, OrderedDict
 import logging
 import os
 
@@ -156,11 +156,11 @@ class MedmBaseWidget(object):
                     blocks.append(block)
         return blocks
     
-    def parseAdlBuffer(self, buf):
+    def parseAdlBuffer(self, buf):              # lgtm [py/similar-function]
         """generic handling, override as needed"""
         assignments = self.locateAssignments(buf)
         blocks = self.locateBlocks(buf)
-        text = "".join(buf)
+        # text = "".join(buf)
 
         # assign certain items in named attributes
         assignments = self.parseColorAssignments(assignments)
@@ -279,7 +279,7 @@ class MedmMainWidget(MedmBaseWidget):
         with open(fname, "r") as fp:
             return fp.readlines()
 
-    def parseAdlBuffer(self, buf):
+    def parseAdlBuffer(self, buf):              # lgtm [py/similar-function]
         logger.debug("\n"*2)
         logger.debug(self.given_filename)
         blocks = self.locateBlocks(buf)
@@ -314,7 +314,7 @@ class MedmMainWidget(MedmBaseWidget):
     def parseColorMapBlock(self, buf):
         """read the color_table (clut) from the "color map"""
         # TODO: keep original line numbers for debug purposes
-        assignments = self.locateAssignments(buf)   # ignore ncolors=
+        # assignments = self.locateAssignments(buf)   # ignore ncolors=
         blocks = self.locateBlocks(buf)
 
         block = self.getNamedBlock("colors", blocks)
@@ -369,10 +369,11 @@ class MedmGenericWidget(MedmBaseWidget):
         self.main = main
         self.symbol = symbol
 
-    def parseAdlBuffer(self, buf):
-        assignments, blocks = MedmBaseWidget.parseAdlBuffer(self, buf)
-        if self.debug:
-            _debug = self.debug
+    def parseAdlBuffer(self, buf):              # lgtm [py/similar-function]
+        # assignments, blocks = MedmBaseWidget.parseAdlBuffer(self, buf)
+        # if self.debug:
+        #     _debug = self.debug
+        pass
 
 
 class MedmArcWidget(MedmGenericWidget): pass
@@ -386,7 +387,7 @@ class MedmCartesianPlotWidget(MedmGenericWidget):
         MedmGenericWidget.__init__(self, line, main, symbol)
         self.traces = []
 
-    def parseAdlBuffer(self, buf):
+    def parseAdlBuffer(self, buf):          # lgtm [py/similar-function] 
         assignments, blocks = MedmBaseWidget.parseAdlBuffer(self, buf)
 
         traces = {}
@@ -420,12 +421,12 @@ class MedmCompositeWidget(MedmBaseWidget):
         self.symbol = symbol        # "composite"
         self.widgets = []
 
-    def parseAdlBuffer(self, buf):
+    def parseAdlBuffer(self, buf):              # lgtm [py/similar-function]
         assignments, blocks = MedmBaseWidget.parseAdlBuffer(self, buf)
         
         block = self.getNamedBlock("children", blocks)
         if block is not None:
-            aa = self.locateAssignments(buf[block.start+1:block.end])
+            # aa = self.locateAssignments(buf[block.start+1:block.end])
             bb = self.locateBlocks(buf[block.start+1:block.end])
             self.parseChildren(self.main, bb, buf[block.start+1:block.end])
 
@@ -448,7 +449,7 @@ class MedmRelatedDisplayWidget(MedmGenericWidget):
         MedmGenericWidget.__init__(self, line, main, symbol)
         self.displays = []
 
-    def parseAdlBuffer(self, buf):
+    def parseAdlBuffer(self, buf):          # lgtm [py/similar-function] 
         assignments, blocks = MedmBaseWidget.parseAdlBuffer(self, buf)
 
         displays = {}
@@ -471,7 +472,7 @@ class MedmShellCommandWidget(MedmGenericWidget):
         MedmGenericWidget.__init__(self, line, main, symbol)
         self.commands = []
 
-    def parseAdlBuffer(self, buf):
+    def parseAdlBuffer(self, buf):          # lgtm [py/similar-function] 
         assignments, blocks = MedmBaseWidget.parseAdlBuffer(self, buf)
 
         commands = {}
@@ -494,7 +495,7 @@ class MedmStripChartWidget(MedmGenericWidget):
         MedmGenericWidget.__init__(self, line, main, symbol)
         self.pens = []
 
-    def parseAdlBuffer(self, buf):
+    def parseAdlBuffer(self, buf):          # lgtm [py/similar-function] 
         assignments, blocks = MedmBaseWidget.parseAdlBuffer(self, buf)
 
         pens = {}
@@ -517,7 +518,7 @@ class MedmStripChartWidget(MedmGenericWidget):
 
 class MedmTextWidget(MedmGenericWidget):
 
-    def parseAdlBuffer(self, buf):
+    def parseAdlBuffer(self, buf):              # lgtm [py/similar-function]
         assignments, blocks = MedmBaseWidget.parseAdlBuffer(self, buf)
         if "textix" in assignments:
             self.title = assignments["textix"]
