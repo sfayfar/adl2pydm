@@ -156,7 +156,7 @@ class MedmBaseWidget(object):
                     blocks.append(block)
         return blocks
     
-    def parseAdlBuffer(self, buf):
+    def parseAdlBuffer(self, buf):              # lgtm [py/similar-function]
         """generic handling, override as needed"""
         assignments = self.locateAssignments(buf)
         blocks = self.locateBlocks(buf)
@@ -279,7 +279,7 @@ class MedmMainWidget(MedmBaseWidget):
         with open(fname, "r") as fp:
             return fp.readlines()
 
-    def parseAdlBuffer(self, buf):
+    def parseAdlBuffer(self, buf):              # lgtm [py/similar-function]
         logger.debug("\n"*2)
         logger.debug(self.given_filename)
         blocks = self.locateBlocks(buf)
@@ -369,7 +369,7 @@ class MedmGenericWidget(MedmBaseWidget):
         self.main = main
         self.symbol = symbol
 
-    def parseAdlBuffer(self, buf):
+    def parseAdlBuffer(self, buf):              # lgtm [py/similar-function]
         # assignments, blocks = MedmBaseWidget.parseAdlBuffer(self, buf)
         # if self.debug:
         #     _debug = self.debug
@@ -421,7 +421,7 @@ class MedmCompositeWidget(MedmBaseWidget):
         self.symbol = symbol        # "composite"
         self.widgets = []
 
-    def parseAdlBuffer(self, buf):
+    def parseAdlBuffer(self, buf):              # lgtm [py/similar-function]
         assignments, blocks = MedmBaseWidget.parseAdlBuffer(self, buf)
         
         block = self.getNamedBlock("children", blocks)
@@ -518,7 +518,7 @@ class MedmStripChartWidget(MedmGenericWidget):
 
 class MedmTextWidget(MedmGenericWidget):
 
-    def parseAdlBuffer(self, buf):
+    def parseAdlBuffer(self, buf):              # lgtm [py/similar-function]
         assignments, blocks = MedmBaseWidget.parseAdlBuffer(self, buf)
         if "textix" in assignments:
             self.title = assignments["textix"]
