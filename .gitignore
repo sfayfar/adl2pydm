@@ -106,3 +106,6 @@ venv.bak/
 
 # development screens
 src/adl2pydm/screens/pydm/*.ui
+
+# Microsoft VS Code configuration
+.vscode/
