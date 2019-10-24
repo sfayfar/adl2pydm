@@ -283,7 +283,8 @@ class MedmMainWidget(MedmBaseWidget):
         logger.debug("\n"*2)
         logger.debug(self.given_filename)
         blocks = self.locateBlocks(buf)
-        logger.debug("\n".join(map(str,blocks)))
+        for block in blocks:
+            logger.debug(str(block))
         
         xref = OrderedDict([
             ("file", self.parseFileBlock),
