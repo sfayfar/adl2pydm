@@ -10,37 +10,14 @@ Only rely on packages in this project or from the standard Python distribution.
 import logging
 import os
 
-from adl_parser import MedmMainWidget
-import adl_symbols
-from output_handler import PYDM_Writer
-import pydm_symbols
+from .adl_parser import MedmMainWidget
+from . import adl_symbols
+from .output_handler import PYDM_Writer
+from .import pydm_symbols
 
 
-OUTPUT_PATH = "screens/pydm"
+OUTPUT_PATH = "screens/pydm"        # FIXME: pass as parameter
 SCREEN_FILE_EXTENSION = ".ui"
-TEST_FILES = [
-    "screens/medm/newDisplay.adl",                  # simple display
-    "screens/medm/xxx-R5-8-4.adl",                  # related display
-    "screens/medm/xxx-R6-0.adl",
-    # FIXME: needs more work here (unusual structure, possibly stress test):  "screens/medm/base-3.15.5-caServerApp-test.adl",# info[, "<<color rules>>", "<<color map>>"
-    "screens/medm/calc-3-4-2-1-FuncGen_full.adl",   # strip chart
-    "screens/medm/calc-R3-7-1-FuncGen_full.adl",    # strip chart
-    "screens/medm/calc-R3-7-userCalcMeter.adl",     # meter
-    "screens/medm/mca-R7-7-mca.adl",                # bar
-    "screens/medm/motorx-R6-10-1.adl",
-    "screens/medm/motorx_all-R6-10-1.adl",
-    "screens/medm/optics-R2-13-1-CoarseFineMotorShow.adl",  # indicator
-    "screens/medm/optics-R2-13-1-kohzuGraphic.adl", # image
-    "screens/medm/optics-R2-13-1-pf4more.adl",      # byte
-    "screens/medm/optics-R2-13-xiahsc.adl",         # valuator
-    "screens/medm/scanDetPlot-R2-11-1.adl",         # cartesian plot, strip
-    "screens/medm/sscan-R2-11-1-scanAux.adl",       # shell command
-    "screens/medm/std-R3-5-ID_ctrl.adl",            # param
-    "screens/medm/wheel_switch.adl",                # wheel switch
-    # "screens/medm/beamHistory_full-R3-5.adl", # dl_color -- this .adl has content errors
-    "screens/medm/ADBase-R3-3-1.adl",               # composite
-    "screens/medm/simDetector-R3-3-31.adl",
-    ]
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)

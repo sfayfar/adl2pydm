@@ -16,10 +16,10 @@ _path = os.path.join(_test_path, '..', 'src')
 if _path not in sys.path:
     sys.path.insert(0, _path)
 
-from adl2pydm import adl_parser
+from adl2pydm import adl2pydm
 
 
-class Test_Files(unittest.TestCase):
+class Test_Main(unittest.TestCase):
 
     test_files = [
         "newDisplay.adl",                  # simple display
@@ -50,33 +50,26 @@ class Test_Files(unittest.TestCase):
     # def tearDown(self):
     #     pass
     
-    def test_adl_parser(self):
-        path = os.path.abspath(os.path.dirname(adl_parser.__file__))
+    def test_main(self):
+        path = os.path.abspath(os.path.dirname(adl2pydm.__file__))
         self.assertTrue(os.path.exists(path))
         
         medm_path = os.path.join(path, "screens", "medm")
         self.assertTrue(os.path.exists(medm_path))
-        
-        for fname in self.test_files:
-            screen = adl_parser.MedmMainWidget()
-            self.assertEqual(screen.line_offset, 1)
 
+        for fname in self.test_files:
             full_name = os.path.join(medm_path, fname)
             self.assertTrue(os.path.exists(full_name))
-
-            buf = screen.getAdlLines(full_name)
-            # any useful MEDM file has more than 10 lines
-            self.assertGreater(len(buf), 10)
-
-            screen.parseAdlBuffer(buf)
-            # TODO: test things
-            self.assertGreater(len(screen.widgets), 0)
+            
+            # TODO: need to specify where to write the output
+            # now, raises FileNotFoundError
+            adl2pydm.main(full_name)
 
 
 def suite(*args, **kw):
     test_suite = unittest.TestSuite()
     test_list = [
-        Test_Files,
+        Test_Main,
         ]
     for test_case in test_list:
         test_suite.addTest(unittest.makeSuite(test_case))
