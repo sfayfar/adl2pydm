@@ -12,7 +12,7 @@ _path = os.path.join(_test_path, '..', 'src')
 if _path not in sys.path:
     sys.path.insert(0, _path)
 
-import adl2pydm as package
+import adl2pydm
 
 
 class Test_Something(unittest.TestCase):
@@ -23,8 +23,8 @@ class Test_Something(unittest.TestCase):
     def tearDown(self):
         pass
     
-    def test_the_project_name(self):
-        self.assertEqual(package.__project__, u'adl2pydm')
+    def test_the_package_name(self):
+        self.assertEqual(adl2pydm.__project__, u'adl2pydm')
 
 
 def suite(*args, **kw):
