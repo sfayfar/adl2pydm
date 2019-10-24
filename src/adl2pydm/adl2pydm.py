@@ -65,6 +65,32 @@ class PydmSupport(object):
     def __init__(self):
         self.custom_widgets = []
         self.unique_widget_names = {}
+        self.pydm_widget_handlers = {
+            #"arc" : dict(type="static", pydm_widget="PyDMDrawingArc"),
+            #"bar" : dict(type="monitor", pydm_widget="PyDMDrawingRectangle"),
+            "byte" : self.write_block_byte_indicator,
+            "cartesian plot" : self.write_block_cartesian_plot,
+            "choice button" : self.write_block_choice_button,
+            "composite" : self.write_block_composite,
+            #"embedded display" : dict(type="static", pydm_widget="PyDMEmbeddedDisplay"),
+            "image" : self.write_block_image,
+            "indicator" : self.write_block_indicator,
+            "menu" : self.write_block_menu,
+            "message button" : self.write_block_message_button,
+            "meter" : self.write_block_meter,
+            #"oval" : dict(type="static", pydm_widget="PyDMDrawingEllipse"),
+            #"polygon" : dict(type="static", pydm_widget="PyDMDrawingPolygon"),
+            "polyline" : self.write_block_polyline,
+            "rectangle" : self.write_block_rectangle,
+            "related display" : self.write_block_related_display,
+            "shell command" : self.write_block_shell_command,
+            "strip chart" : self.write_block_strip_chart,
+            "text" : self.write_block_text,
+            "text entry" : self.write_block_text_entry,
+            "text update" : self.write_block_text_update,
+            "valuator" : self.write_block_valuator,
+            "wheel switch" : self.write_block_wheel_switch,
+            }
     
     def get_unique_widget_name(self, suggestion):
         """
@@ -134,33 +160,6 @@ class PydmSupport(object):
         self.writer.closeFile()
 
     def write_block(self, parent, block):
-        handlers = {
-            #"arc" : dict(type="static", pydm_widget="PyDMDrawingArc"),
-            #"bar" : dict(type="monitor", pydm_widget="PyDMDrawingRectangle"),
-            "byte" : self.write_block_byte_indicator,
-            "cartesian plot" : self.write_block_cartesian_plot,
-            "choice button" : self.write_block_choice_button,
-            "composite" : self.write_block_composite,
-            #"embedded display" : dict(type="static", pydm_widget="PyDMEmbeddedDisplay"),
-            "image" : self.write_block_image,
-            "indicator" : self.write_block_indicator,
-            "menu" : self.write_block_menu,
-            "message button" : self.write_block_message_button,
-            "meter" : self.write_block_meter,
-            #"oval" : dict(type="static", pydm_widget="PyDMDrawingEllipse"),
-            #"polygon" : dict(type="static", pydm_widget="PyDMDrawingPolygon"),
-            "polyline" : self.write_block_polyline,
-            "rectangle" : self.write_block_rectangle,
-            "related display" : self.write_block_related_display,
-            "shell command" : self.write_block_shell_command,
-            "strip chart" : self.write_block_strip_chart,
-            "text" : self.write_block_text,
-            "text entry" : self.write_block_text_entry,
-            "text update" : self.write_block_text_update,
-            "valuator" : self.write_block_valuator,
-            "wheel switch" : self.write_block_wheel_switch,
-            }
-
         nm = self.get_unique_widget_name(block.symbol.replace(" ", "_"))
         widget_info = adl_symbols.widgets.get(block.symbol)
         if widget_info is not None:
@@ -168,7 +167,7 @@ class PydmSupport(object):
             if cls not in self.custom_widgets:
                 self.custom_widgets.append(cls)
         
-        handler = handlers.get(block.symbol, self.write_block_default)
+        handler = self.pydm_widget_handlers.get(block.symbol, self.write_block_default)
         cls = widget_info["pydm_widget"]
         if block.symbol.find("chart") >= 0:
             pass

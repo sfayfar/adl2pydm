@@ -98,6 +98,32 @@ class MedmBaseWidget(object):
         self.line_offset = 0
         self.symbol = None
         self.title = None
+        self.medm_widget_handlers = {
+            "arc" : MedmArcWidget,
+            "bar" : MedmBarWidget,
+            "byte" : MedmByteWidget,
+            "cartesian plot" : MedmCartesianPlotWidget,
+            "choice button" : MedmChoiceButtonWidget,
+            "composite" : MedmCompositeWidget,
+            "embedded display" : MedmEmbeddedDisplayWidget,
+            "image" : MedmImageWidget,
+            "indicator" : MedmIndicatorWidget,
+            "menu" : MedmMenuWidget,
+            "message button" : MedmMessageButtonWidget,
+            "meter" : MedmMeterWidget,
+            "oval" : MedmOvalWidget,
+            "polygon" : MedmPolygonWidget,
+            "polyline" : MedmPolylineWidget,
+            "rectangle" : MedmRectangleWidget,
+            "related display" : MedmRelatedDisplayWidget,
+            "shell command" : MedmShellCommandWidget,
+            "strip chart" : MedmStripChartWidget,
+            "text" : MedmTextWidget,
+            "text entry" : MedmTextEntryWidget,
+            "text update" : MedmTextUpdateWidget,
+            "valuator" : MedmValuatorWidget,
+            "wheel switch" : MedmWheelSwitchWidget,
+            }
     
     def __str__(self):
         fmt = "Widget(%s)"
@@ -204,37 +230,11 @@ class MedmBaseWidget(object):
         return assignments, blocks
     
     def parseChildren(self, main, blocks, buf):
-        xref = {
-            "arc" : MedmArcWidget,
-            "bar" : MedmBarWidget,
-            "byte" : MedmByteWidget,
-            "cartesian plot" : MedmCartesianPlotWidget,
-            "choice button" : MedmChoiceButtonWidget,
-            "composite" : MedmCompositeWidget,
-            "embedded display" : MedmEmbeddedDisplayWidget,
-            "image" : MedmImageWidget,
-            "indicator" : MedmIndicatorWidget,
-            "menu" : MedmMenuWidget,
-            "message button" : MedmMessageButtonWidget,
-            "meter" : MedmMeterWidget,
-            "oval" : MedmOvalWidget,
-            "polygon" : MedmPolygonWidget,
-            "polyline" : MedmPolylineWidget,
-            "rectangle" : MedmRectangleWidget,
-            "related display" : MedmRelatedDisplayWidget,
-            "shell command" : MedmShellCommandWidget,
-            "strip chart" : MedmStripChartWidget,
-            "text" : MedmTextWidget,
-            "text entry" : MedmTextEntryWidget,
-            "text update" : MedmTextUpdateWidget,
-            "valuator" : MedmValuatorWidget,
-            "wheel switch" : MedmWheelSwitchWidget,
-            }
         for block in blocks:
             if block.symbol in adl_symbols.widgets:
                 logger.debug("Processing %s block" % block.symbol)
-                widget_handler = xref.get(block.symbol, MedmGenericWidget)
-                widget = widget_handler(self.line_offset+block.start, main, block.symbol)
+                handler = self.medm_widget_handlers.get(block.symbol, MedmGenericWidget)
+                widget = handler(self.line_offset+block.start, main, block.symbol)
                 widget.parseAdlBuffer(buf[block.start+1:block.end])
                 self.widgets.append(widget)
     
