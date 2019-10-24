@@ -299,7 +299,11 @@ class MedmMainWidget(MedmBaseWidget):
                 handler(buf[block.start+1:block.end])
          
         # sift out the three block types already handled
-        blocks = [block for block in blocks if block.symbol in adl_symbols.widgets]
+        blocks = [
+            block 
+            for block in blocks 
+            if block.symbol in adl_symbols.widgets
+            ]
         self.parseChildren(self, blocks, buf)
     
     def parseFileBlock(self, buf):
@@ -370,10 +374,10 @@ class MedmGenericWidget(MedmBaseWidget):
         self.symbol = symbol
 
     def parseAdlBuffer(self, buf):              # lgtm [py/similar-function]
-        # assignments, blocks = MedmBaseWidget.parseAdlBuffer(self, buf)
+        assignments, blocks = MedmBaseWidget.parseAdlBuffer(self, buf)
         # if self.debug:
         #     _debug = self.debug
-        pass
+#         pass
 
 
 class MedmArcWidget(MedmGenericWidget): pass

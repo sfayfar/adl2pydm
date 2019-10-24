@@ -195,9 +195,12 @@ class PydmSupport(object):
         # TODO: block.contents["sbit"]
         
     def write_block_choice_button(self, parent, block, nm, qw):
-        pv = self.get_channel(block.contents["control"])
-        self.write_tooltip(qw, pv)
-        self.write_channel(qw, pv)
+        if hasattr(block, "contents"):
+            pv = self.get_channel(block.contents["control"])
+            self.write_tooltip(qw, pv)
+            self.write_channel(qw, pv)
+        else:
+            logger.warning(f"{block} ({block.main.adl_filename}) has no 'contents'")
         
     def write_block_cartesian_plot(self, parent, block, nm, qw):
         self.write_tooltip(qw, nm)
@@ -217,31 +220,46 @@ class PydmSupport(object):
             self.write_block(qw, widget)
     
     def write_block_image(self, parent, block, nm, qw):
-        image_name = block.contents.get("image name")
-        self.writer.writeProperty(qw, "filename", image_name, tag="string", stdset="0")
-        self.write_tooltip(qw, nm)
+        if hasattr(block, "contents"):
+            image_name = block.contents.get("image name")
+            self.writer.writeProperty(qw, "filename", image_name, tag="string", stdset="0")
+            self.write_tooltip(qw, nm)
+        else:
+            logger.warning(f"{block} ({block.main.adl_filename}) has no 'contents'")
         
     def write_block_indicator(self, parent, block, nm, qw):
-        pv = self.get_channel(block.contents["monitor"])
-        self.write_channel(qw, pv)
-        self.write_tooltip(qw, nm)
-        self.writer.writeProperty(qw, "text", block.title, tag="string")
+        if hasattr(block, "contents"):
+            pv = self.get_channel(block.contents["monitor"])
+            self.write_channel(qw, pv)
+            self.write_tooltip(qw, nm)
+            self.writer.writeProperty(qw, "text", block.title, tag="string")
+        else:
+            logger.warning(f"{block} ({block.main.adl_filename}) has no 'contents'")
         
     def write_block_menu(self, parent, block, nm, qw):
-        pv = self.get_channel(block.contents["control"])
-        self.write_channel(qw, pv)
-        self.write_tooltip(qw, pv)
+        if hasattr(block, "contents"):
+            pv = self.get_channel(block.contents["control"])
+            self.write_channel(qw, pv)
+            self.write_tooltip(qw, pv)
+        else:
+            logger.warning(f"{block} ({block.main.adl_filename}) has no 'contents'")
         
     def write_block_message_button(self, parent, block, nm, qw):
-        pv = self.get_channel(block.contents["control"])
-        self.writer.writeProperty(qw, "text", block.title, tag="string")
-        self.write_tooltip(qw, pv)
-        self.write_channel(qw, pv)  # TODO:block.contents["press_msg"]
+        if hasattr(block, "contents"):
+            pv = self.get_channel(block.contents["control"])
+            self.writer.writeProperty(qw, "text", block.title, tag="string")
+            self.write_tooltip(qw, pv)
+            self.write_channel(qw, pv)  # TODO:block.contents["press_msg"]
+        else:
+            logger.warning(f"{block} ({block.main.adl_filename}) has no 'contents'")
         
     def write_block_meter(self, parent, block, nm, qw):
-        pv = self.get_channel(block.contents["monitor"])
-        self.write_channel(qw, pv)
-        self.write_tooltip(qw, pv)
+        if hasattr(block, "contents"):
+            pv = self.get_channel(block.contents["monitor"])
+            self.write_channel(qw, pv)
+            self.write_tooltip(qw, pv)
+        else:
+            logger.warning(f"{block} ({block.main.adl_filename}) has no 'contents'")
         
     def write_block_polyline(self, parent, block, nm, qw):
         # TODO: PyDM widget choice needs help here
@@ -276,27 +294,39 @@ class PydmSupport(object):
         self.write_tooltip(qw, nm)
     
     def write_block_text_entry(self, parent, block, nm, qw):
-        pv = self.get_channel(block.contents["control"])    # TODO: format = string | compact
-        self.write_channel(qw, pv)
-        self.write_tooltip(qw, pv)
+        if hasattr(block, "contents"):
+            pv = self.get_channel(block.contents["control"])    # TODO: format = string | compact
+            self.write_channel(qw, pv)
+            self.write_tooltip(qw, pv)
+        else:
+            logger.warning(f"{block} ({block.main.adl_filename}) has no 'contents'")
     
     def write_block_text_update(self, parent, block, nm, qw):
-        pv = self.get_channel(block.contents["monitor"])
-        self.write_tooltip(qw, "PV: " + pv)
-        self.writer.writeProperty(qw, "readOnly", "true", tag="bool")
-        self.write_channel(qw, pv)
+        if hasattr(block, "contents"):
+            pv = self.get_channel(block.contents["monitor"])
+            self.write_tooltip(qw, "PV: " + pv)
+            self.writer.writeProperty(qw, "readOnly", "true", tag="bool")
+            self.write_channel(qw, pv)
+        else:
+            logger.warning(f"{block} ({block.main.adl_filename}) has no 'contents'")
         
     def write_block_valuator(self, parent, block, nm, qw):
-        pv = self.get_channel(block.contents["control"])
-        self.write_channel(qw, pv)
-        self.write_tooltip(qw, pv)
-        # TODO: block.contents["dPrecision"]
-        
+        if hasattr(block, "contents"):
+            pv = self.get_channel(block.contents["control"])
+            self.write_channel(qw, pv)
+            self.write_tooltip(qw, pv)
+            # TODO: block.contents["dPrecision"]
+        else:
+            logger.warning(f"{block} ({block.main.adl_filename}) has no 'contents'")
+
     def write_block_wheel_switch(self, parent, block, nm, qw):
-        pv = self.get_channel(block.contents["control"])
-        self.write_channel(qw, pv)
-        self.write_tooltip(qw, pv)
-    
+        if hasattr(block, "contents"):
+            pv = self.get_channel(block.contents["control"])
+            self.write_channel(qw, pv)
+            self.write_tooltip(qw, pv)
+        else:
+            logger.warning(f"{block} ({block.main.adl_filename}) has no 'contents'")
+
     # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
     def write_channel(self, parent, channel):
@@ -333,14 +363,17 @@ class PydmSupport(object):
             self.writer.writeTaggedString(cw, "header", item.header)
     
     def write_geometry(self, parent, geom):
-        propty = self.writer.writeOpenProperty(parent, "geometry")
-        rect = self.writer.writeOpenTag(propty, "rect")
-        # if str(geom.x) == "-":
-        #     _debug_ = True
-        self.writer.writeTaggedString(rect, "x", str(geom.x))
-        self.writer.writeTaggedString(rect, "y", str(geom.y))
-        self.writer.writeTaggedString(rect, "width", str(geom.width))
-        self.writer.writeTaggedString(rect, "height", str(geom.height))
+        if geom is None:
+            logger.warning(f"parent widget {parent} has 'None' for geometry")
+        else:
+            propty = self.writer.writeOpenProperty(parent, "geometry")
+            rect = self.writer.writeOpenTag(propty, "rect")
+            # if str(geom.x) == "-":
+            #     _debug_ = True
+            self.writer.writeTaggedString(rect, "x", str(geom.x))
+            self.writer.writeTaggedString(rect, "y", str(geom.y))
+            self.writer.writeTaggedString(rect, "width", str(geom.width))
+            self.writer.writeTaggedString(rect, "height", str(geom.height))
 
     def write_tooltip(self, parent, tip):
         propty = self.writer.writeOpenProperty(parent, "toolTip")
