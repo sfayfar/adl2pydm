@@ -78,12 +78,66 @@ class Test_Files(unittest.TestCase):
             screen.parseAdlBuffer(buf)
             self.assertGreater(len(screen.widgets), 0)
 
+    def test_parse_composite(self):
+        screen = self.parseFile("ADBase-R3-3-1.adl")
+        self.assertEqual(len(screen.widgets), 10)
+
+        w = screen.widgets[1]
+        self.assertEqual(w.symbol, "composite")
+        self.assertEqual(w.line_offset, 101)
+        self.assertEqual(w.geometry.x, 6)
+        self.assertEqual(w.geometry.y, 35)
+        self.assertEqual(w.geometry.width, 350)
+        self.assertEqual(w.geometry.height, 340)
+        self.assertIsInstance(w.contents, dict)
+        self.assertEqual(len(w.contents), 2)
+        self.assertIn("composite file", w.contents)
+        self.assertEqual(w.contents["composite file"], 'ADSetup.adl')
+        self.assertIn("composite name", w.contents)
+        self.assertEqual(w.contents["composite name"], '')
+
+    def test_parse_rectangle(self):
+        screen = self.parseFile("ADBase-R3-3-1.adl")
+        self.assertEqual(len(screen.widgets), 10)
+
+        w = screen.widgets[0]
+        self.assertEqual(w.symbol, "rectangle")
+        self.assertEqual(w.line_offset, 90)
+        self.assertEqual(w.geometry.x, 0)
+        self.assertEqual(w.geometry.y, 4)
+        self.assertEqual(w.geometry.width, 715)
+        self.assertEqual(w.geometry.height, 25)
+        self.assertIsInstance(w.contents, dict)
+        self.assertEqual(len(w.contents), 1)
+        self.assertIn("basic attribute", w.contents)
+        self.assertEqual(len(w.contents["basic attribute"]), 0)
+
+    def test_parse_text(self):
+        screen = self.parseFile("ADBase-R3-3-1.adl")
+        self.assertEqual(len(screen.widgets), 10)
+
+        w = screen.widgets[9]
+        self.assertEqual(w.symbol, "text")
+        self.assertEqual(w.line_offset, 181)
+        self.assertEqual(w.geometry.x, 0)
+        self.assertEqual(w.geometry.y, 5)
+        self.assertEqual(w.geometry.width, 715)
+        self.assertEqual(w.geometry.height, 25)
+        self.assertIsInstance(w.contents, dict)
+        self.assertEqual(len(w.contents), 2)
+        self.assertIn("align", w.contents)
+        self.assertEqual(w.contents["align"], 'horiz. centered')
+        self.assertIn("basic attribute", w.contents)
+        self.assertEqual(len(w.contents["basic attribute"]), 0)
+        self.assertEqual(w.title, "Area Detector Control - $(P)$(R)")
+
     def test_parse_text_update(self):
         screen = self.parseFile("newDisplay.adl")
         self.assertEqual(len(screen.widgets), 1)
 
         w = screen.widgets[0]
         self.assertEqual(w.symbol, "text update")
+        self.assertEqual(w.line_offset, 90)
         self.assertEqual(w.geometry.x, 40)
         self.assertEqual(w.geometry.y, 46)
         self.assertEqual(w.geometry.width, 195)
