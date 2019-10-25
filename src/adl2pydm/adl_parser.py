@@ -204,6 +204,8 @@ class MedmBaseWidget(object):
                 x, y = map(int, pair.replace("(", "").replace(")", "").split(","))
                 points.append(Point(x, y))
             self.points = points
+            if "points" in self.contents:
+                del self.contents["points"]
 
         return assignments, blocks
     
