@@ -78,6 +78,14 @@ class Test_Files(unittest.TestCase):
             screen.parseAdlBuffer(buf)
             self.assertGreater(len(screen.widgets), 0)
 
+    def test_parse_basic_attribute(self):
+        screen = self.parseFile("std-R3-5-ID_ctrl.adl")
+        self.assertEqual(len(screen.widgets), 25)
+        # TODO: where is data from basic attribute, line 708
+        # goes into contents, but what widget?
+        # Why is it given multiple times at the file level?  Error?
+        # There's channel content in some of these blocks.
+
     def test_parse_composite(self):
         screen = self.parseFile("ADBase-R3-3-1.adl")
         self.assertEqual(len(screen.widgets), 10)
@@ -96,6 +104,38 @@ class Test_Files(unittest.TestCase):
         self.assertIn("composite name", w.contents)
         self.assertEqual(w.contents["composite name"], '')
 
+    def test_parse_dynamic_attribute(self):
+        screen = self.parseFile("std-R3-5-ID_ctrl.adl")
+        self.assertEqual(len(screen.widgets), 25)
+        # TODO: where is data from dynamic attribute, line 687
+
+    def test_parse_message_button(self):
+        screen = self.parseFile("std-R3-5-ID_ctrl.adl")
+        self.assertEqual(len(screen.widgets), 25)
+
+        w = screen.widgets[3]
+        self.assertEqual(w.symbol, "message button")
+        self.assertEqual(w.line_offset, 434)
+        self.assertEqual(w.geometry.x, 150)
+        self.assertEqual(w.geometry.y, 220)
+        self.assertEqual(w.geometry.width, 140)
+        self.assertEqual(w.geometry.height, 40)
+        self.assertIsInstance(w.contents, dict)
+        self.assertEqual(len(w.contents), 4)
+        self.assertIn("clrmod", w.contents)
+        self.assertEqual(w.contents["clrmod"], "static")
+        self.assertIn("press_msg", w.contents)
+        self.assertEqual(w.contents["press_msg"], "1")
+        self.assertIn("release_msg", w.contents)
+        self.assertEqual(w.contents["release_msg"], "")
+        self.assertIn("control", w.contents)
+        control = w.contents["control"]
+        self.assertIsInstance(control, dict)
+        self.assertEqual(len(control), 1)
+        self.assertIn("ctrl", control)
+        self.assertEqual(control["ctrl"], 'ID$(xx):UN:stopSQ.PROC')
+        self.assertEqual(w.title, "Stop ")
+
     def test_parse_rectangle(self):
         screen = self.parseFile("ADBase-R3-3-1.adl")
         self.assertEqual(len(screen.widgets), 10)
@@ -111,6 +151,28 @@ class Test_Files(unittest.TestCase):
         self.assertEqual(len(w.contents), 1)
         self.assertIn("basic attribute", w.contents)
         self.assertEqual(len(w.contents["basic attribute"]), 0)
+
+    def test_parse_related_display(self):
+        screen = self.parseFile("std-R3-5-ID_ctrl.adl")
+        self.assertEqual(len(screen.widgets), 25)
+
+        w = screen.widgets[13]
+        self.assertEqual(w.symbol, "related display")
+        self.assertEqual(w.line_offset, 611)
+        self.assertEqual(w.geometry.x, 119)
+        self.assertEqual(w.geometry.y, 285)
+        self.assertEqual(w.geometry.width, 18)
+        self.assertEqual(w.geometry.height, 18)
+        self.assertIsInstance(w.displays, list)
+        self.assertEqual(len(w.displays), 8)
+        display = w.displays[0]
+        self.assertIsInstance(display, dict)
+        self.assertIn("args", display)
+        self.assertEqual(display["args"], "xx=$(xx)")
+        self.assertIn("label", display)
+        self.assertEqual(display["label"], "Taper Control")
+        self.assertIn("name", display)
+        self.assertEqual(display["name"], "ID_taper_ctrl.adl")
 
     def test_parse_text(self):
         screen = self.parseFile("ADBase-R3-3-1.adl")
@@ -130,6 +192,30 @@ class Test_Files(unittest.TestCase):
         self.assertIn("basic attribute", w.contents)
         self.assertEqual(len(w.contents["basic attribute"]), 0)
         self.assertEqual(w.title, "Area Detector Control - $(P)$(R)")
+
+    def test_parse_text_entry(self):
+        screen = self.parseFile("std-R3-5-ID_ctrl.adl")
+        self.assertEqual(len(screen.widgets), 25)
+
+        w = screen.widgets[8]
+        self.assertEqual(w.symbol, "text entry")
+        self.assertEqual(w.line_offset, 531)
+        self.assertEqual(w.geometry.x, 54)
+        self.assertEqual(w.geometry.y, 114)
+        self.assertEqual(w.geometry.width, 120)
+        self.assertEqual(w.geometry.height, 38)
+        self.assertIsInstance(w.contents, dict)
+        self.assertEqual(len(w.contents), 3)
+        self.assertIn("format", w.contents)
+        self.assertEqual(w.contents["format"], "decimal")
+        self.assertIn("clrmod", w.contents)
+        self.assertEqual(w.contents["clrmod"], "static")
+        self.assertIn("control", w.contents)
+        control = w.contents["control"]
+        self.assertIsInstance(control, dict)
+        self.assertEqual(len(control), 1)
+        self.assertIn("ctrl", control)
+        self.assertEqual(control["ctrl"], "ID$(xx):UN:setavgAI.VAL")
 
     def test_parse_text_update(self):
         screen = self.parseFile("newDisplay.adl")
