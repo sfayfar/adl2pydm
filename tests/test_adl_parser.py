@@ -36,6 +36,7 @@ class Test_Files(unittest.TestCase):
         "optics-R2-13-1-kohzuGraphic.adl", # image
         "optics-R2-13-1-pf4more.adl",      # byte
         "optics-R2-13-xiahsc.adl",         # valuator
+        "sampleWheel.adl",                 # image
         "scanDetPlot-R2-11-1.adl",         # cartesian plot, strip
         "sscan-R2-11-1-scanAux.adl",       # shell command
         "std-R3-5-ID_ctrl.adl",            # param
@@ -79,13 +80,77 @@ class Test_Files(unittest.TestCase):
             screen.parseAdlBuffer(buf)
             self.assertGreater(len(screen.widgets), 0)
 
-    def test_parse_basic_attribute(self):
-        screen = self.parseFile("std-R3-5-ID_ctrl.adl")
-        self.assertEqual(len(screen.widgets), 25)
-        # TODO: where is data from basic attribute, line 708
-        # goes into contents, but what widget?
-        # Why is it given multiple times at the file level?  Error?
-        # There's channel content in some of these blocks.
+    # -------------------------------------------------
+
+    def test_parse_arc(self):
+        screen = self.parseFile("sampleWheel.adl")
+        self.assertEqual(len(screen.widgets), 197)
+
+        w = screen.widgets[2]
+        self.assertEqual(w.symbol, "arc")
+        self.assertEqual(w.line_offset, 111)
+        self.assertEqual(w.geometry.x, 436)
+        self.assertEqual(w.geometry.y, 158)
+        self.assertEqual(w.geometry.width, 40)
+        self.assertEqual(w.geometry.height, 40)
+        self.assertTrue(hasattr(w, "contents"))
+        self.assertIsInstance(w.contents, dict)
+        self.assertEqual(len(w.contents), 4)
+        self.assertIn("begin", w.contents)
+        self.assertEqual(w.contents["begin"], "0")
+        self.assertIn("path", w.contents)
+        self.assertEqual(w.contents["path"], "23040")
+        self.assertIn("basic attribute", w.contents)
+        attr = w.contents["basic attribute"]
+        self.assertIsInstance(attr, dict)
+        self.assertEqual(len(attr), 2)
+        self.assertIn("fill", attr)
+        self.assertEqual(attr["fill"], "outline")
+        self.assertIn("width", attr)
+        self.assertEqual(attr["width"], "5")
+        self.assertIn("dynamic attribute", w.contents)
+        attr = w.contents["dynamic attribute"]
+        self.assertIsInstance(attr, dict)
+        self.assertEqual(len(attr), 3)
+        self.assertIn("calc", attr)
+        self.assertEqual(attr["calc"], "A=3")
+        self.assertIn("chan", attr)
+        self.assertEqual(attr["chan"], "$(P)sample")
+        self.assertIn("vis", attr)
+        self.assertEqual(attr["vis"], "calc")
+
+    # bar
+
+    # def test_parse_basic_attribute(self):
+    #     screen = self.parseFile("std-R3-5-ID_ctrl.adl")
+    #     self.assertEqual(len(screen.widgets), 25)
+    #     # TODO: where is data from basic attribute, line 708
+    #     # goes into contents, but what widget?
+    #     # Why is it given multiple times at the file level?  Error?
+    #     # There's channel content in some of these blocks.
+
+    # byte
+    # cartesian plot
+
+    def test_parse_choice_button(self):
+        screen = self.parseFile("motorx-R6-10-1.adl")
+        self.assertEqual(len(screen.widgets), 31)
+
+        w = screen.widgets[30]
+        self.assertEqual(w.symbol, "choice button")
+        self.assertEqual(w.line_offset, 568)
+        self.assertEqual(w.geometry.x, 45)
+        self.assertEqual(w.geometry.y, 137)
+        self.assertEqual(w.geometry.width, 71)
+        self.assertEqual(w.geometry.height, 20)
+        self.assertIsInstance(w.contents, dict)
+        self.assertEqual(len(w.contents), 2)
+        self.assertIn("stacking", w.contents)
+        self.assertEqual(w.contents["stacking"], 'column')
+        self.assertIn("control", w.contents)
+        control = w.contents["control"]
+        self.assertIsInstance(control, dict)
+        self.assertEqual(control["chan"], '$(P)$(M).SET')
 
     def test_parse_composite(self):
         screen = self.parseFile("ADBase-R3-3-1.adl")
@@ -105,10 +170,34 @@ class Test_Files(unittest.TestCase):
         self.assertIn("composite name", w.contents)
         self.assertEqual(w.contents["composite name"], '')
 
-    def test_parse_dynamic_attribute(self):
-        screen = self.parseFile("std-R3-5-ID_ctrl.adl")
-        self.assertEqual(len(screen.widgets), 25)
-        # TODO: where is data from dynamic attribute, line 687
+    # def test_parse_dynamic_attribute(self):
+    #     screen = self.parseFile("std-R3-5-ID_ctrl.adl")
+    #     self.assertEqual(len(screen.widgets), 25)
+    #     # TODO: where is data from dynamic attribute, line 687
+
+    # TODO: embedded display : no example in synApps
+
+    def test_parse_image(self):
+        screen = self.parseFile("sampleWheel.adl")
+        self.assertEqual(len(screen.widgets), 197)
+
+        w = screen.widgets[1]
+        self.assertEqual(w.symbol, "image")
+        self.assertEqual(w.line_offset, 101)
+        self.assertEqual(w.geometry.x, 0)
+        self.assertEqual(w.geometry.y, 20)
+        self.assertEqual(w.geometry.width, 500)
+        self.assertEqual(w.geometry.height, 500)
+        self.assertTrue(hasattr(w, "contents"))
+        self.assertIsInstance(w.contents, dict)
+        self.assertEqual(len(w.contents), 2)
+        self.assertIn("image name", w.contents)
+        self.assertEqual(w.contents["image name"], "sampleWheel.gif")
+        self.assertIn("type", w.contents)
+        self.assertEqual(w.contents["type"], "gif")
+
+    # indicator
+    # menu
 
     def test_parse_message_button(self):
         screen = self.parseFile("std-R3-5-ID_ctrl.adl")
@@ -136,6 +225,11 @@ class Test_Files(unittest.TestCase):
         self.assertIn("ctrl", control)
         self.assertEqual(control["ctrl"], 'ID$(xx):UN:stopSQ.PROC')
         self.assertEqual(w.title, "Stop ")
+
+    # meter
+    # oval
+    # polygon
+    # polyline
 
     def test_parse_rectangle(self):
         screen = self.parseFile("ADBase-R3-3-1.adl")
@@ -174,6 +268,9 @@ class Test_Files(unittest.TestCase):
         self.assertEqual(display["label"], "Taper Control")
         self.assertIn("name", display)
         self.assertEqual(display["name"], "ID_taper_ctrl.adl")
+
+    # shell command
+    # strip chart
 
     def test_parse_text(self):
         screen = self.parseFile("ADBase-R3-3-1.adl")
@@ -239,6 +336,9 @@ class Test_Files(unittest.TestCase):
         self.assertEqual(len(mon), 1)
         self.assertIn("chan", mon)
         self.assertEqual(mon["chan"], "$(P)")
+
+    # valuator
+    # wheel switch
 
 
 def suite(*args, **kw):
