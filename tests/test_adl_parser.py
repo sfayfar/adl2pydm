@@ -60,6 +60,27 @@ class Test_Files(unittest.TestCase):
         buf = screen.getAdlLines(full_name)
         screen.parseAdlBuffer(buf)
         return screen
+
+    def assertEqualDictKeyValue(self, dictionary, key, value):
+        self.assertIsInstance(dictionary, dict)
+        self.assertIn(key, dictionary)
+        self.assertEqual(dictionary[key], value)
+
+    def assertEqualGeometry(self, geom, x, y, w, h):
+        self.assertEqual(geom.x, x)
+        self.assertEqual(geom.y, y)
+        self.assertEqual(geom.width, w)
+        self.assertEqual(geom.height, h)
+    
+    def pickWidget(self, parent, num_widgets, n, symbol, line_offset):
+        self.assertTrue(hasattr(parent, "widgets"))
+        self.assertEqual(len(parent.widgets), num_widgets)
+        w = parent.widgets[n]
+        self.assertEqual(w.symbol, symbol)
+        self.assertEqual(w.line_offset, line_offset)
+        return w
+
+    # -------------------------------------------------
     
     def test__paths(self):
         self.assertTrue(os.path.exists(self.path))
@@ -84,261 +105,217 @@ class Test_Files(unittest.TestCase):
 
     def test_parse_arc(self):
         screen = self.parseFile("sampleWheel.adl")
-        self.assertEqual(len(screen.widgets), 197)
+        w = self.pickWidget(screen, 197, 2, "arc", 111)
 
-        w = screen.widgets[2]
-        self.assertEqual(w.symbol, "arc")
-        self.assertEqual(w.line_offset, 111)
-        self.assertEqual(w.geometry.x, 436)
-        self.assertEqual(w.geometry.y, 158)
-        self.assertEqual(w.geometry.width, 40)
-        self.assertEqual(w.geometry.height, 40)
+        self.assertEqualGeometry(w.geometry, 436, 158, 40, 40)
         self.assertTrue(hasattr(w, "contents"))
         self.assertIsInstance(w.contents, dict)
         self.assertEqual(len(w.contents), 4)
-        self.assertIn("begin", w.contents)
-        self.assertEqual(w.contents["begin"], "0")
-        self.assertIn("path", w.contents)
-        self.assertEqual(w.contents["path"], "23040")
+        self.assertEqualDictKeyValue(w.contents, "begin", "0")
+        self.assertEqualDictKeyValue(w.contents, "path", "23040")
         self.assertIn("basic attribute", w.contents)
         attr = w.contents["basic attribute"]
         self.assertIsInstance(attr, dict)
         self.assertEqual(len(attr), 2)
-        self.assertIn("fill", attr)
-        self.assertEqual(attr["fill"], "outline")
-        self.assertIn("width", attr)
-        self.assertEqual(attr["width"], "5")
+        self.assertEqualDictKeyValue(attr, "fill", "outline")
+        self.assertEqualDictKeyValue(attr, "width", "5")
         self.assertIn("dynamic attribute", w.contents)
         attr = w.contents["dynamic attribute"]
         self.assertIsInstance(attr, dict)
         self.assertEqual(len(attr), 3)
-        self.assertIn("calc", attr)
-        self.assertEqual(attr["calc"], "A=3")
-        self.assertIn("chan", attr)
-        self.assertEqual(attr["chan"], "$(P)sample")
-        self.assertIn("vis", attr)
-        self.assertEqual(attr["vis"], "calc")
+        self.assertEqualDictKeyValue(attr, "calc", "A=3")
+        self.assertEqualDictKeyValue(attr, "chan", "$(P)sample")
+        self.assertEqualDictKeyValue(attr, "vis", "calc")
 
     # bar
-
-    # def test_parse_basic_attribute(self):
-    #     screen = self.parseFile("std-R3-5-ID_ctrl.adl")
-    #     self.assertEqual(len(screen.widgets), 25)
-    #     # TODO: where is data from basic attribute, line 708
-    #     # goes into contents, but what widget?
-    #     # Why is it given multiple times at the file level?  Error?
-    #     # There's channel content in some of these blocks.
-
     # byte
     # cartesian plot
 
     def test_parse_choice_button(self):
         screen = self.parseFile("motorx-R6-10-1.adl")
-        self.assertEqual(len(screen.widgets), 31)
-
-        w = screen.widgets[30]
-        self.assertEqual(w.symbol, "choice button")
-        self.assertEqual(w.line_offset, 568)
-        self.assertEqual(w.geometry.x, 45)
-        self.assertEqual(w.geometry.y, 137)
-        self.assertEqual(w.geometry.width, 71)
-        self.assertEqual(w.geometry.height, 20)
+        w = self.pickWidget(screen, 31, 30, "choice button", 568)
+        
+        self.assertEqualGeometry(w.geometry, 45, 137, 71, 20)
         self.assertIsInstance(w.contents, dict)
         self.assertEqual(len(w.contents), 2)
-        self.assertIn("stacking", w.contents)
-        self.assertEqual(w.contents["stacking"], 'column')
+        self.assertEqualDictKeyValue(w.contents, "stacking", "column")
         self.assertIn("control", w.contents)
         control = w.contents["control"]
-        self.assertIsInstance(control, dict)
-        self.assertEqual(control["chan"], '$(P)$(M).SET')
+        self.assertEqual(len(control), 1)
+        self.assertEqualDictKeyValue(control, "chan", "$(P)$(M).SET")
 
     def test_parse_composite(self):
         screen = self.parseFile("ADBase-R3-3-1.adl")
-        self.assertEqual(len(screen.widgets), 10)
-
-        w = screen.widgets[1]
-        self.assertEqual(w.symbol, "composite")
-        self.assertEqual(w.line_offset, 101)
-        self.assertEqual(w.geometry.x, 6)
-        self.assertEqual(w.geometry.y, 35)
-        self.assertEqual(w.geometry.width, 350)
-        self.assertEqual(w.geometry.height, 340)
+        w = self.pickWidget(screen, 10, 1, "composite", 101)
+        
+        self.assertEqualGeometry(w.geometry, 6, 35, 350, 340)
         self.assertIsInstance(w.contents, dict)
         self.assertEqual(len(w.contents), 2)
-        self.assertIn("composite file", w.contents)
-        self.assertEqual(w.contents["composite file"], 'ADSetup.adl')
-        self.assertIn("composite name", w.contents)
-        self.assertEqual(w.contents["composite name"], '')
-
-    # def test_parse_dynamic_attribute(self):
-    #     screen = self.parseFile("std-R3-5-ID_ctrl.adl")
-    #     self.assertEqual(len(screen.widgets), 25)
-    #     # TODO: where is data from dynamic attribute, line 687
+        self.assertEqualDictKeyValue(w.contents, "composite file", "ADSetup.adl")
+        self.assertEqualDictKeyValue(w.contents, "composite name", "")
 
     # TODO: embedded display : no example in synApps
 
     def test_parse_image(self):
         screen = self.parseFile("sampleWheel.adl")
-        self.assertEqual(len(screen.widgets), 197)
-
-        w = screen.widgets[1]
-        self.assertEqual(w.symbol, "image")
-        self.assertEqual(w.line_offset, 101)
-        self.assertEqual(w.geometry.x, 0)
-        self.assertEqual(w.geometry.y, 20)
-        self.assertEqual(w.geometry.width, 500)
-        self.assertEqual(w.geometry.height, 500)
+        w = self.pickWidget(screen, 197, 1, "image", 101)
+        
+        self.assertEqualGeometry(w.geometry, 0, 20, 500, 500)
         self.assertTrue(hasattr(w, "contents"))
         self.assertIsInstance(w.contents, dict)
         self.assertEqual(len(w.contents), 2)
-        self.assertIn("image name", w.contents)
-        self.assertEqual(w.contents["image name"], "sampleWheel.gif")
-        self.assertIn("type", w.contents)
-        self.assertEqual(w.contents["type"], "gif")
+        self.assertEqualDictKeyValue(w.contents, "image name", "sampleWheel.gif")
+        self.assertEqualDictKeyValue(w.contents, "type", "gif")
 
     # indicator
     # menu
 
     def test_parse_message_button(self):
         screen = self.parseFile("std-R3-5-ID_ctrl.adl")
-        self.assertEqual(len(screen.widgets), 25)
-
-        w = screen.widgets[3]
-        self.assertEqual(w.symbol, "message button")
-        self.assertEqual(w.line_offset, 434)
-        self.assertEqual(w.geometry.x, 150)
-        self.assertEqual(w.geometry.y, 220)
-        self.assertEqual(w.geometry.width, 140)
-        self.assertEqual(w.geometry.height, 40)
+        w = self.pickWidget(screen, 25, 3, "message button", 434)
+        
+        self.assertEqualGeometry(w.geometry, 150, 220, 140, 40)
         self.assertIsInstance(w.contents, dict)
         self.assertEqual(len(w.contents), 4)
-        self.assertIn("clrmod", w.contents)
-        self.assertEqual(w.contents["clrmod"], "static")
-        self.assertIn("press_msg", w.contents)
-        self.assertEqual(w.contents["press_msg"], "1")
-        self.assertIn("release_msg", w.contents)
-        self.assertEqual(w.contents["release_msg"], "")
+        self.assertEqualDictKeyValue(w.contents, "clrmod", "static")
+        self.assertEqualDictKeyValue(w.contents, "press_msg", "1")
+        self.assertEqualDictKeyValue(w.contents, "release_msg", "")
         self.assertIn("control", w.contents)
         control = w.contents["control"]
         self.assertIsInstance(control, dict)
         self.assertEqual(len(control), 1)
-        self.assertIn("ctrl", control)
-        self.assertEqual(control["ctrl"], 'ID$(xx):UN:stopSQ.PROC')
+        self.assertEqualDictKeyValue(control, "ctrl", "ID$(xx):UN:stopSQ.PROC")
         self.assertEqual(w.title, "Stop ")
 
     # meter
     # oval
-    # polygon
-    # polyline
+    # polygon - calc-R3-7-1-FuncGen_full.adl
+    # polyline - calc-R3-7-1-FuncGen_full.adl
 
     def test_parse_rectangle(self):
         screen = self.parseFile("ADBase-R3-3-1.adl")
-        self.assertEqual(len(screen.widgets), 10)
-
-        w = screen.widgets[0]
-        self.assertEqual(w.symbol, "rectangle")
-        self.assertEqual(w.line_offset, 90)
-        self.assertEqual(w.geometry.x, 0)
-        self.assertEqual(w.geometry.y, 4)
-        self.assertEqual(w.geometry.width, 715)
-        self.assertEqual(w.geometry.height, 25)
+        w = self.pickWidget(screen, 10, 0, "rectangle", 90)
+        
+        self.assertEqualGeometry(w.geometry, 0, 4, 715, 25)
         self.assertIsInstance(w.contents, dict)
         self.assertEqual(len(w.contents), 1)
         self.assertIn("basic attribute", w.contents)
-        self.assertEqual(len(w.contents["basic attribute"]), 0)
+        attr = w.contents["basic attribute"]
+        self.assertEqual(len(attr), 0)
 
     def test_parse_related_display(self):
         screen = self.parseFile("std-R3-5-ID_ctrl.adl")
-        self.assertEqual(len(screen.widgets), 25)
-
-        w = screen.widgets[13]
-        self.assertEqual(w.symbol, "related display")
-        self.assertEqual(w.line_offset, 611)
-        self.assertEqual(w.geometry.x, 119)
-        self.assertEqual(w.geometry.y, 285)
-        self.assertEqual(w.geometry.width, 18)
-        self.assertEqual(w.geometry.height, 18)
+        w = self.pickWidget(screen, 25, 13, "related display", 611)
+        
+        self.assertEqualGeometry(w.geometry, 119, 285, 18, 18)
         self.assertIsInstance(w.displays, list)
         self.assertEqual(len(w.displays), 8)
         display = w.displays[0]
         self.assertIsInstance(display, dict)
-        self.assertIn("args", display)
-        self.assertEqual(display["args"], "xx=$(xx)")
-        self.assertIn("label", display)
-        self.assertEqual(display["label"], "Taper Control")
-        self.assertIn("name", display)
-        self.assertEqual(display["name"], "ID_taper_ctrl.adl")
+        self.assertEqualDictKeyValue(display, "args", "xx=$(xx)")
+        self.assertEqualDictKeyValue(display, "label", "Taper Control")
+        self.assertEqualDictKeyValue(display, "name", "ID_taper_ctrl.adl")
 
-    # shell command
-    # strip chart
+    def test_parse_shell_command(self):
+        screen = self.parseFile("sscan-R2-11-1-scanAux.adl")
+        w = self.pickWidget(screen, 66, 42, "shell command", 725)
+        
+        self.assertEqualGeometry(w.geometry, 350, 239, 20, 20)
+        self.assertTrue(hasattr(w, "contents"))
+        self.assertIsInstance(w.contents, dict)
+        self.assertEqual(len(w.contents), 0)
+        self.assertTrue(hasattr(w, "commands"))
+        self.assertIsInstance(w.commands, list)
+        self.assertEqual(len(w.commands), 1)
+        cmd = w.commands[0]
+        self.assertIsInstance(cmd, dict)
+        self.assertEqual(len(cmd), 2)
+        self.assertEqualDictKeyValue(cmd, "label", "Help")
+        self.assertEqualDictKeyValue(cmd, "name", "medm_help.sh &T")
+
+    def test_parse_strip_chart(self):
+        screen = self.parseFile("calc-R3-7-1-FuncGen_full.adl")
+        # this widget is in a composite
+        w = self.pickWidget(screen, 38, 32, "composite", 614)
+        w = self.pickWidget(w, 1, 0, "strip chart", 614)
+        
+        self.assertEqualGeometry(w.geometry, 0, 260, 450, 170)
+        self.assertTrue(hasattr(w, "contents"))
+        self.assertIsInstance(w.contents, dict)
+        self.assertEqual(len(w.contents), 2)
+        self.assertEqualDictKeyValue(w.contents, "period", "1.000000")
+        self.assertEqualDictKeyValue(w.contents, "units", "minute")
+        self.assertTrue(hasattr(w, "title"))
+        self.assertEqual(w.title, None)
 
     def test_parse_text(self):
         screen = self.parseFile("ADBase-R3-3-1.adl")
-        self.assertEqual(len(screen.widgets), 10)
-
-        w = screen.widgets[9]
-        self.assertEqual(w.symbol, "text")
-        self.assertEqual(w.line_offset, 181)
-        self.assertEqual(w.geometry.x, 0)
-        self.assertEqual(w.geometry.y, 5)
-        self.assertEqual(w.geometry.width, 715)
-        self.assertEqual(w.geometry.height, 25)
+        w = self.pickWidget(screen, 10, 9, "text", 181)
+        
+        self.assertEqualGeometry(w.geometry, 0, 5, 715, 25)
         self.assertIsInstance(w.contents, dict)
         self.assertEqual(len(w.contents), 2)
-        self.assertIn("align", w.contents)
-        self.assertEqual(w.contents["align"], 'horiz. centered')
+        self.assertEqualDictKeyValue(w.contents, "align", "horiz. centered")
         self.assertIn("basic attribute", w.contents)
-        self.assertEqual(len(w.contents["basic attribute"]), 0)
+        attr = w.contents["basic attribute"]
+        self.assertEqual(len(attr), 0)
         self.assertEqual(w.title, "Area Detector Control - $(P)$(R)")
 
     def test_parse_text_entry(self):
         screen = self.parseFile("std-R3-5-ID_ctrl.adl")
-        self.assertEqual(len(screen.widgets), 25)
-
-        w = screen.widgets[8]
-        self.assertEqual(w.symbol, "text entry")
-        self.assertEqual(w.line_offset, 531)
-        self.assertEqual(w.geometry.x, 54)
-        self.assertEqual(w.geometry.y, 114)
-        self.assertEqual(w.geometry.width, 120)
-        self.assertEqual(w.geometry.height, 38)
+        w = self.pickWidget(screen, 25, 8, "text entry", 531)
+        
+        self.assertEqualGeometry(w.geometry, 54, 114, 120, 38)
         self.assertIsInstance(w.contents, dict)
         self.assertEqual(len(w.contents), 3)
-        self.assertIn("format", w.contents)
-        self.assertEqual(w.contents["format"], "decimal")
-        self.assertIn("clrmod", w.contents)
-        self.assertEqual(w.contents["clrmod"], "static")
+        self.assertEqualDictKeyValue(w.contents, "format", "decimal")
+        self.assertEqualDictKeyValue(w.contents, "clrmod", "static")
         self.assertIn("control", w.contents)
         control = w.contents["control"]
         self.assertIsInstance(control, dict)
         self.assertEqual(len(control), 1)
-        self.assertIn("ctrl", control)
-        self.assertEqual(control["ctrl"], "ID$(xx):UN:setavgAI.VAL")
+        self.assertEqualDictKeyValue(control, "ctrl", "ID$(xx):UN:setavgAI.VAL")
 
     def test_parse_text_update(self):
         screen = self.parseFile("newDisplay.adl")
-        self.assertEqual(len(screen.widgets), 1)
-
-        w = screen.widgets[0]
-        self.assertEqual(w.symbol, "text update")
-        self.assertEqual(w.line_offset, 90)
-        self.assertEqual(w.geometry.x, 40)
-        self.assertEqual(w.geometry.y, 46)
-        self.assertEqual(w.geometry.width, 195)
-        self.assertEqual(w.geometry.height, 31)
+        w = self.pickWidget(screen, 1, 0, "text update", 90)
+        
+        self.assertEqualGeometry(w.geometry, 40, 46, 195, 31)
         self.assertIsInstance(w.contents, dict)
         self.assertEqual(len(w.contents), 2)
-        self.assertIn("limits", w.contents)
-        self.assertEqual(w.contents["limits"], "")
+        self.assertEqualDictKeyValue(w.contents, "limits", "")
         self.assertIn("monitor", w.contents)
         mon = w.contents["monitor"]
         self.assertIsInstance(mon, dict)
         self.assertEqual(len(mon), 1)
-        self.assertIn("chan", mon)
-        self.assertEqual(mon["chan"], "$(P)")
+        self.assertEqualDictKeyValue(mon, "chan", "$(P)")
 
-    # valuator
-    # wheel switch
+    def test_parse_valuator(self):
+        screen = self.parseFile("optics-R2-13-xiahsc.adl")
+        w = self.pickWidget(screen, 55, 8, "valuator", 201)
+        
+        self.assertEqualGeometry(w.geometry, 52, 247, 100, 20)
+        self.assertIsInstance(w.contents, dict)
+        self.assertEqual(len(w.contents), 2)
+        self.assertEqualDictKeyValue(w.contents, "dPrecision", "0.010000")
+        self.assertIn("control", w.contents)
+        control = w.contents["control"]
+        self.assertEqual(len(control), 1)
+        self.assertEqualDictKeyValue(control, "chan", "$(P)$(HSC)l")
+        self.assertTrue(hasattr(w, "title"))
+        self.assertEqual(w.title, "no decorations")
+
+    def test_parse_wheel_switch(self):
+        screen = self.parseFile("wheel_switch.adl")
+        w = self.pickWidget(screen, 1, 0, "wheel switch", 90)
+        
+        self.assertEqualGeometry(w.geometry, 48, 29, 144, 48)
+        self.assertIsInstance(w.contents, dict)
+        self.assertEqual(len(w.contents), 2)
+        self.assertEqualDictKeyValue(w.contents, "limits", "")
+        control = w.contents["control"]
+        self.assertEqual(len(control), 1)
+        self.assertEqualDictKeyValue(control, "chan", "$(P)$(M)")
 
 
 def suite(*args, **kw):
