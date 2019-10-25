@@ -16,7 +16,6 @@ from .output_handler import PYDM_Writer
 from .import pydm_symbols
 
 
-OUTPUT_PATH = "screens/pydm"        # FIXME: pass as parameter
 SCREEN_FILE_EXTENSION = ".ui"
 
 logging.basicConfig(level=logging.DEBUG)
@@ -106,10 +105,10 @@ class PydmSupport(object):
             pv = pv.replace("(", "{").replace(")", "}")
         return pv
     
-    def write_ui(self, screen):
+    def write_ui(self, screen, output_path):
         """main entry point to write the .ui file"""
         title = screen.title or os.path.split(os.path.splitext(screen.given_filename)[0])[-1]
-        ui_filename = os.path.join(OUTPUT_PATH, title + SCREEN_FILE_EXTENSION)
+        ui_filename = os.path.join(output_path, title + SCREEN_FILE_EXTENSION)
         self.writer = PYDM_Writer(None)
 
         root = self.writer.openFile(ui_filename)
@@ -323,16 +322,14 @@ class PydmSupport(object):
         self.writer.writeTaggedString(propty, value=tip)
 
 
-def main(adl_filename):
+def main(adl_filename, output_path):
     screen = MedmMainWidget(adl_filename)
     buf = screen.getAdlLines(adl_filename)
     screen.parseAdlBuffer(buf)
     
     writer = PydmSupport()
-    writer.write_ui(screen)
+    writer.write_ui(screen, output_path)
 
 
 if __name__ == "__main__":
-    for fname in TEST_FILES:
-        main(fname)
-    print("done")
+    print("UI is TBA now")

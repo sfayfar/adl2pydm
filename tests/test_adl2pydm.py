@@ -56,14 +56,15 @@ class Test_Main(unittest.TestCase):
         
         medm_path = os.path.join(path, "screens", "medm")
         self.assertTrue(os.path.exists(medm_path))
+        
+        output_path = os.path.join(path, "screens", "pydm")
 
         for fname in self.test_files:
             full_name = os.path.join(medm_path, fname)
             self.assertTrue(os.path.exists(full_name))
             
-            # TODO: need to specify where to write the output
-            # now, raises FileNotFoundError
-            adl2pydm.main(full_name)
+            adl2pydm.main(full_name, output_path)
+            # TODO: test things
 
 
 def suite(*args, **kw):
