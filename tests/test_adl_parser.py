@@ -44,24 +44,31 @@ class Test_Files(unittest.TestCase):
         "simDetector-R3-3-31.adl",
         ]
 
-    # def setUp(self):
-    #     pass
-    # 
+    def setUp(self):
+        self.path = os.path.abspath(os.path.dirname(adl_parser.__file__))
+        self.medm_path = os.path.join(self.path, "screens", "medm")
+    
     # def tearDown(self):
     #     pass
+
+    def parseFile(self, short_name):
+        full_name = os.path.join(self.medm_path, short_name)
+        
+        screen = adl_parser.MedmMainWidget()
+        buf = screen.getAdlLines(full_name)
+        screen.parseAdlBuffer(buf)
+        return screen
     
+    def test_paths(self):
+        self.assertTrue(os.path.exists(self.path))
+        self.assertTrue(os.path.exists(self.medm_path))
+
     def test_adl_parser(self):
-        path = os.path.abspath(os.path.dirname(adl_parser.__file__))
-        self.assertTrue(os.path.exists(path))
-        
-        medm_path = os.path.join(path, "screens", "medm")
-        self.assertTrue(os.path.exists(medm_path))
-        
         for fname in self.test_files:
             screen = adl_parser.MedmMainWidget()
             self.assertEqual(screen.line_offset, 1)
 
-            full_name = os.path.join(medm_path, fname)
+            full_name = os.path.join(self.medm_path, fname)
             self.assertTrue(os.path.exists(full_name))
 
             buf = screen.getAdlLines(full_name)
@@ -69,8 +76,28 @@ class Test_Files(unittest.TestCase):
             self.assertGreater(len(buf), 10)
 
             screen.parseAdlBuffer(buf)
-            # TODO: test things
             self.assertGreater(len(screen.widgets), 0)
+
+    def test_parse_text_update(self):
+        screen = self.parseFile("newDisplay.adl")
+        self.assertEqual(len(screen.widgets), 1)
+
+        w = screen.widgets[0]
+        self.assertEqual(w.symbol, "text update")
+        self.assertEqual(w.geometry.x, 40)
+        self.assertEqual(w.geometry.y, 46)
+        self.assertEqual(w.geometry.width, 195)
+        self.assertEqual(w.geometry.height, 31)
+        self.assertIsInstance(w.contents, dict)
+        self.assertEqual(len(w.contents), 2)
+        self.assertIn("limits", w.contents)
+        self.assertEqual(w.contents["limits"], "")
+        self.assertIn("monitor", w.contents)
+        mon = w.contents["monitor"]
+        self.assertIsInstance(mon, dict)
+        self.assertEqual(len(mon), 1)
+        self.assertIn("chan", mon)
+        self.assertEqual(mon["chan"], "$(P)")
 
 
 def suite(*args, **kw):

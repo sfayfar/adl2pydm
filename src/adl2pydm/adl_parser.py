@@ -354,9 +354,8 @@ class MedmGenericWidget(MedmBaseWidget):
 
     def parseAdlBuffer(self, buf):              # lgtm [py/similar-function]
         assignments, blocks = MedmBaseWidget.parseAdlBuffer(self, buf)
-        # if self.debug:
-        #     _debug = self.debug
-#         pass
+        if self.debug:
+            _debug = self.debug
 
 
 class MedmArcWidget(MedmGenericWidget): pass
