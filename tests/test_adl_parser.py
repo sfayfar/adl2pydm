@@ -39,6 +39,7 @@ class Test_Files(unittest.TestCase):
         "scanDetPlot-R2-11-1.adl",         # cartesian plot, strip
         "sscan-R2-11-1-scanAux.adl",       # shell command
         "std-R3-5-ID_ctrl.adl",            # param
+        "wheel_switch.adl",                # wheel switch
         # "beamHistory_full-R3-5.adl", # dl_color -- this .adl has content errors
         "ADBase-R3-3-1.adl",               # composite
         "simDetector-R3-3-31.adl",
