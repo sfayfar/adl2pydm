@@ -59,7 +59,7 @@ class Test_Files(unittest.TestCase):
         screen.parseAdlBuffer(buf)
         return screen
     
-    def test_paths(self):
+    def test__paths(self):
         self.assertTrue(os.path.exists(self.path))
         self.assertTrue(os.path.exists(self.medm_path))
 
