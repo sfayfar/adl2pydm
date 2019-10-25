@@ -66,6 +66,8 @@ class Test_Main(unittest.TestCase):
             
             adl2pydm.main(full_name, output_path)
             # TODO: test things
+            uiname = os.path.splitext(fname)[0] + adl2pydm.SCREEN_FILE_EXTENSION
+            self.assertTrue(os.path.exists(os.path.join(output_path, uiname)))
 
 
 def suite(*args, **kw):
