@@ -4,10 +4,10 @@
  <widget class="QWidget" name="Form">
   <property name="geometry">
    <rect>
-    <x>0</x>
-    <y>0</y>
+    <x>20</x>
+    <y>10</y>
     <width>321</width>
-    <height>118</height>
+    <height>188</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -45,11 +45,15 @@
    <property name="showIcon" stdset="0">
     <bool>false</bool>
    </property>
-   <property name="displayFilename" stdset="0">
-    <string>motorp.ui</string>
+   <property name="filenames" stdset="0">
+	<stringlist>
+      <string>motorp.ui</string>
+    </stringlist>
    </property>
    <property name="macros" stdset="0">
-    <string>P=${P}, M=m1</string>
+    <stringlist>
+     <string>P=${P}, M=m1</string>
+    </stringlist>
    </property>
    <property name="openInNewWindow" stdset="0">
     <bool>true</bool>
@@ -87,11 +91,15 @@
    <property name="showIcon" stdset="0">
     <bool>false</bool>
    </property>
-   <property name="displayFilename" stdset="0">
-    <string>motorp.ui</string>
+   <property name="filenames" stdset="0">
+	<stringlist>
+      <string>motorp.ui</string>
+    </stringlist>
    </property>
    <property name="macros" stdset="0">
-    <string>P=${P}, M=m5</string>
+    <stringlist>
+     <string>P=${P}, M=m5</string>
+    </stringlist>
    </property>
    <property name="openInNewWindow" stdset="0">
     <bool>true</bool>
@@ -129,11 +137,15 @@
    <property name="showIcon" stdset="0">
     <bool>false</bool>
    </property>
-   <property name="displayFilename" stdset="0">
-    <string>motorp.ui</string>
+   <property name="filenames" stdset="0">
+	<stringlist>
+      <string>motorp.ui</string>
+    </stringlist>
    </property>
    <property name="macros" stdset="0">
-    <string>P=${P}, M=m2</string>
+    <stringlist>
+     <string>P=${P}, M=m2</string>
+    </stringlist>
    </property>
    <property name="openInNewWindow" stdset="0">
     <bool>true</bool>
@@ -171,11 +183,15 @@
    <property name="showIcon" stdset="0">
     <bool>false</bool>
    </property>
-   <property name="displayFilename" stdset="0">
-    <string>motorp.ui</string>
+   <property name="filenames" stdset="0">
+	<stringlist>
+      <string>motorp.ui</string>
+    </stringlist>
    </property>
    <property name="macros" stdset="0">
-    <string>P=${P}, M=m6</string>
+    <stringlist>
+     <string>P=${P}, M=m6</string>
+    </stringlist>
    </property>
    <property name="openInNewWindow" stdset="0">
     <bool>true</bool>
@@ -213,11 +229,15 @@
    <property name="showIcon" stdset="0">
     <bool>false</bool>
    </property>
-   <property name="displayFilename" stdset="0">
-    <string>motorp.ui</string>
+   <property name="filenames" stdset="0">
+	<stringlist>
+      <string>motorp.ui</string>
+    </stringlist>
    </property>
    <property name="macros" stdset="0">
-    <string>P=${P}, M=m3</string>
+    <stringlist>
+     <string>P=${P}, M=m3</string>
+    </stringlist>
    </property>
    <property name="openInNewWindow" stdset="0">
     <bool>true</bool>
@@ -255,11 +275,15 @@
    <property name="showIcon" stdset="0">
     <bool>false</bool>
    </property>
-   <property name="displayFilename" stdset="0">
-    <string>motorp.ui</string>
+   <property name="filenames" stdset="0">
+	<stringlist>
+      <string>motorp.ui</string>
+    </stringlist>
    </property>
    <property name="macros" stdset="0">
-    <string>P=${P}, M=m7</string>
+    <stringlist>
+     <string>P=${P}, M=m7</string>
+    </stringlist>
    </property>
    <property name="openInNewWindow" stdset="0">
     <bool>true</bool>
@@ -297,11 +321,15 @@
    <property name="showIcon" stdset="0">
     <bool>false</bool>
    </property>
-   <property name="displayFilename" stdset="0">
-    <string>motorp.ui</string>
+   <property name="filenames" stdset="0">
+	<stringlist>
+      <string>motorp.ui</string>
+    </stringlist>
    </property>
    <property name="macros" stdset="0">
-    <string>P=${P}, M=m4</string>
+    <stringlist>
+     <string>P=${P}, M=m4</string>
+    </stringlist>
    </property>
    <property name="openInNewWindow" stdset="0">
     <bool>true</bool>
@@ -339,11 +367,15 @@
    <property name="showIcon" stdset="0">
     <bool>false</bool>
    </property>
-   <property name="displayFilename" stdset="0">
-    <string>motorp.ui</string>
+   <property name="filenames" stdset="0">
+	<stringlist>
+      <string>motorp.ui</string>
+    </stringlist>
    </property>
    <property name="macros" stdset="0">
-    <string>P=${P}, M=m8</string>
+    <stringlist>
+     <string>P=${P}, M=m8</string>
+    </stringlist>
    </property>
    <property name="openInNewWindow" stdset="0">
     <bool>true</bool>
@@ -376,6 +408,81 @@
    </property>
    <property name="text">
     <string>prefix</string>
+   </property>
+  </widget>
+  <widget class="PyDMRelatedDisplayButton" name="PyDMRelatedDisplayButton_9">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>130</y>
+     <width>121</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string/>
+   </property>
+   <property name="whatsThis">
+    <string>
+    A QPushButton capable of opening a new Display at the same of at a
+    new window.
+
+    Parameters
+    ----------
+    init_channel : str, optional
+        The channel to be used by the widget.
+
+    filename : str, optional
+        The file to be opened
+    </string>
+   </property>
+   <property name="text">
+    <string>motors 1-8</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="filenames" stdset="0">
+    <stringlist>
+     <string>motorp.ui</string>
+     <string>motorp.ui</string>
+     <string>motorp.ui</string>
+     <string>motorp.ui</string>
+     <string>motorp.ui</string>
+     <string>motorp.ui</string>
+     <string>motorp.ui</string>
+     <string>motorp.ui</string>
+    </stringlist>
+   </property>
+   <property name="titles" stdset="0">
+    <stringlist>
+     <string>m1</string>
+     <string>m2</string>
+     <string>m3</string>
+     <string>m4</string>
+     <string>m5</string>
+     <string>m6</string>
+     <string>m7</string>
+     <string>m8</string>
+    </stringlist>
+   </property>
+   <property name="showIcon" stdset="0">
+    <bool>false</bool>
+   </property>
+   <property name="macros" stdset="0">
+    <stringlist>
+     <string>P=${P}, M=m1</string>
+     <string>P=${P}, M=m2</string>
+     <string>P=${P}, M=m3</string>
+     <string>P=${P}, M=m4</string>
+     <string>P=${P}, M=m5</string>
+     <string>P=${P}, M=m6</string>
+     <string>P=${P}, M=m7</string>
+     <string>P=${P}, M=m8</string>
+    </stringlist>
+   </property>
+   <property name="openInNewWindow" stdset="0">
+    <bool>true</bool>
    </property>
   </widget>
  </widget>

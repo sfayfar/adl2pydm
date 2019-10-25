@@ -6,41 +6,17 @@ convert MEDM .adl screen file(s) to PyDM .ui format
 Only rely on packages in this project or from the standard Python distribution. 
 """
 
-from collections import namedtuple
+# from collections import namedtuple
 import logging
 import os
 
-from adl_parser import MedmMainWidget
-import adl_symbols
-from output_handler import PYDM_Writer
-import pydm_symbols
+from .adl_parser import MedmMainWidget
+from . import adl_symbols
+from .output_handler import PYDM_Writer
+from .import pydm_symbols
 
 
-OUTPUT_PATH = "screens/pydm"
 SCREEN_FILE_EXTENSION = ".ui"
-TEST_FILES = [
-    "screens/medm/newDisplay.adl",                  # simple display
-    "screens/medm/xxx-R5-8-4.adl",                  # related display
-    "screens/medm/xxx-R6-0.adl",
-    # FIXME: needs more work here (unusual structure, possibly stress test):  "screens/medm/base-3.15.5-caServerApp-test.adl",# info[, "<<color rules>>", "<<color map>>"
-    "screens/medm/calc-3-4-2-1-FuncGen_full.adl",   # strip chart
-    "screens/medm/calc-R3-7-1-FuncGen_full.adl",    # strip chart
-    "screens/medm/calc-R3-7-userCalcMeter.adl",     # meter
-    "screens/medm/mca-R7-7-mca.adl",                # bar
-    "screens/medm/motorx-R6-10-1.adl",
-    "screens/medm/motorx_all-R6-10-1.adl",
-    "screens/medm/optics-R2-13-1-CoarseFineMotorShow.adl",  # indicator
-    "screens/medm/optics-R2-13-1-kohzuGraphic.adl", # image
-    "screens/medm/optics-R2-13-1-pf4more.adl",      # byte
-    "screens/medm/optics-R2-13-xiahsc.adl",         # valuator
-    "screens/medm/scanDetPlot-R2-11-1.adl",         # cartesian plot, strip
-    "screens/medm/sscan-R2-11-1-scanAux.adl",       # shell command
-    "screens/medm/std-R3-5-ID_ctrl.adl",            # param
-    "screens/medm/wheel_switch.adl",                # wheel switch
-    # "screens/medm/beamHistory_full-R3-5.adl", # dl_color -- this .adl has content errors
-    "screens/medm/ADBase-R3-3-1.adl",               # composite
-    "screens/medm/simDetector-R3-3-31.adl",
-    ]
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -65,6 +41,32 @@ class PydmSupport(object):
     def __init__(self):
         self.custom_widgets = []
         self.unique_widget_names = {}
+        self.pydm_widget_handlers = {
+            #"arc" : dict(type="static", pydm_widget="PyDMDrawingArc"),
+            #"bar" : dict(type="monitor", pydm_widget="PyDMDrawingRectangle"),
+            "byte" : self.write_block_byte_indicator,
+            "cartesian plot" : self.write_block_cartesian_plot,
+            "choice button" : self.write_block_choice_button,
+            "composite" : self.write_block_composite,
+            #"embedded display" : dict(type="static", pydm_widget="PyDMEmbeddedDisplay"),
+            "image" : self.write_block_image,
+            "indicator" : self.write_block_indicator,
+            "menu" : self.write_block_menu,
+            "message button" : self.write_block_message_button,
+            "meter" : self.write_block_meter,
+            #"oval" : dict(type="static", pydm_widget="PyDMDrawingEllipse"),
+            #"polygon" : dict(type="static", pydm_widget="PyDMDrawingPolygon"),
+            "polyline" : self.write_block_polyline,
+            "rectangle" : self.write_block_rectangle,
+            "related display" : self.write_block_related_display,
+            "shell command" : self.write_block_shell_command,
+            "strip chart" : self.write_block_strip_chart,
+            "text" : self.write_block_text,
+            "text entry" : self.write_block_text_entry,
+            "text update" : self.write_block_text_update,
+            "valuator" : self.write_block_valuator,
+            "wheel switch" : self.write_block_wheel_switch,
+            }
     
     def get_unique_widget_name(self, suggestion):
         """
@@ -103,10 +105,10 @@ class PydmSupport(object):
             pv = pv.replace("(", "{").replace(")", "}")
         return pv
     
-    def write_ui(self, screen):
+    def write_ui(self, screen, output_path):
         """main entry point to write the .ui file"""
         title = screen.title or os.path.split(os.path.splitext(screen.given_filename)[0])[-1]
-        ui_filename = os.path.join(OUTPUT_PATH, title + SCREEN_FILE_EXTENSION)
+        ui_filename = os.path.join(output_path, title + SCREEN_FILE_EXTENSION)
         self.writer = PYDM_Writer(None)
 
         root = self.writer.openFile(ui_filename)
@@ -134,33 +136,6 @@ class PydmSupport(object):
         self.writer.closeFile()
 
     def write_block(self, parent, block):
-        handlers = {
-            #"arc" : dict(type="static", pydm_widget="PyDMDrawingArc"),
-            #"bar" : dict(type="monitor", pydm_widget="PyDMDrawingRectangle"),
-            "byte" : self.write_block_byte_indicator,
-            "cartesian plot" : self.write_block_cartesian_plot,
-            "choice button" : self.write_block_choice_button,
-            "composite" : self.write_block_composite,
-            #"embedded display" : dict(type="static", pydm_widget="PyDMEmbeddedDisplay"),
-            "image" : self.write_block_image,
-            "indicator" : self.write_block_indicator,
-            "menu" : self.write_block_menu,
-            "message button" : self.write_block_message_button,
-            "meter" : self.write_block_meter,
-            #"oval" : dict(type="static", pydm_widget="PyDMDrawingEllipse"),
-            #"polygon" : dict(type="static", pydm_widget="PyDMDrawingPolygon"),
-            "polyline" : self.write_block_polyline,
-            "rectangle" : self.write_block_rectangle,
-            "related display" : self.write_block_related_display,
-            "shell command" : self.write_block_shell_command,
-            "strip chart" : self.write_block_strip_chart,
-            "text" : self.write_block_text,
-            "text entry" : self.write_block_text_entry,
-            "text update" : self.write_block_text_update,
-            "valuator" : self.write_block_valuator,
-            #"wheel switch" : dict(type="controller", pydm_widget="PyDMSpinbox"),
-            }
-
         nm = self.get_unique_widget_name(block.symbol.replace(" ", "_"))
         widget_info = adl_symbols.widgets.get(block.symbol)
         if widget_info is not None:
@@ -168,7 +143,7 @@ class PydmSupport(object):
             if cls not in self.custom_widgets:
                 self.custom_widgets.append(cls)
         
-        handler = handlers.get(block.symbol, self.write_block_default)
+        handler = self.pydm_widget_handlers.get(block.symbol, self.write_block_default)
         cls = widget_info["pydm_widget"]
         if block.symbol.find("chart") >= 0:
             pass
@@ -291,7 +266,12 @@ class PydmSupport(object):
         self.write_channel(qw, pv)
         self.write_tooltip(qw, pv)
         # TODO: block.contents["dPrecision"]
-    
+
+    def write_block_wheel_switch(self, parent, block, nm, qw):
+        pv = self.get_channel(block.contents["control"])
+        self.write_channel(qw, pv)
+        self.write_tooltip(qw, pv)
+
     # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
     def write_channel(self, parent, channel):
@@ -330,8 +310,8 @@ class PydmSupport(object):
     def write_geometry(self, parent, geom):
         propty = self.writer.writeOpenProperty(parent, "geometry")
         rect = self.writer.writeOpenTag(propty, "rect")
-        if str(geom.x) == "-":
-            _debug_ = True
+        # if str(geom.x) == "-":
+        #     _debug_ = True
         self.writer.writeTaggedString(rect, "x", str(geom.x))
         self.writer.writeTaggedString(rect, "y", str(geom.y))
         self.writer.writeTaggedString(rect, "width", str(geom.width))
@@ -340,19 +320,16 @@ class PydmSupport(object):
     def write_tooltip(self, parent, tip):
         propty = self.writer.writeOpenProperty(parent, "toolTip")
         self.writer.writeTaggedString(propty, value=tip)
-    
 
 
-def main(adl_filename):
+def main(adl_filename, output_path):
     screen = MedmMainWidget(adl_filename)
     buf = screen.getAdlLines(adl_filename)
     screen.parseAdlBuffer(buf)
     
     writer = PydmSupport()
-    writer.write_ui(screen)
+    writer.write_ui(screen, output_path)
 
 
 if __name__ == "__main__":
-    for fname in TEST_FILES:
-        main(fname)
-    print("done")
+    print("UI is TBA now")
