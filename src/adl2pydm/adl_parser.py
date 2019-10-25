@@ -482,16 +482,27 @@ class MedmStripChartWidget(MedmGenericWidget):
 
         pens = {}
         for block in blocks:
-            if not block.symbol.startswith("pen["):
-                continue
-            del self.contents[block.symbol]
-            aa = self.locateAssignments(buf[block.start+1:block.end])
-            clr = aa.get("clr")
-            if clr is not None:
-                del aa["clr"]
-                aa["color"] = self.main.color_table[int(clr)]
-            row = block.symbol.replace("[", " ").replace("]", "").split()[-1]
-            pens[row] = aa
+            if block.symbol.startswith("pen["):
+                del self.contents[block.symbol]
+                aa = self.locateAssignments(buf[block.start+1:block.end])
+                clr = aa.get("clr")
+                if clr is not None:
+                    del aa["clr"]
+                    aa["color"] = self.main.color_table[int(clr)]
+                row = block.symbol.replace("[", " ").replace("]", "").split()[-1]
+                pens[row] = aa
+            elif block.symbol == "plotcom":
+                self.parseColorAssignments(
+                    self.locateAssignments(
+                        buf[block.start+1:block.end]
+                        )
+                    )
+                if "plotcom" in self.contents:
+                    del self.contents["plotcom"]
+            elif block.symbol == "symbol":
+                raise ValueError(block.symbol + " not handled yet")
+            else:
+                raise ValueError(block.symbol + " not expected here")
         
         def sorter(value):
             return int(value)
