@@ -21,9 +21,7 @@ from adl2pydm import adl2pydm
 
 class Test_Main(unittest.TestCase):
 
-    # TODO: reduce number of files tested
-    # no need to test so many files both here and adl_parser
-    # only test files for different command options
+    # these files both reader AND writer
     test_files = [
         "newDisplay.adl",                  # simple display
         "xxx-R5-8-4.adl",                  # related display
