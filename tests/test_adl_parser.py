@@ -128,6 +128,43 @@ class Test_Files(unittest.TestCase):
 
     # -------------------------------------------------
 
+    def test_parse_medm_file(self):
+        screen = self.parseFile("std-R3-5-ID_ctrl.adl")
+
+        self.assertEqualGeometry(screen, 10, 10, 290, 310)
+        self.assertEqualColor(screen.color, 0, 0, 0)
+        self.assertEqualColor(screen.background_color, 212, 219, 157)
+        self.assertEqual(screen.adl_filename, '/home/oxygen16/MOHAN/user_adl/ID_ctrl.adl')
+        self.assertEqual(screen.adl_version, "020199")
+        self.assertEqual(screen.cmap, "")
+        self.assertEqual(len(screen.color_table), 65)
+        self.assertEqualColor(screen.color_table[0], 255, 255, 255)
+        self.assertEqualColor(screen.color_table[1], 236, 236, 236)
+        self.assertEqualColor(screen.color_table[25], 88, 147, 255)
+        self.assertEqualColor(screen.color_table[-1], 26, 115, 9)
+        self.assertEqual(screen.line_offset, 1)
+        self.assertEqual(screen.symbol, None)
+        self.assertEqualTitle(screen, None)
+
+        screen = self.parseFile("beamHistory_full-R3-5.adl")
+
+        self.assertEqualGeometry(screen, 10, 10, 500, 650)
+        self.assertEqualColor(screen.color, 0, 0, 0)
+        self.assertEqualColor(screen.background_color, 212, 219, 157)
+        self.assertEqual(screen.adl_filename, '/net/epics/xfd/WWW/xfd/operations/SR_Status.adl')
+        self.assertEqual(screen.adl_version, "020199")
+        self.assertEqual(screen.cmap, "")
+        self.assertEqual(len(screen.color_table), 65)
+        self.assertEqualColor(screen.color_table[0], 255, 255, 255)
+        self.assertEqualColor(screen.color_table[1], 236, 236, 236)
+        self.assertEqualColor(screen.color_table[25], 88, 147, 255)
+        self.assertEqualColor(screen.color_table[-1], 26, 115, 9)
+        self.assertEqual(screen.line_offset, 1)
+        self.assertEqual(screen.symbol, None)
+        self.assertEqualTitle(screen, None)
+
+    # -------------------------------------------------
+
     def test_parse_medm_widget_arc(self):
         screen = self.parseFile("sampleWheel.adl")
         w = self.pickWidget(screen, 197, 2, "arc", 111)
