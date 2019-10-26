@@ -40,7 +40,6 @@ test:
     - adl2pydm
   commands:
     - python -c "import adl2pydm;"
-    - bluesky_snapshot --help
 
 extra:
   recipe-maintainers:
