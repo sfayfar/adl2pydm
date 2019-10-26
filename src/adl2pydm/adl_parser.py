@@ -238,6 +238,26 @@ class MedmBaseWidget(object):
         arr = map(int, (a["x"], a["y"], a["width"], a["height"]))   # convert to int
         return Geometry(*list(arr))
 
+    def parsePlotcomBlock(self, buf, blocks):
+        block = self.getNamedBlock("plotcom", blocks)
+        if block is not None:
+            self.parseColorAssignments(
+                self.locateAssignments(
+                    buf[block.start+1:block.end]
+                    )
+                )
+            aa = self.locateAssignments(buf[block.start+1:block.end])
+            for symbol in "clr bclr".split():
+                if symbol in aa:
+                    del aa[symbol]
+            for k, v in aa.items():
+                if k == "title":
+                    self.title = v
+                else:
+                    self.contents[k] = v
+            if "plotcom" in self.contents:
+                del self.contents["plotcom"]
+
 
 class MedmMainWidget(MedmBaseWidget):
     
@@ -374,24 +394,7 @@ class MedmCartesianPlotWidget(MedmGenericWidget):
     def parseAdlBuffer(self, buf):          # lgtm [py/similar-function] 
         assignments, blocks = MedmBaseWidget.parseAdlBuffer(self, buf)
 
-        block = self.getNamedBlock("plotcom", blocks)
-        if block is not None:
-            self.parseColorAssignments(
-                self.locateAssignments(
-                    buf[block.start+1:block.end]
-                    )
-                )
-            aa = self.locateAssignments(buf[block.start+1:block.end])
-            for symbol in "clr bclr".split():
-                if symbol in aa:
-                    del aa[symbol]
-            for k, v in aa.items():
-                if k == "title":
-                    self.title = v
-                else:
-                    self.contents[k] = v
-            if "plotcom" in self.contents:
-                del self.contents["plotcom"]
+        self.parsePlotcomBlock(buf, blocks)
 
         for symbol in ("x_axis", "y1_axis", "y2_axis"):
             block = self.getNamedBlock(symbol, blocks)
@@ -535,13 +538,7 @@ class MedmStripChartWidget(MedmGenericWidget):
                 row = block.symbol.replace("[", " ").replace("]", "").split()[-1]
                 pens[row] = aa
             elif block.symbol == "plotcom":
-                self.parseColorAssignments(
-                    self.locateAssignments(
-                        buf[block.start+1:block.end]
-                        )
-                    )
-                if "plotcom" in self.contents:
-                    del self.contents["plotcom"]
+                self.parsePlotcomBlock(buf, blocks)
             elif block.symbol == "symbol":
                 raise ValueError(block.symbol + " not handled yet")
             else:
