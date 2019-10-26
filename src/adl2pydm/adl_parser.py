@@ -381,6 +381,15 @@ class MedmCartesianPlotWidget(MedmGenericWidget):
                     buf[block.start+1:block.end]
                     )
                 )
+            aa = self.locateAssignments(buf[block.start+1:block.end])
+            for symbol in "clr bclr".split():
+                if symbol in aa:
+                    del aa[symbol]
+            for k, v in aa.items():
+                if k == "title":
+                    self.title = v
+                else:
+                    self.contents[k] = v
             if "plotcom" in self.contents:
                 del self.contents["plotcom"]
 
