@@ -164,6 +164,8 @@ class Test_Files(unittest.TestCase):
         
         self.assertEqualGeometry(w, 6, 217, 60, 16)
         self.assertEqualTitle(w, None)
+        self.assertEqualColor(w.color, 255, 255, 255)
+        self.assertEqualColor(w.background_color, 0, 0, 0)
 
         self.assertIsInstance(w.contents, dict)
         self.assertEqual(len(w.contents), 3)
@@ -180,6 +182,8 @@ class Test_Files(unittest.TestCase):
         
         self.assertEqualGeometry(w, 166, 224, 10, 336)
         self.assertEqualTitle(w, None)
+        self.assertEqualColor(w.color, 139, 26, 150)
+        self.assertEqualColor(w.background_color, 218, 218, 218)
 
         self.assertIsInstance(w.contents, dict)
         self.assertEqual(len(w.contents), 4)
@@ -197,6 +201,8 @@ class Test_Files(unittest.TestCase):
         
         self.assertEqualGeometry(w, 11, 281, 480, 200)
         self.assertEqualTitle(w, "")
+        self.assertEqualColor(w.color, 10, 0, 184)
+        self.assertEqualColor(w.background_color, 218, 218, 218)
 
         self.assertIsInstance(w.contents, dict)
         self.assertEqual(len(w.contents), 13)
@@ -276,6 +282,9 @@ class Test_Files(unittest.TestCase):
         w = self.pickWidget(screen, 10, 1, "composite", 101)
         
         self.assertEqualGeometry(w, 6, 35, 350, 340)
+        self.assertEqualColor(w.color, None)
+        self.assertEqualColor(w.background_color, None)
+
         self.assertIsInstance(w.contents, dict)
         self.assertEqual(len(w.contents), 2)
         self.assertEqualDictKeyValue(w.contents, "composite file", "ADSetup.adl")
@@ -289,6 +298,9 @@ class Test_Files(unittest.TestCase):
         
         self.assertEqualGeometry(w, 0, 20, 500, 500)
         self.assertEqualTitle(w, None)
+        self.assertEqualColor(w.color, None)
+        self.assertEqualColor(w.background_color, None)
+
         self.assertTrue(hasattr(w, "contents"))
         self.assertIsInstance(w.contents, dict)
         self.assertEqual(len(w.contents), 2)
@@ -301,6 +313,8 @@ class Test_Files(unittest.TestCase):
         
         self.assertEqualGeometry(w, 178, 52, 250, 25)
         self.assertEqualTitle(w, "no decorations")
+        self.assertEqualColor(w.color, 0, 0, 0)
+        self.assertEqualColor(w.background_color, 115, 223, 255)
 
         self.assertIsInstance(w.contents, dict)
         self.assertEqual(len(w.contents), 2)
@@ -318,6 +332,8 @@ class Test_Files(unittest.TestCase):
         
         self.assertEqualGeometry(w, 186, 232, 100, 18)
         self.assertEqualTitle(w, None)
+        self.assertEqualColor(w.color, 0, 0, 0)
+        self.assertEqualColor(w.background_color, 115, 223, 255)
 
         self.assertIsInstance(w.contents, dict)
         self.assertEqual(len(w.contents), 1)
@@ -334,6 +350,8 @@ class Test_Files(unittest.TestCase):
         
         self.assertEqualGeometry(w, 150, 220, 140, 40)
         self.assertEqualTitle(w, "Stop ")
+        self.assertEqualColor(w.color, 253, 0, 0)
+        self.assertEqualColor(w.background_color, 160, 18, 7)
 
         self.assertIsInstance(w.contents, dict)
         self.assertEqual(len(w.contents), 4)
@@ -353,6 +371,8 @@ class Test_Files(unittest.TestCase):
         
         self.assertEqualGeometry(w, 0, 38, 200, 150)
         self.assertEqualTitle(w, None)
+        self.assertEqualColor(w.color, 0, 0, 0)
+        self.assertEqualColor(w.background_color, 218, 218, 218)
 
         self.assertIsInstance(w.contents, dict)
         self.assertEqual(len(w.contents), 1)
@@ -367,6 +387,8 @@ class Test_Files(unittest.TestCase):
         
         self.assertEqualGeometry(w, 290, 132, 21, 21)
         self.assertEqualTitle(w, None)
+        self.assertEqualColor(w.color, 253, 0, 0)
+        self.assertEqualColor(w.background_color, None)
 
         self.assertIsInstance(w.contents, dict)
         self.assertEqual(len(w.contents), 2)
@@ -430,6 +452,9 @@ class Test_Files(unittest.TestCase):
         
         self.assertEqualGeometry(w, 0, 4, 715, 25)
         self.assertEqualTitle(w, None)
+        self.assertEqualColor(w.color, 218, 218, 218)
+        self.assertEqualColor(w.background_color, None)
+
         self.assertIsInstance(w.contents, dict)
         self.assertEqual(len(w.contents), 1)
         self.assertIn("basic attribute", w.contents)
@@ -442,6 +467,9 @@ class Test_Files(unittest.TestCase):
         
         self.assertEqualGeometry(w, 119, 285, 18, 18)
         self.assertEqualTitle(w, None)
+        self.assertEqualColor(w.color, 88, 52, 15)
+        self.assertEqualColor(w.background_color, 115, 223, 255)
+
         self.assertIsInstance(w.displays, list)
         self.assertEqual(len(w.displays), 8)
         display = w.displays[0]
@@ -456,9 +484,13 @@ class Test_Files(unittest.TestCase):
         
         self.assertEqualGeometry(w, 350, 239, 20, 20)
         self.assertEqualTitle(w, None)
+        self.assertEqualColor(w.color, 0, 0, 0)
+        self.assertEqualColor(w.background_color, 251, 243, 74)
+
         self.assertHasAttribute(w, "contents")
         self.assertIsInstance(w.contents, dict)
         self.assertEqual(len(w.contents), 0)
+
         self.assertHasAttribute(w, "commands")
         self.assertIsInstance(w.commands, list)
         self.assertEqual(len(w.commands), 1)
@@ -476,6 +508,9 @@ class Test_Files(unittest.TestCase):
         
         self.assertEqualGeometry(w, 0, 260, 450, 170)
         self.assertEqualTitle(w, None)
+        self.assertEqualColor(w.color, 0, 0, 0)
+        self.assertEqualColor(w.background_color, 255, 255, 255)
+
         self.assertHasAttribute(w, "contents")
         self.assertIsInstance(w.contents, dict)
         self.assertEqual(len(w.contents), 2)
@@ -487,13 +522,16 @@ class Test_Files(unittest.TestCase):
         w = self.pickWidget(screen, 10, 9, "text", 181)
         
         self.assertEqualGeometry(w, 0, 5, 715, 25)
+        self.assertEqualTitle(w, "Area Detector Control - $(P)$(R)")
+        self.assertEqualColor(w.color, 10, 0, 184)
+        self.assertEqualColor(w.background_color, None)
+
         self.assertIsInstance(w.contents, dict)
         self.assertEqual(len(w.contents), 2)
         self.assertEqualDictKeyValue(w.contents, "align", "horiz. centered")
         self.assertIn("basic attribute", w.contents)
         attr = w.contents["basic attribute"]
         self.assertEqual(len(attr), 0)
-        self.assertEqualTitle(w, "Area Detector Control - $(P)$(R)")
 
     def test_parse_medm_widget_text_entry(self):
         screen = self.parseFile("std-R3-5-ID_ctrl.adl")
@@ -501,10 +539,14 @@ class Test_Files(unittest.TestCase):
         
         self.assertEqualGeometry(w, 54, 114, 120, 38)
         self.assertEqualTitle(w, None)
+        self.assertEqualColor(w.color, 255, 255, 255)
+        self.assertEqualColor(w.background_color, 10, 0, 184)
+
         self.assertIsInstance(w.contents, dict)
         self.assertEqual(len(w.contents), 3)
         self.assertEqualDictKeyValue(w.contents, "format", "decimal")
         self.assertEqualDictKeyValue(w.contents, "clrmod", "static")
+
         self.assertIn("control", w.contents)
         control = w.contents["control"]
         self.assertIsInstance(control, dict)
@@ -517,9 +559,13 @@ class Test_Files(unittest.TestCase):
         
         self.assertEqualGeometry(w, 40, 46, 195, 31)
         self.assertEqualTitle(w, None)
+        self.assertEqualColor(w.color, 0, 0, 0)
+        self.assertEqualColor(w.background_color, 187, 187, 187)
+
         self.assertIsInstance(w.contents, dict)
         self.assertEqual(len(w.contents), 2)
         self.assertEqualDictKeyValue(w.contents, "limits", "")
+
         self.assertIn("monitor", w.contents)
         mon = w.contents["monitor"]
         self.assertIsInstance(mon, dict)
