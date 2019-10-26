@@ -205,6 +205,7 @@ class Test_Files(unittest.TestCase):
         symbol = "x_axis"
         self.assertIn(symbol, w.contents)
         axis = w.contents[symbol]
+        self.assertEqual(len(axis), 4)
         self.assertEqualDictKeyValue(axis, "axisStyle", "linear")
         self.assertEqualDictKeyValue(axis, "maxRange", "1.000000")
         self.assertEqualDictKeyValue(axis, "minRange", "0.000000")
@@ -213,6 +214,7 @@ class Test_Files(unittest.TestCase):
         symbol = "y1_axis"
         self.assertIn(symbol, w.contents)
         axis = w.contents[symbol]
+        self.assertEqual(len(axis), 4)
         self.assertEqualDictKeyValue(axis, "axisStyle", "linear")
         self.assertEqualDictKeyValue(axis, "maxRange", "1.000000")
         self.assertEqualDictKeyValue(axis, "minRange", "0.000000")
@@ -221,6 +223,7 @@ class Test_Files(unittest.TestCase):
         symbol = "y2_axis"
         self.assertIn(symbol, w.contents)
         axis = w.contents[symbol]
+        self.assertEqual(len(axis), 4)
         self.assertEqualDictKeyValue(axis, "axisStyle", "linear")
         self.assertEqualDictKeyValue(axis, "maxRange", "1.000000")
         self.assertEqualDictKeyValue(axis, "minRange", "0.000000")
