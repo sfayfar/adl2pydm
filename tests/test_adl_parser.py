@@ -189,25 +189,48 @@ class Test_Files(unittest.TestCase):
         w = self.pickWidget(screen, 47, 13, "cartesian plot", 551)
         
         self.assertEqualGeometry(w, 11, 281, 480, 200)
-        self.assertEqualTitle(w, None)
+        self.assertEqualTitle(w, "")
 
         self.assertIsInstance(w.contents, dict)
-        self.assertEqual(len(w.contents), 10)
+        self.assertEqual(len(w.contents), 13)
         self.assertEqualDictKeyValue(w.contents, "count", "1")
         self.assertEqualDictKeyValue(w.contents, "erase", "")
         self.assertEqualDictKeyValue(w.contents, "eraseMode", "if not zero")
         self.assertEqualDictKeyValue(w.contents, "erase_oldest", "plot last n pts")
         self.assertEqualDictKeyValue(w.contents, "style", "fill-under")
         self.assertEqualDictKeyValue(w.contents, "trigger", "")
-        # TODO: w.contents["plotcom"]
-        # TODO: w.contents["x_axis"]
-        # TODO: w.contents["y1_axis"]
-        # TODO: w.contents["y2_axis"]
+        self.assertEqualDictKeyValue(w.contents, "xlabel", "History (Hours)")
+        self.assertEqualDictKeyValue(w.contents, "ylabel", "Current")
 
-        self.assertHasAttribute(w, "traces")
-        self.assertIsInstance(w.traces, list)
-        self.assertEqual(len(w.traces), 8)
-        for item, trace in enumerate(w.traces):
+        symbol = "x_axis"
+        self.assertIn(symbol, w.contents)
+        axis = w.contents[symbol]
+        self.assertEqualDictKeyValue(axis, "axisStyle", "linear")
+        self.assertEqualDictKeyValue(axis, "maxRange", "1.000000")
+        self.assertEqualDictKeyValue(axis, "minRange", "0.000000")
+        self.assertEqualDictKeyValue(axis, "rangeStyle", "auto-scale")
+
+        symbol = "y1_axis"
+        self.assertIn(symbol, w.contents)
+        axis = w.contents[symbol]
+        self.assertEqualDictKeyValue(axis, "axisStyle", "linear")
+        self.assertEqualDictKeyValue(axis, "maxRange", "1.000000")
+        self.assertEqualDictKeyValue(axis, "minRange", "0.000000")
+        self.assertEqualDictKeyValue(axis, "rangeStyle", "auto-scale")
+
+        symbol = "y2_axis"
+        self.assertIn(symbol, w.contents)
+        axis = w.contents[symbol]
+        self.assertEqualDictKeyValue(axis, "axisStyle", "linear")
+        self.assertEqualDictKeyValue(axis, "maxRange", "1.000000")
+        self.assertEqualDictKeyValue(axis, "minRange", "0.000000")
+        self.assertEqualDictKeyValue(axis, "rangeStyle", "from channel")
+
+        self.assertIn("traces", w.contents)
+        traces = w.contents["traces"]
+        self.assertIsInstance(traces, list)
+        self.assertEqual(len(traces), 8)
+        for item, trace in enumerate(traces):
             self.assertEqual(len(trace), 3)
             self.assertIn("color", trace)
             if item == 0:
