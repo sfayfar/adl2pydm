@@ -19,6 +19,7 @@ before_script:
   # uses standard python
   # must have no special requirements
   - python --version
+  - pip install coveralls coverage
   - which coveralls
 
 # command to run tests
