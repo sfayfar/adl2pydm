@@ -51,7 +51,7 @@ class Test_Main(unittest.TestCase):
     # def tearDown(self):
     #     pass
     
-    def test_main(self):
+    def test_adl2pydm_main(self):
         path = os.path.abspath(os.path.dirname(adl2pydm.__file__))
         self.assertTrue(os.path.exists(path))
         

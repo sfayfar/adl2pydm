@@ -123,7 +123,7 @@ class Test_Files(unittest.TestCase):
 
     # -------------------------------------------------
 
-    def test_parse_arc(self):
+    def test_parse_medm_widget_arc(self):
         screen = self.parseFile("sampleWheel.adl")
         w = self.pickWidget(screen, 197, 2, "arc", 111)
 
@@ -151,7 +151,7 @@ class Test_Files(unittest.TestCase):
         self.assertEqualDictKeyValue(attr, "chan", "$(P)sample")
         self.assertEqualDictKeyValue(attr, "vis", "calc")
 
-    def test_parse_bar(self):
+    def test_parse_medm_widget_bar(self):
         screen = self.parseFile("mca-R7-7-mca.adl")
         w = self.pickWidget(screen, 86, 84, "bar", 1779)
         
@@ -167,7 +167,7 @@ class Test_Files(unittest.TestCase):
         self.assertEqual(len(monitor), 1)
         self.assertEqualDictKeyValue(monitor, "chan", "$(P)$(M).IDTIM")
 
-    def test_parse_byte(self):
+    def test_parse_medm_widget_byte(self):
         screen = self.parseFile("optics-R2-13-1-pf4more.adl")
         w = self.pickWidget(screen, 79, 41, "byte", 754)
         
@@ -184,7 +184,7 @@ class Test_Files(unittest.TestCase):
         self.assertEqual(len(monitor), 1)
         self.assertEqualDictKeyValue(monitor, "chan", "$(P)$(H)bitFlag$(A)")
 
-    def test_parse_cartesian_plot(self):
+    def test_parse_medm_widget_cartesian_plot(self):
         screen = self.parseFile("beamHistory_full-R3-5.adl")
         w = self.pickWidget(screen, 47, 13, "cartesian plot", 551)
         
@@ -248,7 +248,7 @@ class Test_Files(unittest.TestCase):
             self.assertEqualDictKeyValue(trace, "ydata", ydata)
             self.assertEqualColor(trace["color"], r, g, b)
 
-    def test_parse_choice_button(self):
+    def test_parse_medm_widget_choice_button(self):
         screen = self.parseFile("motorx-R6-10-1.adl")
         w = self.pickWidget(screen, 31, 30, "choice button", 568)
         
@@ -264,7 +264,7 @@ class Test_Files(unittest.TestCase):
         self.assertEqual(len(control), 1)
         self.assertEqualDictKeyValue(control, "chan", "$(P)$(M).SET")
 
-    def test_parse_composite(self):
+    def test_parse_medm_widget_composite(self):
         screen = self.parseFile("ADBase-R3-3-1.adl")
         w = self.pickWidget(screen, 10, 1, "composite", 101)
         
@@ -276,7 +276,7 @@ class Test_Files(unittest.TestCase):
 
     # TODO: embedded display : no example in synApps
 
-    def test_parse_image(self):
+    def test_parse_medm_widget_image(self):
         screen = self.parseFile("sampleWheel.adl")
         w = self.pickWidget(screen, 197, 1, "image", 101)
         
@@ -288,7 +288,7 @@ class Test_Files(unittest.TestCase):
         self.assertEqualDictKeyValue(w.contents, "image name", "sampleWheel.gif")
         self.assertEqualDictKeyValue(w.contents, "type", "gif")
 
-    def test_parse_indicator(self):
+    def test_parse_medm_widget_indicator(self):
         screen = self.parseFile("optics-R2-13-1-CoarseFineMotorShow.adl")
         w = self.pickWidget(screen, 12, 5, "indicator", 156)
         
@@ -304,7 +304,7 @@ class Test_Files(unittest.TestCase):
         self.assertEqual(len(monitor), 1)
         self.assertEqualDictKeyValue(monitor, "chan", "$(PM)$(CM).RBV")
 
-    def test_parse_menu(self):
+    def test_parse_medm_widget_menu(self):
         screen = self.parseFile("motorx_all-R6-10-1.adl")
         w = self.pickWidget(screen, 175, 23, "composite", 417)
         w = self.pickWidget(w, 2, 0, "menu", 417)
@@ -321,7 +321,7 @@ class Test_Files(unittest.TestCase):
         self.assertEqual(len(control), 1)
         self.assertEqualDictKeyValue(control, "chan", "$(P)$(M).FOFF")
 
-    def test_parse_message_button(self):
+    def test_parse_medm_widget_message_button(self):
         screen = self.parseFile("std-R3-5-ID_ctrl.adl")
         w = self.pickWidget(screen, 25, 3, "message button", 434)
         
@@ -340,7 +340,7 @@ class Test_Files(unittest.TestCase):
         self.assertEqual(len(control), 1)
         self.assertEqualDictKeyValue(control, "ctrl", "ID$(xx):UN:stopSQ.PROC")
 
-    def test_parse_meter(self):
+    def test_parse_medm_widget_meter(self):
         screen = self.parseFile("calc-R3-7-userCalcMeter.adl")
         w = self.pickWidget(screen, 6, 0, "meter", 87)
         
@@ -354,7 +354,7 @@ class Test_Files(unittest.TestCase):
         self.assertEqual(len(monitor), 1)
         self.assertEqualDictKeyValue(monitor, "chan", "$(P)$(C).VAL")
 
-    def test_parse_oval(self):
+    def test_parse_medm_widget_oval(self):
         screen = self.parseFile("motorx_all-R6-10-1.adl")
         w = self.pickWidget(screen, 175, 60, "oval", 993)
         
@@ -374,7 +374,7 @@ class Test_Files(unittest.TestCase):
         self.assertEqualDictKeyValue(attr, "chan", "$(P)$(M).LLS")
         self.assertEqualDictKeyValue(attr, "vis", "if not zero")
 
-    def test_parse_polygon(self):
+    def test_parse_medm_widget_polygon(self):
         screen = self.parseFile("calc-R3-7-1-FuncGen_full.adl")
         w = self.pickWidget(screen, 38, 18, "composite", 337)
         w = self.pickWidget(w, 2, 1, "polygon", 353)
@@ -396,7 +396,7 @@ class Test_Files(unittest.TestCase):
         self.assertEqualPoint(w.points[2], 260, 184)
         self.assertEqualPoint(w.points[3], 260, 174)
 
-    def test_parse_polyline(self):
+    def test_parse_medm_widget_polyline(self):
         screen = self.parseFile("calc-R3-7-1-FuncGen_full.adl")
         w = self.pickWidget(screen, 38, 18, "composite", 337)
         w = self.pickWidget(w, 2, 0, "polyline", 337)
@@ -417,7 +417,7 @@ class Test_Files(unittest.TestCase):
         self.assertEqualPoint(w.points[0], 121, 179)
         self.assertEqualPoint(w.points[1], 261, 179)
 
-    def test_parse_rectangle(self):
+    def test_parse_medm_widget_rectangle(self):
         screen = self.parseFile("ADBase-R3-3-1.adl")
         w = self.pickWidget(screen, 10, 0, "rectangle", 90)
         
@@ -429,7 +429,7 @@ class Test_Files(unittest.TestCase):
         attr = w.contents["basic attribute"]
         self.assertEqual(len(attr), 0)
 
-    def test_parse_related_display(self):
+    def test_parse_medm_widget_related_display(self):
         screen = self.parseFile("std-R3-5-ID_ctrl.adl")
         w = self.pickWidget(screen, 25, 13, "related display", 611)
         
@@ -443,7 +443,7 @@ class Test_Files(unittest.TestCase):
         self.assertEqualDictKeyValue(display, "label", "Taper Control")
         self.assertEqualDictKeyValue(display, "name", "ID_taper_ctrl.adl")
 
-    def test_parse_shell_command(self):
+    def test_parse_medm_widget_shell_command(self):
         screen = self.parseFile("sscan-R2-11-1-scanAux.adl")
         w = self.pickWidget(screen, 66, 42, "shell command", 725)
         
@@ -461,7 +461,7 @@ class Test_Files(unittest.TestCase):
         self.assertEqualDictKeyValue(cmd, "label", "Help")
         self.assertEqualDictKeyValue(cmd, "name", "medm_help.sh &T")
 
-    def test_parse_strip_chart(self):
+    def test_parse_medm_widget_strip_chart(self):
         screen = self.parseFile("calc-R3-7-1-FuncGen_full.adl")
         # this widget is in a composite
         w = self.pickWidget(screen, 38, 32, "composite", 614)
@@ -475,7 +475,7 @@ class Test_Files(unittest.TestCase):
         self.assertEqualDictKeyValue(w.contents, "period", "1.000000")
         self.assertEqualDictKeyValue(w.contents, "units", "minute")
 
-    def test_parse_text(self):
+    def test_parse_medm_widget_text(self):
         screen = self.parseFile("ADBase-R3-3-1.adl")
         w = self.pickWidget(screen, 10, 9, "text", 181)
         
@@ -488,7 +488,7 @@ class Test_Files(unittest.TestCase):
         self.assertEqual(len(attr), 0)
         self.assertEqualTitle(w, "Area Detector Control - $(P)$(R)")
 
-    def test_parse_text_entry(self):
+    def test_parse_medm_widget_text_entry(self):
         screen = self.parseFile("std-R3-5-ID_ctrl.adl")
         w = self.pickWidget(screen, 25, 8, "text entry", 531)
         
@@ -504,7 +504,7 @@ class Test_Files(unittest.TestCase):
         self.assertEqual(len(control), 1)
         self.assertEqualDictKeyValue(control, "ctrl", "ID$(xx):UN:setavgAI.VAL")
 
-    def test_parse_text_update(self):
+    def test_parse_medm_widget_text_update(self):
         screen = self.parseFile("newDisplay.adl")
         w = self.pickWidget(screen, 1, 0, "text update", 90)
         
@@ -519,7 +519,7 @@ class Test_Files(unittest.TestCase):
         self.assertEqual(len(mon), 1)
         self.assertEqualDictKeyValue(mon, "chan", "$(P)")
 
-    def test_parse_valuator(self):
+    def test_parse_medm_widget_valuator(self):
         screen = self.parseFile("optics-R2-13-xiahsc.adl")
         w = self.pickWidget(screen, 55, 8, "valuator", 201)
         
@@ -533,7 +533,7 @@ class Test_Files(unittest.TestCase):
         self.assertEqualDictKeyValue(control, "chan", "$(P)$(HSC)l")
         self.assertEqualTitle(w, "no decorations")
 
-    def test_parse_wheel_switch(self):
+    def test_parse_medm_widget_wheel_switch(self):
         screen = self.parseFile("wheel_switch.adl")
         w = self.pickWidget(screen, 1, 0, "wheel switch", 90)
         
