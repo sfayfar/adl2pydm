@@ -374,22 +374,36 @@ class MedmCartesianPlotWidget(MedmGenericWidget):
     def parseAdlBuffer(self, buf):          # lgtm [py/similar-function] 
         assignments, blocks = MedmBaseWidget.parseAdlBuffer(self, buf)
 
+        block = self.getNamedBlock("plotcom", blocks)
+        if block is not None:
+            self.parseColorAssignments(
+                self.locateAssignments(
+                    buf[block.start+1:block.end]
+                    )
+                )
+            if "plotcom" in self.contents:
+                del self.contents["plotcom"]
+
+        for symbol in ("x_axis", "y1_axis", "y2_axis"):
+            block = self.getNamedBlock(symbol, blocks)
+            aa = self.locateAssignments(buf[block.start+1:block.end])
+            self.contents[symbol] = aa
+
         traces = {}
         for block in blocks:
-            if not block.symbol.startswith("trace["):
-                continue
-            del self.contents[block.symbol]
-            aa = self.locateAssignments(buf[block.start+1:block.end])
-            clr = aa.get("data_clr")
-            if clr is not None:
-                del aa["data_clr"]
-                aa["color"] = self.main.color_table[int(clr)]
-            row = block.symbol.replace("[", " ").replace("]", "").split()[-1]
-            traces[row] = aa
+            if block.symbol.startswith("trace["):
+                del self.contents[block.symbol]
+                aa = self.locateAssignments(buf[block.start+1:block.end])
+                clr = aa.get("data_clr")
+                if clr is not None:
+                    del aa["data_clr"]
+                    aa["color"] = self.main.color_table[int(clr)]
+                row = block.symbol.replace("[", " ").replace("]", "").split()[-1]
+                traces[row] = aa
         
         def sorter(value):
             return int(value)
-        self.traces = [traces[k] for k in sorted(traces.keys(), key=sorter)]
+        self.contents["traces"] = [traces[k] for k in sorted(traces.keys(), key=sorter)]
 
 
 class MedmChoiceButtonWidget(MedmGenericWidget): pass
