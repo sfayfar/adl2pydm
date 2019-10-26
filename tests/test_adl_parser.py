@@ -61,11 +61,16 @@ class Test_Files(unittest.TestCase):
         screen.parseAdlBuffer(buf)
         return screen
     
-    def assertEqualColor(self, color, r, g, b):
-        self.assertIsInstance(color, adl_parser.Color)
-        self.assertEqual(color.r, r)
-        self.assertEqual(color.b, b)
-        self.assertEqual(color.g, g)
+    def assertEqualColor(self, color, r=None, g=None, b=None):
+        if color is None:
+            self.assertIsNone(r)
+            self.assertIsNone(g)
+            self.assertIsNone(b)
+        else:
+            self.assertIsInstance(color, adl_parser.Color)
+            self.assertEqual(color.r, r)
+            self.assertEqual(color.b, b)
+            self.assertEqual(color.g, g)
 
     def assertEqualDictKeyValue(self, dictionary, key, value):
         self.assertIsInstance(dictionary, dict)
@@ -129,6 +134,8 @@ class Test_Files(unittest.TestCase):
 
         self.assertEqualGeometry(w, 436, 158, 40, 40)
         self.assertEqualTitle(w, None)
+        self.assertEqualColor(w.color, 0, 216, 0)
+        self.assertEqualColor(w.background_color, None)
 
         self.assertTrue(hasattr(w, "contents"))
         self.assertIsInstance(w.contents, dict)
