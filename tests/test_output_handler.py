@@ -76,6 +76,7 @@ class TestOutputHandler(unittest.TestCase):
         uiname = self.convertAdlFile("ADBase-R3-3-1.adl")
         self.assertTrue(os.path.exists(os.path.join(self.tempdir, uiname)))
 
+
 class Test_PYDM_Writer_Support(unittest.TestCase):
 
     def setUp(self):
@@ -85,7 +86,7 @@ class Test_PYDM_Writer_Support(unittest.TestCase):
         if os.path.exists(self.tempdir):
             shutil.rmtree(self.tempdir, ignore_errors=True)
 
-    def test1(self):
+    def test_zorder(self):
         fname = os.path.join(self.tempdir, "test.xml")
         writer = output_handler.PYDM_Writer(None)
         writer.openFile(fname)
@@ -100,11 +101,25 @@ class Test_PYDM_Writer_Support(unittest.TestCase):
             writer.widget_stacking_info.append(
                 output_handler.Qt_zOrder(*args))
         writer.closeFile()
+        self.assertTrue(os.path.exists(fname))
 
-        # TODO: now, test for them, in order
+        with open(fname, "r") as fp:
+            buf = fp.readlines()
+        expected = (
+            '<?xml version="1.0" ?>',
+            '<ui version="4.0">',
+            '  <zorder>first</zorder>',
+            '  <zorder>3</zorder>',
+            '  <zorder>4</zorder>',
+            '  <zorder>last</zorder>',
+            '</ui>',
+        )
+        self.assertEqual(len(buf), len(expected))
+        for idx in range(len(buf)):
+            self.assertEqual(buf[idx].rstrip(), expected[idx])
 
 
-    def test2(self):
+    def test_xml_subelements(self):
         fname = os.path.join(self.tempdir, "test.xml")
         writer = output_handler.PYDM_Writer(None)
         writer.openFile(fname)
@@ -115,8 +130,29 @@ class Test_PYDM_Writer_Support(unittest.TestCase):
         for tag in "banana banana banana orange".split():
             sub = writer.writeOpenTag(sub, tag)
         writer.closeFile()
+        self.assertTrue(os.path.exists(fname))
 
-        # TODO: now, test
+        with open(fname, "r") as fp:
+            buf = fp.readlines()
+        expected = (
+            '<?xml version="1.0" ?>',
+            '<ui version="4.0">',
+            '  <property name="example">',
+            '    <string>text value</string>',
+            '  </property>',
+            '  <property name="another_example">',
+            '    <enum>upper</enum>',
+            '  </property>',
+            '  <banana>',
+            '    <banana>',
+            '      <banana>',
+            '        <orange/>',
+            '      </banana>',
+            '    </banana>',
+            '  </banana>',
+            '</ui>',
+            )
+        self.assertEqual(len(buf), len(expected))
 
 
 def suite(*args, **kw):
