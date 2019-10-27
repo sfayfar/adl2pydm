@@ -67,7 +67,7 @@ class Test_Main(unittest.TestCase):
             
             sys.argv = [sys.argv[0], "-d", self.tempdir, full_name]
             cli.main()
-            # TODO: test things
+
             uiname = os.path.splitext(fname)[0] + output_handler.SCREEN_FILE_EXTENSION
             self.assertTrue(os.path.exists(os.path.join(self.tempdir, uiname)))
 
