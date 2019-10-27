@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="toolTip">
-    <string/>
+    <string>${P}m1</string>
    </property>
    <property name="whatsThis">
     <string>
@@ -42,13 +42,13 @@
    <property name="text">
     <string>m1</string>
    </property>
+   <property name="filenames" stdset="0">
+    <stringlist>
+     <string>motorp.ui</string>
+    </stringlist>
+   </property>
    <property name="showIcon" stdset="0">
     <bool>false</bool>
-   </property>
-   <property name="filenames" stdset="0">
-	<stringlist>
-      <string>motorp.ui</string>
-    </stringlist>
    </property>
    <property name="macros" stdset="0">
     <stringlist>
@@ -69,7 +69,7 @@
     </rect>
    </property>
    <property name="toolTip">
-    <string/>
+    <string>${P}m5</string>
    </property>
    <property name="whatsThis">
     <string>
@@ -88,13 +88,13 @@
    <property name="text">
     <string>m5</string>
    </property>
+   <property name="filenames" stdset="0">
+    <stringlist>
+     <string>motorp.ui</string>
+    </stringlist>
+   </property>
    <property name="showIcon" stdset="0">
     <bool>false</bool>
-   </property>
-   <property name="filenames" stdset="0">
-	<stringlist>
-      <string>motorp.ui</string>
-    </stringlist>
    </property>
    <property name="macros" stdset="0">
     <stringlist>
@@ -115,7 +115,7 @@
     </rect>
    </property>
    <property name="toolTip">
-    <string/>
+    <string>${P}m2</string>
    </property>
    <property name="whatsThis">
     <string>
@@ -134,13 +134,13 @@
    <property name="text">
     <string>m2</string>
    </property>
+   <property name="filenames" stdset="0">
+    <stringlist>
+     <string>motorp.ui</string>
+    </stringlist>
+   </property>
    <property name="showIcon" stdset="0">
     <bool>false</bool>
-   </property>
-   <property name="filenames" stdset="0">
-	<stringlist>
-      <string>motorp.ui</string>
-    </stringlist>
    </property>
    <property name="macros" stdset="0">
     <stringlist>
@@ -161,7 +161,7 @@
     </rect>
    </property>
    <property name="toolTip">
-    <string/>
+    <string>${P}m6</string>
    </property>
    <property name="whatsThis">
     <string>
@@ -180,13 +180,13 @@
    <property name="text">
     <string>m6</string>
    </property>
+   <property name="filenames" stdset="0">
+    <stringlist>
+     <string>motorp.ui</string>
+    </stringlist>
+   </property>
    <property name="showIcon" stdset="0">
     <bool>false</bool>
-   </property>
-   <property name="filenames" stdset="0">
-	<stringlist>
-      <string>motorp.ui</string>
-    </stringlist>
    </property>
    <property name="macros" stdset="0">
     <stringlist>
@@ -207,7 +207,7 @@
     </rect>
    </property>
    <property name="toolTip">
-    <string/>
+    <string>${P}m3</string>
    </property>
    <property name="whatsThis">
     <string>
@@ -226,13 +226,13 @@
    <property name="text">
     <string>m3</string>
    </property>
+   <property name="filenames" stdset="0">
+    <stringlist>
+     <string>motorp.ui</string>
+    </stringlist>
+   </property>
    <property name="showIcon" stdset="0">
     <bool>false</bool>
-   </property>
-   <property name="filenames" stdset="0">
-	<stringlist>
-      <string>motorp.ui</string>
-    </stringlist>
    </property>
    <property name="macros" stdset="0">
     <stringlist>
@@ -253,7 +253,7 @@
     </rect>
    </property>
    <property name="toolTip">
-    <string/>
+    <string>${P}m7</string>
    </property>
    <property name="whatsThis">
     <string>
@@ -272,13 +272,13 @@
    <property name="text">
     <string>m7</string>
    </property>
+   <property name="filenames" stdset="0">
+    <stringlist>
+     <string>motorp.ui</string>
+    </stringlist>
+   </property>
    <property name="showIcon" stdset="0">
     <bool>false</bool>
-   </property>
-   <property name="filenames" stdset="0">
-	<stringlist>
-      <string>motorp.ui</string>
-    </stringlist>
    </property>
    <property name="macros" stdset="0">
     <stringlist>
@@ -299,7 +299,7 @@
     </rect>
    </property>
    <property name="toolTip">
-    <string/>
+    <string>${P}m4</string>
    </property>
    <property name="whatsThis">
     <string>
@@ -318,13 +318,13 @@
    <property name="text">
     <string>m4</string>
    </property>
+   <property name="filenames" stdset="0">
+    <stringlist>
+     <string>motorp.ui</string>
+    </stringlist>
+   </property>
    <property name="showIcon" stdset="0">
     <bool>false</bool>
-   </property>
-   <property name="filenames" stdset="0">
-	<stringlist>
-      <string>motorp.ui</string>
-    </stringlist>
    </property>
    <property name="macros" stdset="0">
     <stringlist>
@@ -345,7 +345,7 @@
     </rect>
    </property>
    <property name="toolTip">
-    <string/>
+    <string>${P}m8</string>
    </property>
    <property name="whatsThis">
     <string>
@@ -364,13 +364,13 @@
    <property name="text">
     <string>m8</string>
    </property>
+   <property name="filenames" stdset="0">
+    <stringlist>
+     <string>motorp.ui</string>
+    </stringlist>
+   </property>
    <property name="showIcon" stdset="0">
     <bool>false</bool>
-   </property>
-   <property name="filenames" stdset="0">
-	<stringlist>
-      <string>motorp.ui</string>
-    </stringlist>
    </property>
    <property name="macros" stdset="0">
     <stringlist>
@@ -391,7 +391,7 @@
     </rect>
    </property>
    <property name="toolTip">
-    <string/>
+    <string>IOC prefix</string>
    </property>
    <property name="text">
     <string>${P}</string>
@@ -420,7 +420,7 @@
     </rect>
    </property>
    <property name="toolTip">
-    <string/>
+    <string>individual motor controls</string>
    </property>
    <property name="whatsThis">
     <string>
