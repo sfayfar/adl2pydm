@@ -38,10 +38,7 @@ import os
 from . import adl_symbols
 
 
-
-logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
-
 
 """a color used in MEDM"""
 Color = namedtuple('Color', 'r g b')

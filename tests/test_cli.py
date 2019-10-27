@@ -18,7 +18,7 @@ _path = os.path.join(_test_path, '..', 'src')
 if _path not in sys.path:
     sys.path.insert(0, _path)
 
-from adl2pydm import cli
+from adl2pydm import cli, output_handler
 
 
 class Test_Main(unittest.TestCase):
@@ -68,7 +68,7 @@ class Test_Main(unittest.TestCase):
             sys.argv = [sys.argv[0], "-d", self.tempdir, full_name]
             cli.main()
             # TODO: test things
-            uiname = os.path.splitext(fname)[0] + cli.SCREEN_FILE_EXTENSION
+            uiname = os.path.splitext(fname)[0] + output_handler.SCREEN_FILE_EXTENSION
             self.assertTrue(os.path.exists(os.path.join(self.tempdir, uiname)))
 
 
