@@ -89,10 +89,19 @@ class Test_PYDM_Writer_Support(unittest.TestCase):
         fname = os.path.join(self.tempdir, "test.xml")
         writer = output_handler.PYDM_Writer(None)
         writer.openFile(fname)
-        writer.widget_stacking_info.append(output_handler.Qt_zOrder("widget_0", 2, 1))
-        writer.widget_stacking_info.append(output_handler.Qt_zOrder("widget_1", -3, 1))
-        writer.widget_stacking_info.append(output_handler.Qt_zOrder("widget_2", 2, 1))
+        specs = [
+            # order     vis text
+            ("widget_0", 2, "first"),
+            ("widget_4", 0, "last"),
+            ("widget_1", -3, 3),
+            ("widget_2", 2, 4)
+        ]
+        for args in specs:
+            writer.widget_stacking_info.append(
+                output_handler.Qt_zOrder(*args))
         writer.closeFile()
+
+        # TODO: now, test for them, in order
 
 
     def test2(self):
@@ -106,6 +115,8 @@ class Test_PYDM_Writer_Support(unittest.TestCase):
         for tag in "banana banana banana orange".split():
             sub = writer.writeOpenTag(sub, tag)
         writer.closeFile()
+
+        # TODO: now, test
 
 
 def suite(*args, **kw):

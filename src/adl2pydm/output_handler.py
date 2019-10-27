@@ -413,6 +413,7 @@ class PYDM_Writer(object):
         # sort widgets by the order we had when parsing
         for widget in sorted(self.widget_stacking_info, key=sorter):
             z = ElementTree.SubElement(self.root, "zorder")
+            # TODO: what about "vis" field?
             z.text = str(widget.text)
 
         # ElementTree needs help to pretty print
