@@ -65,7 +65,8 @@ class Test_Main(unittest.TestCase):
             full_name = os.path.join(medm_path, fname)
             self.assertTrue(os.path.exists(full_name))
             
-            cli.main(full_name, self.tempdir)
+            sys.argv = [sys.argv[0], "-d", self.tempdir, full_name]
+            cli.main()
             # TODO: test things
             uiname = os.path.splitext(fname)[0] + cli.SCREEN_FILE_EXTENSION
             self.assertTrue(os.path.exists(os.path.join(self.tempdir, uiname)))
