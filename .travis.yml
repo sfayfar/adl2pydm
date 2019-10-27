@@ -31,4 +31,3 @@ after_success:
   - coverage report -m
   - which coveralls
   - coveralls
-  - source deactivate
