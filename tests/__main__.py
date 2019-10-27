@@ -16,11 +16,13 @@ def suite(*args, **kw):
     from tests import test_simple
     from tests import test_adl_parser
     from tests import test_cli
+    from tests import test_output_handler
 
     test_list = [
         test_simple,
         test_adl_parser,
         test_cli,
+        test_output_handler
         ]
 
     test_suite = unittest.TestSuite()
