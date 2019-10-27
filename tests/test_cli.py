@@ -5,7 +5,9 @@ simple unit tests for this package
 
 import logging
 import os
+import shutil
 import sys
+import tempfile
 import unittest
 
 # turn off logging output
@@ -16,7 +18,7 @@ _path = os.path.join(_test_path, '..', 'src')
 if _path not in sys.path:
     sys.path.insert(0, _path)
 
-from adl2pydm import adl2pydm
+from adl2pydm import cli
 
 
 class Test_Main(unittest.TestCase):
@@ -45,29 +47,28 @@ class Test_Main(unittest.TestCase):
         "simDetector-R3-3-31.adl",
         ]
 
-    # def setUp(self):
-    #     pass
-    # 
-    # def tearDown(self):
-    #     pass
+    def setUp(self):
+        self.tempdir = tempfile.mkdtemp()
     
-    def test_adl2pydm_main(self):
-        path = os.path.abspath(os.path.dirname(adl2pydm.__file__))
+    def tearDown(self):
+        if os.path.exists(self.tempdir):
+            shutil.rmtree(self.tempdir, ignore_errors=True)
+    
+    def test_cli_main(self):
+        path = os.path.abspath(os.path.dirname(cli.__file__))
         self.assertTrue(os.path.exists(path))
         
         medm_path = os.path.join(path, "screens", "medm")
         self.assertTrue(os.path.exists(medm_path))
-        
-        output_path = os.path.join(path, "screens", "pydm")
 
         for fname in self.test_files:
             full_name = os.path.join(medm_path, fname)
             self.assertTrue(os.path.exists(full_name))
             
-            adl2pydm.main(full_name, output_path)
+            cli.main(full_name, self.tempdir)
             # TODO: test things
-            uiname = os.path.splitext(fname)[0] + adl2pydm.SCREEN_FILE_EXTENSION
-            self.assertTrue(os.path.exists(os.path.join(output_path, uiname)))
+            uiname = os.path.splitext(fname)[0] + cli.SCREEN_FILE_EXTENSION
+            self.assertTrue(os.path.exists(os.path.join(self.tempdir, uiname)))
 
 
 def suite(*args, **kw):

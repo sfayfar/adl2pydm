@@ -15,7 +15,7 @@ import adl2pydm as package
 
 __entry_points__  = {
     'console_scripts': [
-        'adl2pydm = adl2pydm.adl2pydm:main',
+        'adl2pydm = adl2pydm.cli:main',
         ],
     #'gui_scripts': [],
 }
