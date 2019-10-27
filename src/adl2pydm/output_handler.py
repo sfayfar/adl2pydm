@@ -413,7 +413,7 @@ class PYDM_Writer(object):
         # sort widgets by the order we had when parsing
         for widget in sorted(self.widget_stacking_info, key=sorter):
             z = ElementTree.SubElement(self.root, "zorder")
-            z.text = widget.text
+            z.text = str(widget.text)
 
         # ElementTree needs help to pretty print
         # (easier in lxml but that's an additional package to add)
@@ -499,27 +499,3 @@ def findFile(fname):
             return path_fname
 
     return None
-
-
-def test1():
-    writer = PYDM_Writer(None)
-    writer.openFile("test.xml")
-    writer.widget_stacking_info.append(Qt_zOrder("widget_0", 2, 1))
-    writer.widget_stacking_info.append(Qt_zOrder("widget_1", -3, 1))
-    writer.widget_stacking_info.append(Qt_zOrder("widget_2", 2, 1))
-    writer.closeFile()
-
-
-def test2():
-    writer = PYDM_Writer(None)
-    root = writer.openFile("test.xml")
-    writer.writeProperty(root, "example", "text value")
-    writer.writeProperty(root, "another_example", "upper", "enum")
-    sub = root
-    for i in range(4):
-        sub = writer.writeOpenTag(sub, "onion")
-    writer.closeFile()
-
-
-# if __name__ == "__main__":
-#     test2()
