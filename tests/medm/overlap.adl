@@ -1,21 +1,18 @@
 
 file {
-	name="rectangle.adl"
-	version=030111
+	name="/home/phoebus5/EVANS/src/medm/overlap.adl"
+	version=020302
 }
 display {
 	object {
-		x=96
-		y=57
-		width=142
-		height=182
+		x=10
+		y=10
+		width=400
+		height=400
 	}
 	clr=14
-	bclr=8
+	bclr=4
 	cmap=""
-	gridSpacing=5
-	gridOn=0
-	snapToGrid=0
 }
 "color map" {
 	ncolors=65
@@ -89,10 +86,21 @@ display {
 }
 rectangle {
 	object {
-		x=10
-		y=15
-		width=113
-		height=35
+		x=133
+		y=205
+		width=28
+		height=19
+	}
+	"basic attribute" {
+		clr=33
+	}
+}
+rectangle {
+	object {
+		x=61
+		y=119
+		width=234
+		height=123
 	}
 	"basic attribute" {
 		clr=14
@@ -100,60 +108,91 @@ rectangle {
 }
 rectangle {
 	object {
-		x=10
-		y=53
-		width=113
-		height=35
+		x=215
+		y=94
+		width=116
+		height=179
 	}
 	"basic attribute" {
 		clr=20
-		fill="outline"
 	}
 }
 rectangle {
 	object {
-		x=10
-		y=92
-		width=113
+		x=150
+		y=149
+		width=131
+		height=51
+	}
+	"basic attribute" {
+		clr=25
+	}
+}
+rectangle {
+	object {
+		x=109
+		y=84
+		width=80
+		height=211
+	}
+	"basic attribute" {
+		clr=15
+	}
+}
+rectangle {
+	object {
+		x=133
+		y=205
+		width=28
+		height=19
+	}
+	"basic attribute" {
+		clr=30
+	}
+}
+rectangle {
+	object {
+		x=171
+		y=328
+		width=167
+		height=43
+	}
+	"basic attribute" {
+		clr=63
+	}
+}
+rectangle {
+	object {
+		x=44
+		y=310
+		width=82
+		height=80
+	}
+	"basic attribute" {
+		clr=47
+	}
+}
+text {
+	object {
+		x=64
+		y=10
+		width=275
 		height=35
 	}
 	"basic attribute" {
-		clr=31
-		style="dash"
-		fill="outline"
+		clr=14
 	}
+	textix="Overlap Selection"
 }
-rectangle {
+text {
 	object {
-		x=10
-		y=130
-		width=113
-		height=36
+		x=8
+		y=48
+		width=382
+		height=13
 	}
 	"basic attribute" {
-		clr=60
-		fill="outline"
-		width=6
+		clr=14
 	}
-	"dynamic attribute" {
-		vis="if zero"
-		chan="$(P)alldone"
-	}
-}
-rectangle {
-	object {
-		x=20
-		y=138
-		width=93
-		height=20
-	}
-	"basic attribute" {
-		clr=51
-	}
-	"dynamic attribute" {
-		vis="calc"
-		calc="A==B"
-		chan="$(P)$(M).RBV"
-		chanB="$(P)$(M).VAL"
-	}
+	textix="Ctrl Btn 1 Cycles Selection of Objects Uner the Pointer"
 }
