@@ -39,6 +39,10 @@ Here's a view of the screen (with the standard Qt widget categories minimized):
 
 ![Designer, showing PyDM widget controls](expected.jpg)
 
+If *designer* does not find the PyDM widget plugins, the screen will look like this one:
+
+![Designer, missing controls for PyDM widgets](fails.jpg)
+
 ## slight modifications
 
 In the documented installation procedure, pip is used to install *pydm*.
