@@ -9,6 +9,7 @@ import shutil
 import sys
 import tempfile
 import unittest
+from xml.etree import ElementTree
 
 # turn off logging output
 logging.basicConfig(level=logging.CRITICAL)
@@ -23,30 +24,6 @@ from adl2pydm import cli, output_handler
 
 class TestOutputHandler(unittest.TestCase):
 
-    # these files both reader AND writer
-    test_files = [
-        "newDisplay.adl",                  # simple display
-        "xxx-R5-8-4.adl",                  # related display
-        "xxx-R6-0.adl",
-        # "base-3.15.5-caServerApp-test.adl"  #  FIXME: needs more work here (unusual structure, possibly stress test):  # info[, "<<color rules>>", "<<color map>>"
-        "calc-3-4-2-1-FuncGen_full.adl",   # strip chart
-        "calc-R3-7-1-FuncGen_full.adl",    # strip chart
-        "calc-R3-7-userCalcMeter.adl",     # meter
-        "mca-R7-7-mca.adl",                # bar
-        "motorx-R6-10-1.adl",
-        "motorx_all-R6-10-1.adl",
-        "optics-R2-13-1-CoarseFineMotorShow.adl",  # indicator
-        "optics-R2-13-1-kohzuGraphic.adl", # image
-        "optics-R2-13-1-pf4more.adl",      # byte
-        "optics-R2-13-xiahsc.adl",         # valuator
-        "scanDetPlot-R2-11-1.adl",         # cartesian plot, strip
-        "sscan-R2-11-1-scanAux.adl",       # shell command
-        "std-R3-5-ID_ctrl.adl",            # param
-        # "beamHistory_full-R3-5.adl", # dl_color -- this .adl has content errors
-        "ADBase-R3-3-1.adl",               # composite
-        "simDetector-R3-3-31.adl",
-        ]
-
     def setUp(self):
         self.tempdir = tempfile.mkdtemp()
     
@@ -55,10 +32,7 @@ class TestOutputHandler(unittest.TestCase):
             shutil.rmtree(self.tempdir, ignore_errors=True)
     
     def convertAdlFile(self, adlname):
-        path = os.path.abspath(os.path.dirname(output_handler.__file__))
-        self.assertTrue(os.path.exists(path))
-
-        medm_path = os.path.join(path, "screens", "medm")
+        medm_path = os.path.join(os.path.dirname(__file__), "medm")
         self.assertTrue(os.path.exists(medm_path))
 
         full_name = os.path.join(medm_path, adlname)
@@ -72,9 +46,161 @@ class TestOutputHandler(unittest.TestCase):
 
         return uiname
 
+    def print_xml_children(self, parent, tag=None, iter=False):
+        if iter:
+            for child in parent.iter(tag):
+                print(child.tag, child.attrib)
+        else:
+            for child in parent:#  .iter(tag):
+                print(child.tag, child.attrib)
+
+    def assertEqualGeometry(self, parent, x, y, w, h):
+        properties = parent.findall("property")
+        self.assertGreater(len(properties), 0)
+        found = False
+        for prop in properties:
+            if prop.attrib["name"] == "geometry":
+                found = True
+                for item in prop.iter():
+                    if item.tag == "rect":
+                        self.assertEqual(len(item), 4)
+                    elif item.tag == "x":
+                        self.assertEqual(item.text, str(x))
+                    elif item.tag == "y":
+                        self.assertEqual(item.text, str(y))
+                    elif item.tag == "width":
+                        self.assertEqual(item.text, str(w))
+                    elif item.tag == "height":
+                        self.assertEqual(item.text, str(h))
+                break
+        self.assertTrue(found, "geometry expected")
+
+    def assertEqualString(self, parent, text=""):
+        child = parent.find("string")
+        self.assertIsNotNone(child)
+        self.assertEqual(child.text, str(text))
+
+    def assertEqualPropertyString(self, parent, propName, expected):
+        properties = parent.findall("property")
+        self.assertGreater(len(properties), 0)
+        found = False
+        for prop in properties:
+            if prop.attrib["name"] == propName:
+                found = True
+                self.assertEqualString(prop, expected)
+                break
+        self.assertTrue(found, f"{propName} expected")
+
+    def assertEqualStyleSheet(self, parent, expected):
+        self.assertEqualPropertyString(parent, "styleSheet", expected)
+
+    def assertEqualToolTip(self, parent, expected):
+        self.assertEqualPropertyString(parent, "toolTip", expected)
+
     def test_write_pydm_widget_rectangle(self):
-        uiname = self.convertAdlFile("ADBase-R3-3-1.adl")
-        self.assertTrue(os.path.exists(os.path.join(self.tempdir, uiname)))
+        uiname = self.convertAdlFile("rectangle.adl")
+        full_uiname = os.path.join(self.tempdir, uiname)
+        self.assertTrue(os.path.exists(full_uiname))
+
+        # five rectangle widgets
+        tree = ElementTree.parse(full_uiname)
+        root = tree.getroot()
+        self.assertEqual(root.tag, "ui")
+        self.assertEqual(len(root), 3)
+
+        screen = root.find("widget")
+        self.assertIsNotNone(screen)
+        self.assertEqual(screen.attrib["class"], "QWidget")
+        self.assertEqual(screen.attrib["name"], "screen")
+        properties = screen.findall("property")
+        self.assertEqual(len(properties), 3)
+        self.assertEqualGeometry(screen, 96, 57, 142, 182)
+        expected = """QWidget#screen {
+  color: rgb(0, 0, 0);
+  background-color: rgb(133, 133, 133);
+  }"""
+        self.assertEqualStyleSheet(screen, expected)
+        self.assertEqual(properties[2].attrib["name"], "windowTitle")
+        self.assertEqualString(properties[2], "rectangle")
+
+        children = screen.findall("widget")
+        self.assertEqual(len(children), 5)
+
+        rect = children[0]
+        key = "rectangle"
+        self.assertEqual(rect.attrib["class"], "PyDMDrawingRectangle")
+        self.assertEqual(rect.attrib["name"], key)
+        self.assertEqualGeometry(rect, 10, 15, 113, 35)
+        expected = """PyDMDrawingRectangle#%s {
+  color: rgb(0, 0, 0);
+  }""" % key
+        self.assertEqualStyleSheet(rect, expected)
+        self.assertEqualToolTip(rect, key)
+
+        rect = children[1]
+        key = "rectangle_1"
+        self.print_xml_children(rect)
+        self.assertEqual(rect.attrib["class"], "PyDMDrawingRectangle")
+        self.assertEqual(rect.attrib["name"], key)
+        self.assertEqualGeometry(rect, 10, 53, 113, 35)
+        expected = """PyDMDrawingRectangle#%s {
+  color: rgb(253, 0, 0);
+  }""" % key
+        self.assertEqualStyleSheet(rect, expected)
+        self.assertEqualToolTip(rect, key)
+        properties = rect.findall("property")
+        self.assertEqual(len(properties), 7)
+        # TODO: test more property content
+        self.assertEqual(properties[3].attrib["name"], "brush")
+        self.assertEqual(properties[4].attrib["name"], "penStyle")
+        self.assertEqual(properties[5].attrib["name"], "penColor")
+        self.assertEqual(properties[6].attrib["name"], "penWidth")
+
+        rect = children[2]
+        key = "rectangle_2"
+        properties = rect.findall("property")
+        self.assertEqual(rect.attrib["class"], "PyDMDrawingRectangle")
+        self.assertEqual(rect.attrib["name"], key)
+        self.assertEqualGeometry(rect, 10, 92, 113, 35)
+        expected = """PyDMDrawingRectangle#%s {
+  color: rgb(249, 218, 60);
+  }""" % key
+        self.assertEqualStyleSheet(rect, expected)
+        self.assertEqualToolTip(rect, key)
+        # TODO: more properties
+
+        rect = children[3]
+        key = "rectangle_3"
+        properties = rect.findall("property")
+        self.assertEqual(rect.attrib["class"], "PyDMDrawingRectangle")
+        self.assertEqual(rect.attrib["name"], key)
+        self.assertEqualGeometry(rect, 10, 130, 113, 36)
+        expected = """PyDMDrawingRectangle#%s {
+  color: rgb(115, 255, 107);
+  }""" % key
+        self.assertEqualStyleSheet(rect, expected)
+        self.assertEqualToolTip(rect, key)
+        # TODO: more properties
+
+        rect = children[4]
+        key = "rectangle_4"
+        properties = rect.findall("property")
+        self.assertEqual(rect.attrib["class"], "PyDMDrawingRectangle")
+        self.assertEqual(rect.attrib["name"], key)
+        self.assertEqualGeometry(rect, 20, 138, 93, 20)
+        expected = """PyDMDrawingRectangle#%s {
+  color: rgb(115, 223, 255);
+  }""" % key
+        self.assertEqualStyleSheet(rect, expected)
+        self.assertEqualToolTip(rect, key)
+        # TODO: more properties
+
+        # # diagnostics
+        # for rect in children:
+        #     print("="*20, rect.attrib["name"])
+        #     self.print_xml_children(rect, iter=True)
+        #     properties = rect.findall("property")
+        #     self.assertEqual(rect.attrib["class"], "PyDMDrawingRectangle")
 
 
 class Test_PYDM_Writer_Support(unittest.TestCase):

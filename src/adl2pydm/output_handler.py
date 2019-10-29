@@ -226,7 +226,36 @@ class Widget2Pydm(object):      # TODO: move to output_handler module
         
     def write_block_rectangle(self, parent, block, nm, qw):
         self.write_tooltip(qw, nm)
-    
+        # TODO: brush, penStyle, penColor, penWidth
+        # self.writePenStyle()
+        # self.writePenColor()
+        # self.writePenWidth()
+
+        # TODO: values from block, need defaults
+        # These are example values ONLY
+        attr = block.contents.get("basic attribute", {})
+        if len(attr) > 0:
+            propty = self.writer.writeOpenProperty(qw, "brush", stdset="0")
+            brush = self.writer.writeOpenTag(propty, "brush")
+            brush.attrib["brushstyle"] = "SolidPattern"
+            item = self.writer.writeOpenTag(brush, "color")
+            item.attrib["alpha"] = "255"
+            self.writer.writeTaggedString(brush, "red", str(133))
+            self.writer.writeTaggedString(brush, "green", str(133))
+            self.writer.writeTaggedString(brush, "blue", str(133))
+
+            propty = self.writer.writeOpenProperty(qw, "penStyle", stdset="0")
+            self.writer.writeTaggedString(propty, "enum", str("Qt::SolidLine"))
+
+            propty = self.writer.writeOpenProperty(qw, "penColor", stdset="0")
+            item = self.writer.writeOpenTag(propty, "color")
+            self.writer.writeTaggedString(brush, "red", str(255))
+            self.writer.writeTaggedString(brush, "green", str(0))
+            self.writer.writeTaggedString(brush, "blue", str(0))
+
+            propty = self.writer.writeOpenProperty(qw, "penWidth", stdset="0")
+            self.writer.writeTaggedString(propty, "double", str(1.0))
+
     def write_block_related_display(self, parent, block, nm, qw):
         text = block.title or nm
         showIcon = not text.startswith("-")
