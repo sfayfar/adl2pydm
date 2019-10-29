@@ -154,21 +154,6 @@ class Test_PYDM_Writer_Support(unittest.TestCase):
             )
         self.assertEqual(len(buf), len(expected))
 
-    # def test_testDisplay_adl(self):
-    #     medm_path = os.path.join(os.path.dirname(__file__), "medm")
-    #     self.assertTrue(os.path.exists(medm_path))
-
-    #     full_name = os.path.join(medm_path, "testDisplay.adl")
-    #     self.assertTrue(os.path.exists(full_name))
-
-    #     sys.argv = [sys.argv[0], "-d", self.tempdir, full_name]
-    #     cli.main()
-
-    #     base = os.path.splitext(os.path.basename(full_name))[0]
-    #     uiname = base + output_handler.SCREEN_FILE_EXTENSION
-
-    #     return uiname
-
 
 def suite(*args, **kw):
     test_suite = unittest.TestSuite()
