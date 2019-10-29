@@ -35,6 +35,10 @@ As this starts, the console should show this text (user, host, & directory will 
 Loading PyDM Widgets
 ```
 
+Here's a view of the screen (with the standard Qt widget categories minimized):
+
+![Designer, showing PyDM widget controls](expected.jpg)
+
 ## slight modifications
 
 In the documented installation procedure, pip is used to install *pydm*.
