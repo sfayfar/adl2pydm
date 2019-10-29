@@ -107,7 +107,6 @@ is 1.7.3.  Also, the installations above all used python=3.6,
 yet the current python is now 3.7. 
 
 ```
-cd /tmp
 conda create -y -n pydm-environment python pydm -c conda-forge
 conda activate pydm-environment
 ```
