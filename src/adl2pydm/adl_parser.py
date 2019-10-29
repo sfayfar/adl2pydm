@@ -395,8 +395,9 @@ class MedmCartesianPlotWidget(MedmGenericWidget):
 
         for symbol in ("x_axis", "y1_axis", "y2_axis"):
             block = self.getNamedBlock(symbol, blocks)
-            aa = self.locateAssignments(buf[block.start+1:block.end])
-            self.contents[symbol] = aa
+            if block is not None:
+                aa = self.locateAssignments(buf[block.start+1:block.end])
+                self.contents[symbol] = aa
 
         traces = {}
         for block in blocks:
