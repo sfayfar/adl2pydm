@@ -1,0 +1,24 @@
+6c6
+< CONDA_DEFAULT_ENV=bluesky
+---
+> CONDA_DEFAULT_ENV=pydm-only
+9,10c9,10
+< CONDA_PREFIX=/home/mintadmin/Apps/anaconda/envs/bluesky
+< CONDA_PROMPT_MODIFIER=(bluesky) 
+---
+> CONDA_PREFIX=/home/mintadmin/Apps/anaconda/envs/pydm-only
+> CONDA_PROMPT_MODIFIER=(pydm-only) 
+18d17
+< EPICS_BASE=/home/mintadmin/Apps/anaconda/envs/bluesky/epics
+23d21
+< EPICS_HOST_ARCH=linux-x86_64
+40c38
+< PATH=/home/mintadmin/Apps/anaconda/envs/bluesky/bin:/home/mintadmin/Apps/anaconda/bin:/home/mintadmin/Apps/anaconda/condabin:/home/mintadmin/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/local/epics/base-7.0.2/bin/linux-x86_64:/usr/local/epics/opi/bin/linux-x86_64:/usr/local/epics/synApps/support/utils
+---
+> PATH=/home/mintadmin/Apps/anaconda/envs/pydm-only/bin:/home/mintadmin/Apps/anaconda/condabin:/home/mintadmin/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/local/epics/base-7.0.2/bin/linux-x86_64:/usr/local/epics/opi/bin/linux-x86_64:/usr/local/epics/synApps/support/utils
+42,43c40,41
+< PWD=/tmp
+< PYQTDESIGNERPATH=/home/mintadmin/Apps/anaconda/envs/bluesky/etc/pydm:
+---
+> PWD=/home/mintadmin/Documents/eclipse/adl2pydm/notes
+> PYQTDESIGNERPATH=/home/mintadmin/Apps/anaconda/envs/pydm-only/etc/pydm:
