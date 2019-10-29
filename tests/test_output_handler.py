@@ -89,7 +89,7 @@ class TestOutputHandler(unittest.TestCase):
                 found = True
                 self.assertEqualString(prop, expected)
                 break
-        self.assertTrue(found, f"{propName} expected")
+        self.assertTrue(found, propName + " expected")
 
     def assertEqualStyleSheet(self, parent, expected):
         self.assertEqualPropertyString(parent, "styleSheet", expected)
