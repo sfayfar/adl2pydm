@@ -53,6 +53,11 @@ class TestOutputHandler(unittest.TestCase):
             if prop.attrib["name"] == propName:
                 return prop
 
+    def getSubElement(self, parent, tag):
+        child = parent.find(tag)
+        self.assertIsNotNone(child, tag + " subelement expected")
+        return child
+
     def print_xml_children(self, parent, tag=None, iter=False):
         if iter:
             for child in parent.iter(tag):
@@ -66,7 +71,7 @@ class TestOutputHandler(unittest.TestCase):
 
     def assertEqualGeometry(self, parent, x, y, w, h):
         prop = self.getNamedProperty(parent, "geometry")
-        self.assertIsNotNone(prop, "geometry expected")
+        self.assertIsNotNone(prop)
         for item in prop.iter():
             if item.tag == "rect":
                 self.assertEqual(len(item), 4)
@@ -80,13 +85,12 @@ class TestOutputHandler(unittest.TestCase):
                 self.assertEqual(item.text, str(h))
 
     def assertEqualString(self, parent, text=""):
-        child = parent.find("string")
-        self.assertIsNotNone(child)
+        child = self.getSubElement(parent, "string")
         self.assertEqual(child.text, str(text))
 
     def assertEqualPropertyString(self, parent, propName, expected):
         prop = self.getNamedProperty(parent, propName)
-        self.assertIsNotNone(prop, propName + " expected")
+        self.assertIsNotNone(prop)
         self.assertEqualString(prop, expected)
 
     def assertEqualStyleSheet(self, parent, expected):
@@ -131,8 +135,7 @@ class TestOutputHandler(unittest.TestCase):
         self.assertEqual(root.tag, "ui")
         self.assertEqual(len(root), 3)
 
-        screen = root.find("widget")
-        self.assertIsNotNone(screen)
+        screen = self.getSubElement(root, "widget")
         self.assertEqualClassName(screen, "QWidget", "screen")
         properties = screen.findall("property")
         self.assertEqual(len(properties), 3)
@@ -210,7 +213,7 @@ class TestOutputHandler(unittest.TestCase):
         self.assertEqualGeometry(rect, 10, 130, 113, 36)
         self.assertEqualToolTip(rect, key)
         properties = rect.findall("property")
-        self.assertEqual(len(properties), 6)
+        self.assertEqual(len(properties), 7)
         self.assertExpectedAttrib(properties[2], name="brush", stdset="0")
         for item in properties[2].iter():
             if item.tag == "brush":
@@ -226,6 +229,20 @@ class TestOutputHandler(unittest.TestCase):
         for item in properties[3].iter():
             if item.tag == "double":
                 self.assertEqual(float(item.text), 0)
+        self.assertExpectedAttrib(properties[6], name="rules", stdset="0")
+        child = self.getSubElement(properties[6], "string")
+        rules = output_handler.jsonDecode(child.text)
+        self.assertEqual(len(rules), 1)
+        expected = {
+            'name': 'rule_0', 
+            'property': 'Visible', 
+            'channels': [
+                {'channel': '${P}alldone', 
+                 'trigger': True}
+                ], 
+            'expression': 'ch[0] == 0'
+            }
+        self.assertExpectedDictInRef(rules[0], **expected)
 
         rect = children[4]
         key = "rectangle_4"
@@ -233,7 +250,7 @@ class TestOutputHandler(unittest.TestCase):
         self.assertEqualGeometry(rect, 20, 138, 93, 20)
         self.assertEqualToolTip(rect, key)
         properties = rect.findall("property")
-        self.assertEqual(len(properties), 6)
+        self.assertEqual(len(properties), 7)
         self.assertExpectedAttrib(properties[2], name="brush", stdset="0")
         for item in properties[2].iter():
             if item.tag == "brush":
@@ -249,13 +266,22 @@ class TestOutputHandler(unittest.TestCase):
         for item in properties[3].iter():
             if item.tag == "double":
                 self.assertEqual(float(item.text), 0)
-
-        # # diagnostics
-        # for rect in children:
-        #     print("="*20, rect.attrib["name"])
-        #     self.print_xml_children(rect, iter=True)
-        #     properties = rect.findall("property")
-        #     self.assertEqual(rect.attrib["class"], "PyDMDrawingRectangle")
+        self.assertExpectedAttrib(properties[6], name="rules", stdset="0")
+        child = self.getSubElement(properties[6], "string")
+        rules = output_handler.jsonDecode(child.text)
+        self.assertEqual(len(rules), 1)
+        expected = {
+            'name': 'rule_0', 
+            'property': 'Visible', 
+            'channels': [
+                {'channel': '${P}${M}.RBV', 
+                 'trigger': True},
+                {'channel': '${P}${M}.VAL', 
+                 'trigger': True}
+                ], 
+            'expression': 'ch[0]==ch[1]'
+            }
+        self.assertExpectedDictInRef(rules[0], **expected)
 
 class Test_PYDM_Writer_Support(unittest.TestCase):
 
