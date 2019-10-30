@@ -46,6 +46,13 @@ class TestOutputHandler(unittest.TestCase):
 
         return uiname
 
+    def getNamedProperty(self, parent, propName):
+        properties = parent.findall("property")
+        self.assertGreater(len(properties), 0)
+        for prop in properties:
+            if prop.attrib["name"] == propName:
+                return prop
+
     def print_xml_children(self, parent, tag=None, iter=False):
         if iter:
             for child in parent.iter(tag):
@@ -54,26 +61,23 @@ class TestOutputHandler(unittest.TestCase):
             for child in parent:#  .iter(tag):
                 print(child.tag, child.attrib)
 
+    def assertEqualClassName(self, parent, cls, nm):
+        self.assertExpectedAttrib(parent, **{"class":cls, "name":nm})
+
     def assertEqualGeometry(self, parent, x, y, w, h):
-        properties = parent.findall("property")
-        self.assertGreater(len(properties), 0)
-        found = False
-        for prop in properties:
-            if prop.attrib["name"] == "geometry":
-                found = True
-                for item in prop.iter():
-                    if item.tag == "rect":
-                        self.assertEqual(len(item), 4)
-                    elif item.tag == "x":
-                        self.assertEqual(item.text, str(x))
-                    elif item.tag == "y":
-                        self.assertEqual(item.text, str(y))
-                    elif item.tag == "width":
-                        self.assertEqual(item.text, str(w))
-                    elif item.tag == "height":
-                        self.assertEqual(item.text, str(h))
-                break
-        self.assertTrue(found, "geometry expected")
+        prop = self.getNamedProperty(parent, "geometry")
+        self.assertIsNotNone(prop, "geometry expected")
+        for item in prop.iter():
+            if item.tag == "rect":
+                self.assertEqual(len(item), 4)
+            elif item.tag == "x":
+                self.assertEqual(item.text, str(x))
+            elif item.tag == "y":
+                self.assertEqual(item.text, str(y))
+            elif item.tag == "width":
+                self.assertEqual(item.text, str(w))
+            elif item.tag == "height":
+                self.assertEqual(item.text, str(h))
 
     def assertEqualString(self, parent, text=""):
         child = parent.find("string")
@@ -81,21 +85,26 @@ class TestOutputHandler(unittest.TestCase):
         self.assertEqual(child.text, str(text))
 
     def assertEqualPropertyString(self, parent, propName, expected):
-        properties = parent.findall("property")
-        self.assertGreater(len(properties), 0)
-        found = False
-        for prop in properties:
-            if prop.attrib["name"] == propName:
-                found = True
-                self.assertEqualString(prop, expected)
-                break
-        self.assertTrue(found, propName + " expected")
+        prop = self.getNamedProperty(parent, propName)
+        self.assertIsNotNone(prop, propName + " expected")
+        self.assertEqualString(prop, expected)
 
     def assertEqualStyleSheet(self, parent, expected):
         self.assertEqualPropertyString(parent, "styleSheet", expected)
 
     def assertEqualToolTip(self, parent, expected):
         self.assertEqualPropertyString(parent, "toolTip", expected)
+
+    def assertExpectedAttrib(self, parent, **kwargs):
+        self.assertTrue(hasattr(parent, "attrib"))
+        self.assertExpectedDictInRef(parent.attrib, **kwargs)
+
+    def assertExpectedDictInRef(self, ref, **kwargs):
+        self.assertIsInstance(ref, dict)
+        self.assertIsInstance(kwargs, dict)
+        for k, v in kwargs.items():
+            self.assertTrue(k in ref)
+            self.assertEqual(v, ref[k])
 
     def test_write_pydm_widget_rectangle(self):
         uiname = self.convertAdlFile("rectangle.adl")
@@ -110,8 +119,7 @@ class TestOutputHandler(unittest.TestCase):
 
         screen = root.find("widget")
         self.assertIsNotNone(screen)
-        self.assertEqual(screen.attrib["class"], "QWidget")
-        self.assertEqual(screen.attrib["name"], "screen")
+        self.assertEqualClassName(screen, "QWidget", "screen")
         properties = screen.findall("property")
         self.assertEqual(len(properties), 3)
         self.assertEqualGeometry(screen, 96, 57, 142, 182)
@@ -120,7 +128,7 @@ class TestOutputHandler(unittest.TestCase):
   background-color: rgb(133, 133, 133);
   }"""
         self.assertEqualStyleSheet(screen, expected)
-        self.assertEqual(properties[2].attrib["name"], "windowTitle")
+        self.assertExpectedAttrib(properties[2], name="windowTitle")
         self.assertEqualString(properties[2], "rectangle")
 
         children = screen.findall("widget")
@@ -128,70 +136,85 @@ class TestOutputHandler(unittest.TestCase):
 
         rect = children[0]
         key = "rectangle"
-        self.assertEqual(rect.attrib["class"], "PyDMDrawingRectangle")
-        self.assertEqual(rect.attrib["name"], key)
+        self.assertEqualClassName(rect, "PyDMDrawingRectangle", key)
         self.assertEqualGeometry(rect, 10, 15, 113, 35)
-        expected = """PyDMDrawingRectangle#%s {
-  color: rgb(0, 0, 0);
-  }""" % key
-        self.assertEqualStyleSheet(rect, expected)
+#         expected = """PyDMDrawingRectangle#%s {
+#   color: rgb(0, 0, 0);
+#   }""" % key
+#         self.assertEqualStyleSheet(rect, expected)
         self.assertEqualToolTip(rect, key)
 
         rect = children[1]
         key = "rectangle_1"
-        self.print_xml_children(rect)
-        self.assertEqual(rect.attrib["class"], "PyDMDrawingRectangle")
-        self.assertEqual(rect.attrib["name"], key)
+        self.assertEqualClassName(rect, "PyDMDrawingRectangle", key)
         self.assertEqualGeometry(rect, 10, 53, 113, 35)
-        expected = """PyDMDrawingRectangle#%s {
-  color: rgb(253, 0, 0);
-  }""" % key
-        self.assertEqualStyleSheet(rect, expected)
+#         expected = """PyDMDrawingRectangle#%s {
+#   color: rgb(253, 0, 0);
+#   }""" % key
+#         self.assertEqualStyleSheet(rect, expected)
         self.assertEqualToolTip(rect, key)
         properties = rect.findall("property")
-        self.assertEqual(len(properties), 7)
-        # TODO: test more property content
-        self.assertEqual(properties[3].attrib["name"], "brush")
-        self.assertEqual(properties[4].attrib["name"], "penStyle")
-        self.assertEqual(properties[5].attrib["name"], "penColor")
-        self.assertEqual(properties[6].attrib["name"], "penWidth")
+        self.assertEqual(len(properties), 6)
+        self.assertExpectedAttrib(properties[2], name="brush", stdset="0")
+        for item in properties[2].iter():
+            if item.tag == "brush":
+                self.assertExpectedAttrib(item, brushstyle="NoBrush")
+            elif item.tag == "color":
+                self.assertExpectedAttrib(item, alpha="255")
+            elif item.tag == "red":
+                self.assertEqual(item.text, "253")
+            elif item.tag in ("green", "blue"):
+                self.assertEqual(item.text, "0")
+        self.assertExpectedAttrib(properties[3], name="penStyle", stdset="0")
+        for item in properties[3].iter():
+            if item.tag == "enum":
+                self.assertEqual(item.text, "Qt::SolidLine")
+        self.assertExpectedAttrib(properties[4], name="penColor", stdset="0")
+        for item in properties[4].iter():
+            if item.tag == "color":
+                self.assertEqual(len(item.attrib), 0)
+            elif item.tag == "red":
+                self.assertEqual(item.text, "253")
+            elif item.tag in ("green", "blue"):
+                self.assertEqual(item.text, "0")
+        self.assertExpectedAttrib(properties[5], name="penWidth", stdset="0")
+        for item in properties[3].iter():
+            if item.tag == "double":
+                self.assertEqual(float(item.text), 0)
 
         rect = children[2]
         key = "rectangle_2"
         properties = rect.findall("property")
-        self.assertEqual(rect.attrib["class"], "PyDMDrawingRectangle")
-        self.assertEqual(rect.attrib["name"], key)
+        self.assertEqualClassName(rect, "PyDMDrawingRectangle", key)
         self.assertEqualGeometry(rect, 10, 92, 113, 35)
-        expected = """PyDMDrawingRectangle#%s {
-  color: rgb(249, 218, 60);
-  }""" % key
-        self.assertEqualStyleSheet(rect, expected)
+#         expected = """PyDMDrawingRectangle#%s {
+#   color: rgb(249, 218, 60);
+#   }""" % key
+#         self.assertEqualStyleSheet(rect, expected)
         self.assertEqualToolTip(rect, key)
         # TODO: more properties
 
         rect = children[3]
         key = "rectangle_3"
         properties = rect.findall("property")
-        self.assertEqual(rect.attrib["class"], "PyDMDrawingRectangle")
-        self.assertEqual(rect.attrib["name"], key)
+        self.assertEqualClassName(rect, "PyDMDrawingRectangle", key)
         self.assertEqualGeometry(rect, 10, 130, 113, 36)
-        expected = """PyDMDrawingRectangle#%s {
-  color: rgb(115, 255, 107);
-  }""" % key
-        self.assertEqualStyleSheet(rect, expected)
+#         expected = """PyDMDrawingRectangle#%s {
+#   color: rgb(115, 255, 107);
+#   }""" % key
+#         self.assertEqualStyleSheet(rect, expected)
         self.assertEqualToolTip(rect, key)
         # TODO: more properties
 
         rect = children[4]
         key = "rectangle_4"
         properties = rect.findall("property")
-        self.assertEqual(rect.attrib["class"], "PyDMDrawingRectangle")
-        self.assertEqual(rect.attrib["name"], key)
+        self.assertEqualClassName(rect, "PyDMDrawingRectangle", key)
         self.assertEqualGeometry(rect, 20, 138, 93, 20)
-        expected = """PyDMDrawingRectangle#%s {
-  color: rgb(115, 223, 255);
-  }""" % key
-        self.assertEqualStyleSheet(rect, expected)
+#         expected = """PyDMDrawingRectangle#%s {
+#   color: rgb(115, 223, 255);
+#   }""" % key
+#         self.assertEqualStyleSheet(rect, expected)
         self.assertEqualToolTip(rect, key)
         # TODO: more properties
 
