@@ -184,39 +184,117 @@ class TestOutputHandler(unittest.TestCase):
 
         rect = children[2]
         key = "rectangle_2"
-        properties = rect.findall("property")
         self.assertEqualClassName(rect, "PyDMDrawingRectangle", key)
         self.assertEqualGeometry(rect, 10, 92, 113, 35)
-#         expected = """PyDMDrawingRectangle#%s {
-#   color: rgb(249, 218, 60);
-#   }""" % key
-#         self.assertEqualStyleSheet(rect, expected)
         self.assertEqualToolTip(rect, key)
-        # TODO: more properties
+        properties = rect.findall("property")
+        self.assertEqual(len(properties), 6)
+        self.assertExpectedAttrib(properties[2], name="brush", stdset="0")
+        for item in properties[2].iter():
+            if item.tag == "brush":
+                self.assertExpectedAttrib(item, brushstyle="NoBrush")
+            elif item.tag == "color":
+                self.assertExpectedAttrib(item, alpha="255")
+            elif item.tag == "red":
+                self.assertEqual(item.text, "249")
+            elif item.tag == "green":
+                self.assertEqual(item.text, "218")
+            elif item.tag == "blue":
+                self.assertEqual(item.text, "60")
+        self.assertExpectedAttrib(properties[3], name="penStyle", stdset="0")
+        for item in properties[3].iter():
+            if item.tag == "enum":
+                self.assertEqual(item.text, "Qt::DashLine")
+        self.assertExpectedAttrib(properties[4], name="penColor", stdset="0")
+        for item in properties[4].iter():
+            if item.tag == "color":
+                self.assertEqual(len(item.attrib), 0)
+            elif item.tag == "red":
+                self.assertEqual(item.text, "249")
+            elif item.tag == "green":
+                self.assertEqual(item.text, "218")
+            elif item.tag == "blue":
+                self.assertEqual(item.text, "60")
+        self.assertExpectedAttrib(properties[5], name="penWidth", stdset="0")
+        for item in properties[3].iter():
+            if item.tag == "double":
+                self.assertEqual(float(item.text), 0)
 
         rect = children[3]
         key = "rectangle_3"
-        properties = rect.findall("property")
         self.assertEqualClassName(rect, "PyDMDrawingRectangle", key)
         self.assertEqualGeometry(rect, 10, 130, 113, 36)
-#         expected = """PyDMDrawingRectangle#%s {
-#   color: rgb(115, 255, 107);
-#   }""" % key
-#         self.assertEqualStyleSheet(rect, expected)
         self.assertEqualToolTip(rect, key)
-        # TODO: more properties
+        properties = rect.findall("property")
+        self.assertEqual(len(properties), 6)
+        self.assertExpectedAttrib(properties[2], name="brush", stdset="0")
+        for item in properties[2].iter():
+            if item.tag == "brush":
+                self.assertExpectedAttrib(item, brushstyle="NoBrush")
+            elif item.tag == "color":
+                self.assertExpectedAttrib(item, alpha="255")
+            elif item.tag == "red":
+                self.assertEqual(item.text, "115")
+            elif item.tag == "green":
+                self.assertEqual(item.text, "255")
+            elif item.tag == "blue":
+                self.assertEqual(item.text, "107")
+        self.assertExpectedAttrib(properties[3], name="penStyle", stdset="0")
+        for item in properties[3].iter():
+            if item.tag == "enum":
+                self.assertEqual(item.text, "Qt::SolidLine")
+        self.assertExpectedAttrib(properties[4], name="penColor", stdset="0")
+        for item in properties[4].iter():
+            if item.tag == "color":
+                self.assertEqual(len(item.attrib), 0)
+            elif item.tag == "red":
+                self.assertEqual(item.text, "115")
+            elif item.tag == "green":
+                self.assertEqual(item.text, "255")
+            elif item.tag == "blue":
+                self.assertEqual(item.text, "107")
+        self.assertExpectedAttrib(properties[5], name="penWidth", stdset="0")
+        for item in properties[3].iter():
+            if item.tag == "double":
+                self.assertEqual(float(item.text), 0)
 
         rect = children[4]
         key = "rectangle_4"
-        properties = rect.findall("property")
         self.assertEqualClassName(rect, "PyDMDrawingRectangle", key)
         self.assertEqualGeometry(rect, 20, 138, 93, 20)
-#         expected = """PyDMDrawingRectangle#%s {
-#   color: rgb(115, 223, 255);
-#   }""" % key
-#         self.assertEqualStyleSheet(rect, expected)
         self.assertEqualToolTip(rect, key)
-        # TODO: more properties
+        properties = rect.findall("property")
+        self.assertEqual(len(properties), 6)
+        self.assertExpectedAttrib(properties[2], name="brush", stdset="0")
+        for item in properties[2].iter():
+            if item.tag == "brush":
+                self.assertExpectedAttrib(item, brushstyle="SolidPattern")
+            elif item.tag == "color":
+                self.assertExpectedAttrib(item, alpha="255")
+            elif item.tag == "red":
+                self.assertEqual(item.text, "115")
+            elif item.tag == "green":
+                self.assertEqual(item.text, "223")
+            elif item.tag == "blue":
+                self.assertEqual(item.text, "255")
+        self.assertExpectedAttrib(properties[3], name="penStyle", stdset="0")
+        for item in properties[3].iter():
+            if item.tag == "enum":
+                self.assertEqual(item.text, "Qt::SolidLine")
+        self.assertExpectedAttrib(properties[4], name="penColor", stdset="0")
+        for item in properties[4].iter():
+            if item.tag == "color":
+                self.assertEqual(len(item.attrib), 0)
+            elif item.tag == "red":
+                self.assertEqual(item.text, "115")
+            elif item.tag == "green":
+                self.assertEqual(item.text, "223")
+            elif item.tag == "blue":
+                self.assertEqual(item.text, "255")
+        self.assertExpectedAttrib(properties[5], name="penWidth", stdset="0")
+        for item in properties[3].iter():
+            if item.tag == "double":
+                self.assertEqual(float(item.text), 0)
 
         # # diagnostics
         # for rect in children:
