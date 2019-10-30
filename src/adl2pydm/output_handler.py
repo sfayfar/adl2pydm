@@ -6,7 +6,6 @@ Only rely on packages in the standard Python distribution. (rules out lxml)
 """
 
 from collections import namedtuple
-import html
 import json
 import logging
 import os
@@ -27,13 +26,11 @@ logger = logging.getLogger(__name__)
 
 def jsonDecode(src):
     "reads rules json text from .ui file"
-    # return json.loads(html.unescape(src))
     return json.loads(src)
 
 
 def jsonEncode(rules):
     "writes rules as json text for .ui file"
-    # return html.escape(json.dumps(rules))
     return json.dumps(rules)
 
 
