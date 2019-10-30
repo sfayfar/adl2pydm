@@ -342,12 +342,7 @@ class Widget2Pydm(object):      # TODO: move to output_handler module
     def write_block_text(self, parent, block, nm, qw):
         self.writer.writeProperty(qw, "text", block.title, tag="string")
         self.write_tooltip(qw, nm)
-        align =  {
-            "horiz. left": "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter",
-            "horiz. center" : "Qt::AlignCenter",
-            "horiz. right" : "Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter",
-            "justify" : "Qt::AlignJustify|Qt::AlignVCenter",
-        }[block.contents.get("align", "horiz. left")]
+        align = block.contents.get("align", "horiz. left")
         self.writer.writeProperty(qw, "alignment", align, tag="set")
     
     def write_block_text_entry(self, parent, block, nm, qw):
