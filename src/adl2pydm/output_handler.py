@@ -6,6 +6,8 @@ Only rely on packages in the standard Python distribution. (rules out lxml)
 """
 
 from collections import namedtuple
+import html
+import json
 import logging
 import os
 from xml.dom import minidom
@@ -21,6 +23,64 @@ ENV_PYDM_DISPLAYS_PATH = "PYDM_DISPLAYS_PATH"
 SCREEN_FILE_EXTENSION = ".ui"
 
 logger = logging.getLogger(__name__)
+
+
+def jsonDecode(src):
+    "reads rules json text from .ui file"
+    # return json.loads(html.unescape(src))
+    return json.loads(src)
+
+
+def jsonEncode(rules):
+    "writes rules as json text for .ui file"
+    # return html.escape(json.dumps(rules))
+    return json.dumps(rules)
+
+
+def interpretAdlDynamicAttribute(attr):
+    """
+    interpret MEDM's "dynamic attribute" into PyDM's "rules"
+
+    note difference in macro expression:
+
+    ====  ======
+    tool  macro
+    ====  ======
+    MEDM  `$(P)`
+    PyDM  `${P}`
+    ====  ======
+    """
+    rule = dict(name="rule_0", property="Visible")
+    channels = []
+    for nm in "chan chanB chanC chanD".split():
+        if nm not in attr:
+            break
+        pv = attr[nm].replace("(", "{").replace(")", "}")
+        channels.append(dict(channel=pv, trigger=len(pv)>0))
+
+    calc = attr.get("calc")
+    visibility_calc = {
+        "if zero": " == 0",
+        "if not zero": " != 0",
+        "calc": calc
+    }[attr.get("vis", "if not zero")]
+    if len(channels) > 0:
+        rule["channels"] = channels
+        if calc is None:
+            calc = "ch[0]" + visibility_calc
+    exchanges = {
+        "A": "ch[0]",
+        "B": "ch[1]",
+        "C": "ch[2]",
+        "D": "ch[3]",
+        "#": "!="
+        }
+    for k, v in exchanges.items():
+        calc = calc.replace(k, v)
+    # FIXME: misses calc="a==0"
+    rule["expression"] = calc
+
+    return [rule]
 
 
 class Widget2Pydm(object):      # TODO: move to output_handler module
@@ -258,13 +318,11 @@ class Widget2Pydm(object):      # TODO: move to output_handler module
 
         attr = block.contents.get("dynamic attribute", {})
         if len(attr) > 0:
-            # TODO:
-            calc = attr.get("calc")
-            chan = attr.get("chan")
-            chanB = attr.get("chanB")
-            chanC = attr.get("chanC")
-            chanD = attr.get("chanD")
-            vis = attr.get("vis")
+            # see: http://slaclab.github.io/pydm/widgets/widget_rules/index.html
+            rules = interpretAdlDynamicAttribute(attr)
+            json_rules = jsonEncode(rules)
+            propty = self.writer.writeOpenProperty(qw, "rules", stdset="0")
+            self.writer.writeTaggedString(propty, value=json_rules)
 
     def write_block_related_display(self, parent, block, nm, qw):
         text = block.title or nm
