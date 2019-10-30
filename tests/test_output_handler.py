@@ -106,6 +106,20 @@ class TestOutputHandler(unittest.TestCase):
             self.assertTrue(k in ref)
             self.assertEqual(v, ref[k])
 
+    def assertPropertyColor(self, parent, r, g, b, **kwargs):
+        self.assertEqual(parent.tag, "property")
+        for item in parent.iter():
+            if item.tag == "color":
+                self.assertEqual(len(item.attrib), len(kwargs))
+                if len(kwargs) > 0:
+                    self.assertExpectedAttrib(item, **kwargs)
+            elif item.tag == "red":
+                self.assertEqual(item.text, str(r))
+            elif item.tag == "green":
+                self.assertEqual(item.text, str(g))
+            elif item.tag == "blue":
+                self.assertEqual(item.text, str(b))
+
     def test_write_pydm_widget_rectangle(self):
         uiname = self.convertAdlFile("rectangle.adl")
         full_uiname = os.path.join(self.tempdir, uiname)
@@ -148,10 +162,6 @@ class TestOutputHandler(unittest.TestCase):
         key = "rectangle_1"
         self.assertEqualClassName(rect, "PyDMDrawingRectangle", key)
         self.assertEqualGeometry(rect, 10, 53, 113, 35)
-#         expected = """PyDMDrawingRectangle#%s {
-#   color: rgb(253, 0, 0);
-#   }""" % key
-#         self.assertEqualStyleSheet(rect, expected)
         self.assertEqualToolTip(rect, key)
         properties = rect.findall("property")
         self.assertEqual(len(properties), 6)
@@ -159,24 +169,13 @@ class TestOutputHandler(unittest.TestCase):
         for item in properties[2].iter():
             if item.tag == "brush":
                 self.assertExpectedAttrib(item, brushstyle="NoBrush")
-            elif item.tag == "color":
-                self.assertExpectedAttrib(item, alpha="255")
-            elif item.tag == "red":
-                self.assertEqual(item.text, "253")
-            elif item.tag in ("green", "blue"):
-                self.assertEqual(item.text, "0")
+        self.assertPropertyColor(properties[2], 253, 0, 0, alpha="255")
         self.assertExpectedAttrib(properties[3], name="penStyle", stdset="0")
         for item in properties[3].iter():
             if item.tag == "enum":
                 self.assertEqual(item.text, "Qt::SolidLine")
         self.assertExpectedAttrib(properties[4], name="penColor", stdset="0")
-        for item in properties[4].iter():
-            if item.tag == "color":
-                self.assertEqual(len(item.attrib), 0)
-            elif item.tag == "red":
-                self.assertEqual(item.text, "253")
-            elif item.tag in ("green", "blue"):
-                self.assertEqual(item.text, "0")
+        self.assertPropertyColor(properties[4], 253, 0, 0)
         self.assertExpectedAttrib(properties[5], name="penWidth", stdset="0")
         for item in properties[3].iter():
             if item.tag == "double":
@@ -193,28 +192,13 @@ class TestOutputHandler(unittest.TestCase):
         for item in properties[2].iter():
             if item.tag == "brush":
                 self.assertExpectedAttrib(item, brushstyle="NoBrush")
-            elif item.tag == "color":
-                self.assertExpectedAttrib(item, alpha="255")
-            elif item.tag == "red":
-                self.assertEqual(item.text, "249")
-            elif item.tag == "green":
-                self.assertEqual(item.text, "218")
-            elif item.tag == "blue":
-                self.assertEqual(item.text, "60")
+        self.assertPropertyColor(properties[2], 249, 218, 60, alpha="255")
         self.assertExpectedAttrib(properties[3], name="penStyle", stdset="0")
         for item in properties[3].iter():
             if item.tag == "enum":
                 self.assertEqual(item.text, "Qt::DashLine")
         self.assertExpectedAttrib(properties[4], name="penColor", stdset="0")
-        for item in properties[4].iter():
-            if item.tag == "color":
-                self.assertEqual(len(item.attrib), 0)
-            elif item.tag == "red":
-                self.assertEqual(item.text, "249")
-            elif item.tag == "green":
-                self.assertEqual(item.text, "218")
-            elif item.tag == "blue":
-                self.assertEqual(item.text, "60")
+        self.assertPropertyColor(properties[4], 249, 218, 60)
         self.assertExpectedAttrib(properties[5], name="penWidth", stdset="0")
         for item in properties[3].iter():
             if item.tag == "double":
@@ -231,28 +215,13 @@ class TestOutputHandler(unittest.TestCase):
         for item in properties[2].iter():
             if item.tag == "brush":
                 self.assertExpectedAttrib(item, brushstyle="NoBrush")
-            elif item.tag == "color":
-                self.assertExpectedAttrib(item, alpha="255")
-            elif item.tag == "red":
-                self.assertEqual(item.text, "115")
-            elif item.tag == "green":
-                self.assertEqual(item.text, "255")
-            elif item.tag == "blue":
-                self.assertEqual(item.text, "107")
+        self.assertPropertyColor(properties[2], 115, 255, 107, alpha="255")
         self.assertExpectedAttrib(properties[3], name="penStyle", stdset="0")
         for item in properties[3].iter():
             if item.tag == "enum":
                 self.assertEqual(item.text, "Qt::SolidLine")
         self.assertExpectedAttrib(properties[4], name="penColor", stdset="0")
-        for item in properties[4].iter():
-            if item.tag == "color":
-                self.assertEqual(len(item.attrib), 0)
-            elif item.tag == "red":
-                self.assertEqual(item.text, "115")
-            elif item.tag == "green":
-                self.assertEqual(item.text, "255")
-            elif item.tag == "blue":
-                self.assertEqual(item.text, "107")
+        self.assertPropertyColor(properties[4], 115, 255, 107)
         self.assertExpectedAttrib(properties[5], name="penWidth", stdset="0")
         for item in properties[3].iter():
             if item.tag == "double":
@@ -269,28 +238,13 @@ class TestOutputHandler(unittest.TestCase):
         for item in properties[2].iter():
             if item.tag == "brush":
                 self.assertExpectedAttrib(item, brushstyle="SolidPattern")
-            elif item.tag == "color":
-                self.assertExpectedAttrib(item, alpha="255")
-            elif item.tag == "red":
-                self.assertEqual(item.text, "115")
-            elif item.tag == "green":
-                self.assertEqual(item.text, "223")
-            elif item.tag == "blue":
-                self.assertEqual(item.text, "255")
+        self.assertPropertyColor(properties[2], 115, 223, 255, alpha="255")
         self.assertExpectedAttrib(properties[3], name="penStyle", stdset="0")
         for item in properties[3].iter():
             if item.tag == "enum":
                 self.assertEqual(item.text, "Qt::SolidLine")
         self.assertExpectedAttrib(properties[4], name="penColor", stdset="0")
-        for item in properties[4].iter():
-            if item.tag == "color":
-                self.assertEqual(len(item.attrib), 0)
-            elif item.tag == "red":
-                self.assertEqual(item.text, "115")
-            elif item.tag == "green":
-                self.assertEqual(item.text, "223")
-            elif item.tag == "blue":
-                self.assertEqual(item.text, "255")
+        self.assertPropertyColor(properties[4], 115, 223, 255)
         self.assertExpectedAttrib(properties[5], name="penWidth", stdset="0")
         for item in properties[3].iter():
             if item.tag == "double":
@@ -302,7 +256,6 @@ class TestOutputHandler(unittest.TestCase):
         #     self.print_xml_children(rect, iter=True)
         #     properties = rect.findall("property")
         #     self.assertEqual(rect.attrib["class"], "PyDMDrawingRectangle")
-
 
 class Test_PYDM_Writer_Support(unittest.TestCase):
 
