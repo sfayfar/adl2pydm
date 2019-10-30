@@ -289,7 +289,10 @@ class Widget2Pydm(object):      # TODO: move to output_handler module
         pv = self.get_channel(block.contents["control"])
         self.writer.writeProperty(qw, "text", block.title, tag="string")
         self.write_tooltip(qw, pv)
-        self.write_channel(qw, pv)  # TODO:block.contents["press_msg"]
+        self.write_channel(qw, pv)  
+        msg = block.contents.get("press_msg")
+        if msg is not None:
+            self.writer.writeProperty(qw, "pressValue", msg, stdset="0")
         
     def write_block_meter(self, parent, block, nm, qw):
         pv = self.get_channel(block.contents["monitor"])
