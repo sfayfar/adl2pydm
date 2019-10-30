@@ -137,10 +137,11 @@ class Widget2Pydm(object):      # TODO: move to output_handler module
         self.writer.closeFile()
         
     def write_color_element(self, xml_element, color, **kwargs):
-        item = self.writer.writeOpenTag(xml_element, "color", **kwargs)
-        self.writer.writeTaggedString(item, "red", str(color.r))
-        self.writer.writeTaggedString(item, "green", str(color.g))
-        self.writer.writeTaggedString(item, "blue", str(color.b))
+        if color is not None:
+            item = self.writer.writeOpenTag(xml_element, "color", **kwargs)
+            self.writer.writeTaggedString(item, "red", str(color.r))
+            self.writer.writeTaggedString(item, "green", str(color.g))
+            self.writer.writeTaggedString(item, "blue", str(color.b))
 
     def write_block(self, parent, block):
         nm = self.get_unique_widget_name(block.symbol.replace(" ", "_"))
