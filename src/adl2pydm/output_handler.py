@@ -118,7 +118,7 @@ class Widget2Pydm(object):      # TODO: move to output_handler module
         form = self.writer.writeOpenTag(root, "widget", cls="QWidget", name="screen")
         
         self.write_geometry(form, screen.geometry)
-        self.write_colors(form, screen)
+        self.write_colors_style(form, screen)
     
         propty = self.writer.writeOpenProperty(form, "windowTitle")
         self.writer.writeTaggedString(propty, value=title)
@@ -135,6 +135,12 @@ class Widget2Pydm(object):      # TODO: move to output_handler module
         # TODO: write .ui file <connections/> elements here (#10)
         
         self.writer.closeFile()
+        
+    def write_color_element(self, xml_element, color, **kwargs):
+        item = self.writer.writeOpenTag(xml_element, "color", **kwargs)
+        self.writer.writeTaggedString(item, "red", str(color.r))
+        self.writer.writeTaggedString(item, "green", str(color.g))
+        self.writer.writeTaggedString(item, "blue", str(color.b))
 
     def write_block(self, parent, block):
         nm = self.get_unique_widget_name(block.symbol.replace(" ", "_"))
@@ -151,7 +157,7 @@ class Widget2Pydm(object):      # TODO: move to output_handler module
         # TODO: PyDMDrawingMMM (Line, Polygon, Oval, ...) need more decisions here 
         qw = self.writer.writeOpenTag(parent, "widget", cls=cls, name=nm)
         self.write_geometry(qw, block.geometry)
-        self.write_colors(qw, block)
+        # self.write_colors_style(qw, block)
         handler(parent, block, nm, qw)
     
     # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -223,38 +229,41 @@ class Widget2Pydm(object):      # TODO: move to output_handler module
         # TODO: PyDM widget choice needs help here
         # this gets interesting because of the number points required for each PyDMDrawingMMM widget
         self.write_tooltip(qw, nm)
-        
+
     def write_block_rectangle(self, parent, block, nm, qw):
         self.write_tooltip(qw, nm)
-        # TODO: brush, penStyle, penColor, penWidth
-        # self.writePenStyle()
-        # self.writePenColor()
-        # self.writePenWidth()
 
-        # TODO: values from block, need defaults
-        # These are example values ONLY
         attr = block.contents.get("basic attribute", {})
+        propty = self.writer.writeOpenProperty(qw, "brush", stdset="0")
+        fill = dict(
+            solid = "SolidPattern", 
+            outline = "NoBrush")[attr.get("fill", "solid")]
+        brush = self.writer.writeOpenTag(propty, "brush", brushstyle=fill)
+        self.write_color_element(brush, block.color, alpha="255")
+
+        propty = self.writer.writeOpenProperty(qw, "penStyle", stdset="0")
+        pen = dict(
+            solid = "Qt::SolidLine",
+            dash = "Qt::DashLine"
+        )[attr.get("style", "solid")]
+        self.writer.writeTaggedString(propty, "enum", pen)
+
+        propty = self.writer.writeOpenProperty(qw, "penColor", stdset="0")
+        self.write_color_element(propty, block.color)
+
+        propty = self.writer.writeOpenProperty(qw, "penWidth", stdset="0")
+        width = attr.get("width", 0)
+        self.writer.writeTaggedString(propty, "double", str(width))
+
+        attr = block.contents.get("dynamic attribute", {})
         if len(attr) > 0:
-            propty = self.writer.writeOpenProperty(qw, "brush", stdset="0")
-            brush = self.writer.writeOpenTag(propty, "brush")
-            brush.attrib["brushstyle"] = "SolidPattern"
-            item = self.writer.writeOpenTag(brush, "color")
-            item.attrib["alpha"] = "255"
-            self.writer.writeTaggedString(brush, "red", str(133))
-            self.writer.writeTaggedString(brush, "green", str(133))
-            self.writer.writeTaggedString(brush, "blue", str(133))
-
-            propty = self.writer.writeOpenProperty(qw, "penStyle", stdset="0")
-            self.writer.writeTaggedString(propty, "enum", str("Qt::SolidLine"))
-
-            propty = self.writer.writeOpenProperty(qw, "penColor", stdset="0")
-            item = self.writer.writeOpenTag(propty, "color")
-            self.writer.writeTaggedString(brush, "red", str(255))
-            self.writer.writeTaggedString(brush, "green", str(0))
-            self.writer.writeTaggedString(brush, "blue", str(0))
-
-            propty = self.writer.writeOpenProperty(qw, "penWidth", stdset="0")
-            self.writer.writeTaggedString(propty, "double", str(1.0))
+            # TODO:
+            calc = attr.get("calc")
+            chan = attr.get("chan")
+            chanB = attr.get("chanB")
+            chanC = attr.get("chanC")
+            chanD = attr.get("chanD")
+            vis = attr.get("vis")
 
     def write_block_related_display(self, parent, block, nm, qw):
         text = block.title or nm
@@ -309,7 +318,7 @@ class Widget2Pydm(object):      # TODO: move to output_handler module
         # stdset=0 signals this attribute is from PyDM, not Qt widget
         self.writer.writeTaggedString(propty, value="ca://" + channel)
     
-    def write_colors(self, parent, block):
+    def write_colors_style(self, parent, block):
         clr = block.color
         bclr = block.background_color
         style = ""
