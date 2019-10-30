@@ -218,6 +218,15 @@ class Widget2Pydm(object):      # TODO: move to output_handler module
         # self.write_colors_style(qw, block)
         handler(parent, block, nm, qw)
     
+    def writePropertyTextAlignment(self, widget, attr):
+        align =  {
+            "horiz. left": "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter",
+            "horiz. centered" : "Qt::AlignCenter",
+            "horiz. right" : "Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter",
+            "justify" : "Qt::AlignJustify|Qt::AlignVCenter",
+        }[attr.get("align", "horiz. left")]
+        self.writer.writeProperty(widget, "alignment", align, tag="set")
+    
     # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
         
     def write_block_default(self, parent, block, nm, qw):
@@ -340,15 +349,6 @@ class Widget2Pydm(object):      # TODO: move to output_handler module
         # TODO: block.pens
         # TODO: block.contents["period"]
         # TODO: much unparsed content in block.contents
-    
-    def writePropertyTextAlignment(self, widget, attr):
-        align =  {
-            "horiz. left": "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter",
-            "horiz. centered" : "Qt::AlignCenter",
-            "horiz. right" : "Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter",
-            "justify" : "Qt::AlignJustify|Qt::AlignVCenter",
-        }[attr.get("align", "horiz. left")]
-        self.writer.writeProperty(widget, "alignment", align, tag="set")
 
     def write_block_text(self, parent, block, nm, qw):
         self.writer.writeProperty(qw, "text", block.title, tag="string")
@@ -365,7 +365,13 @@ class Widget2Pydm(object):      # TODO: move to output_handler module
         self.write_tooltip(qw, "PV: " + pv)
         self.writePropertyTextAlignment(qw, block.contents)
         self.writer.writeProperty(qw, "readOnly", "true", tag="bool")
+        self.writer.writeProperty(
+            qw, 
+            "textInteractionFlags", 
+            "Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse",
+            tag="set")
         self.write_channel(qw, pv)
+        self.write_colors_style(qw, block)
         
     def write_block_valuator(self, parent, block, nm, qw):
         pv = self.get_channel(block.contents["control"])
