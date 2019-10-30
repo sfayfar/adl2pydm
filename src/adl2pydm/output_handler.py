@@ -65,16 +65,20 @@ def interpretAdlDynamicAttribute(attr):
         rule["channels"] = channels
         if calc is None:
             calc = "ch[0]" + visibility_calc
+    
+    # edit the calc expression for known changes
+    # FIXME: misses calc="a==0", algorithm needs improvement
     exchanges = {
         "A": "ch[0]",
         "B": "ch[1]",
         "C": "ch[2]",
         "D": "ch[3]",
-        "#": "!="
+        "#": "!=",
+        "||": "|"
         }
     for k, v in exchanges.items():
         calc = calc.replace(k, v)
-    # FIXME: misses calc="a==0", algorithm needs improvement
+
     rule["expression"] = calc
 
     return [rule]
@@ -364,7 +368,6 @@ class Widget2Pydm(object):      # TODO: move to output_handler module
         pv = self.get_channel(block.contents["monitor"])
         self.write_tooltip(qw, "PV: " + pv)
         self.writePropertyTextAlignment(qw, block.contents)
-        self.writer.writeProperty(qw, "readOnly", "true", tag="bool")
         self.writer.writeProperty(
             qw, 
             "textInteractionFlags", 

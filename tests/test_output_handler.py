@@ -326,11 +326,6 @@ class TestOutputHandler(unittest.TestCase):
   }""" % key
         self.assertEqualStyleSheet(widget, expected)
 
-        prop = self.getNamedProperty(widget, "readOnly")
-        child = self.getSubElement(prop, "bool")
-        self.assertIsNotNone(child)
-        self.assertEqual(child.text, "true")
-
         prop = self.getNamedProperty(widget, "channel")
         self.assertEqualString(prop, "ca://Xorbit:S1A:H1:CurrentAO")
 
