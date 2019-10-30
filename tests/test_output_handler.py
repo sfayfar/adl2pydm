@@ -124,13 +124,14 @@ class TestOutputHandler(unittest.TestCase):
             elif item.tag == "blue":
                 self.assertEqual(item.text, str(b))
 
-    def test_write_pydm_widget_label(self):
+    # ----------------------------------------------------------
+
+    def test_write_widget_PyDMLabel(self):
         uiname = self.convertAdlFile("testDisplay.adl")
         full_uiname = os.path.join(self.tempdir, uiname)
         self.assertTrue(os.path.exists(full_uiname))
 
-        tree = ElementTree.parse(full_uiname)
-        root = tree.getroot()
+        root = ElementTree.parse(full_uiname).getroot()
         screen = self.getSubElement(root, "widget")
         widgets = screen.findall("widget")
         self.assertEqual(len(widgets), 64)
@@ -144,7 +145,10 @@ class TestOutputHandler(unittest.TestCase):
         self.assertIsNotNone(child)
         self.assertEqual(child.text, "Qt::AlignCenter")
 
-    def test_write_pydm_widget_rectangle(self):
+    def test_write_widget_PyDMDrawingRectangle(self):
+        """
+        also test the full file structure
+        """
         uiname = self.convertAdlFile("rectangle.adl")
         full_uiname = os.path.join(self.tempdir, uiname)
         self.assertTrue(os.path.exists(full_uiname))
@@ -302,6 +306,7 @@ class TestOutputHandler(unittest.TestCase):
             'expression': 'ch[0]==ch[1]'
             }
         self.assertExpectedDictInRef(rules[0], **expected)
+
 
 class Test_PYDM_Writer_Support(unittest.TestCase):
 
