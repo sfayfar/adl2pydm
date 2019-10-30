@@ -344,7 +344,7 @@ class Widget2Pydm(object):      # TODO: move to output_handler module
         self.write_tooltip(qw, nm)
         align =  {
             "horiz. left": "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter",
-            "horiz. center" : "Qt::AlignCenter",
+            "horiz. centered" : "Qt::AlignCenter",
             "horiz. right" : "Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter",
             "justify" : "Qt::AlignJustify|Qt::AlignVCenter",
         }[block.contents.get("align", "horiz. left")]
