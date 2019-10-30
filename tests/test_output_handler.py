@@ -60,11 +60,11 @@ class TestOutputHandler(unittest.TestCase):
 
     def print_xml_children(self, parent, tag=None, iter=False):
         if iter:
-            for child in parent.iter(tag):
-                print(child.tag, child.attrib)
+            for i, child in enumerate(parent.iter(tag)):
+                print(i, child.tag, child.attrib)
         else:
-            for child in parent:#  .iter(tag):
-                print(child.tag, child.attrib)
+            for i, child in enumerate(parent):#  .iter(tag):
+                print(i, child.tag, child.attrib)
 
     def assertEqualClassName(self, parent, cls, nm):
         self.assertExpectedAttrib(parent, **{"class":cls, "name":nm})
@@ -123,6 +123,26 @@ class TestOutputHandler(unittest.TestCase):
                 self.assertEqual(item.text, str(g))
             elif item.tag == "blue":
                 self.assertEqual(item.text, str(b))
+
+    def test_write_pydm_widget_label(self):
+        uiname = self.convertAdlFile("testDisplay.adl")
+        full_uiname = os.path.join(self.tempdir, uiname)
+        self.assertTrue(os.path.exists(full_uiname))
+
+        tree = ElementTree.parse(full_uiname)
+        root = tree.getroot()
+        screen = self.getSubElement(root, "widget")
+        widgets = screen.findall("widget")
+        self.assertEqual(len(widgets), 64)
+
+        widget = widgets[3]
+        self.assertEqualClassName(widget, "PyDMLabel", "text")
+        prop = self.getNamedProperty(widget, "text")
+        self.assertEqualString(prop, "Test Display")
+        prop = self.getNamedProperty(widget, "alignment")
+        child = self.getSubElement(prop, "set")
+        self.assertIsNotNone(child)
+        self.assertEqual(child.text, "Qt::AlignCenter")
 
     def test_write_pydm_widget_rectangle(self):
         uiname = self.convertAdlFile("rectangle.adl")
