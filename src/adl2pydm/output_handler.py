@@ -318,8 +318,7 @@ class Widget2Pydm(object):      # TODO: move to output_handler module
             # see: http://slaclab.github.io/pydm/widgets/widget_rules/index.html
             rules = interpretAdlDynamicAttribute(attr)
             json_rules = jsonEncode(rules)
-            propty = self.writer.writeOpenProperty(qw, "rules", stdset="0")
-            self.writer.writeTaggedString(propty, value=json_rules)
+            self.writer.writeProperty(qw, "rules", json_rules, stdset="0")
 
     def write_block_related_display(self, parent, block, nm, qw):
         text = block.title or nm
@@ -341,9 +340,15 @@ class Widget2Pydm(object):      # TODO: move to output_handler module
         # TODO: much unparsed content in block.contents
     
     def write_block_text(self, parent, block, nm, qw):
-        # block.contents["align"] = horiz. right
         self.writer.writeProperty(qw, "text", block.title, tag="string")
         self.write_tooltip(qw, nm)
+        align =  {
+            "horiz. left": "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter",
+            "horiz. center" : "Qt::AlignCenter",
+            "horiz. right" : "Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter",
+            "justify" : "Qt::AlignJustify|Qt::AlignVCenter",
+        }[block.contents.get("align", "horiz. left")]
+        self.writer.writeProperty(qw, "alignment", align, tag="set")
     
     def write_block_text_entry(self, parent, block, nm, qw):
         pv = self.get_channel(block.contents["control"])    # TODO: format = string | compact
