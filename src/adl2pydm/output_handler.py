@@ -74,7 +74,7 @@ def interpretAdlDynamicAttribute(attr):
         }
     for k, v in exchanges.items():
         calc = calc.replace(k, v)
-    # FIXME: misses calc="a==0"
+    # FIXME: misses calc="a==0", algorithm needs improvement
     rule["expression"] = calc
 
     return [rule]
@@ -339,16 +339,19 @@ class Widget2Pydm(object):      # TODO: move to output_handler module
         # TODO: block.contents["period"]
         # TODO: much unparsed content in block.contents
     
-    def write_block_text(self, parent, block, nm, qw):
-        self.writer.writeProperty(qw, "text", block.title, tag="string")
-        self.write_tooltip(qw, nm)
+    def writePropertyTextAlignment(self, widget, attr):
         align =  {
             "horiz. left": "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter",
             "horiz. centered" : "Qt::AlignCenter",
             "horiz. right" : "Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter",
             "justify" : "Qt::AlignJustify|Qt::AlignVCenter",
-        }[block.contents.get("align", "horiz. left")]
-        self.writer.writeProperty(qw, "alignment", align, tag="set")
+        }[attr.get("align", "horiz. left")]
+        self.writer.writeProperty(widget, "alignment", align, tag="set")
+
+    def write_block_text(self, parent, block, nm, qw):
+        self.writer.writeProperty(qw, "text", block.title, tag="string")
+        self.write_tooltip(qw, nm)
+        self.writePropertyTextAlignment(qw, block.contents)
     
     def write_block_text_entry(self, parent, block, nm, qw):
         pv = self.get_channel(block.contents["control"])    # TODO: format = string | compact
