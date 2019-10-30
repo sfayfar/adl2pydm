@@ -126,6 +126,32 @@ class TestOutputHandler(unittest.TestCase):
 
     # ----------------------------------------------------------
 
+    def test_write_widget_message_button(self):
+        uiname = self.convertAdlFile("testDisplay.adl")
+        full_uiname = os.path.join(self.tempdir, uiname)
+        self.assertTrue(os.path.exists(full_uiname))
+
+        root = ElementTree.parse(full_uiname).getroot()
+        screen = self.getSubElement(root, "widget")
+        widgets = screen.findall("widget")
+        self.assertEqual(len(widgets), 64)
+
+        widget = widgets[32]
+        self.assertEqualClassName(widget, "PyDMPushButton", "message_button")
+        # self.print_xml_children(widget)
+
+        prop = self.getNamedProperty(widget, "text")
+        self.assertEqualString(prop, "S1A:H1 Reset")
+
+        prop = self.getNamedProperty(widget, "toolTip")
+        self.assertEqualString(prop, "Xorbit:S1A:H1:CurrentAO")
+
+        prop = self.getNamedProperty(widget, "channel")
+        self.assertEqualString(prop, "ca://Xorbit:S1A:H1:CurrentAO")
+
+        prop = self.getNamedProperty(widget, "pressValue")
+        self.assertEqualString(prop, "0.00")
+
     def test_write_widget_rectangle(self):
         """
         also test the full file structure
