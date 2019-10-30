@@ -126,26 +126,7 @@ class TestOutputHandler(unittest.TestCase):
 
     # ----------------------------------------------------------
 
-    def test_write_widget_PyDMLabel(self):
-        uiname = self.convertAdlFile("testDisplay.adl")
-        full_uiname = os.path.join(self.tempdir, uiname)
-        self.assertTrue(os.path.exists(full_uiname))
-
-        root = ElementTree.parse(full_uiname).getroot()
-        screen = self.getSubElement(root, "widget")
-        widgets = screen.findall("widget")
-        self.assertEqual(len(widgets), 64)
-
-        widget = widgets[3]
-        self.assertEqualClassName(widget, "PyDMLabel", "text")
-        prop = self.getNamedProperty(widget, "text")
-        self.assertEqualString(prop, "Test Display")
-        prop = self.getNamedProperty(widget, "alignment")
-        child = self.getSubElement(prop, "set")
-        self.assertIsNotNone(child)
-        self.assertEqual(child.text, "Qt::AlignCenter")
-
-    def test_write_widget_PyDMDrawingRectangle(self):
+    def test_write_widget_rectangle(self):
         """
         also test the full file structure
         """
@@ -204,9 +185,9 @@ class TestOutputHandler(unittest.TestCase):
         self.assertExpectedAttrib(properties[4], name="penColor", stdset="0")
         self.assertPropertyColor(properties[4], 253, 0, 0)
         self.assertExpectedAttrib(properties[5], name="penWidth", stdset="0")
-        for item in properties[3].iter():
+        for item in properties[5].iter():
             if item.tag == "double":
-                self.assertEqual(float(item.text), 0)
+                self.assertEqual(float(item.text), 1)
 
         rect = children[2]
         key = "rectangle_2"
@@ -227,9 +208,9 @@ class TestOutputHandler(unittest.TestCase):
         self.assertExpectedAttrib(properties[4], name="penColor", stdset="0")
         self.assertPropertyColor(properties[4], 249, 218, 60)
         self.assertExpectedAttrib(properties[5], name="penWidth", stdset="0")
-        for item in properties[3].iter():
+        for item in properties[5].iter():
             if item.tag == "double":
-                self.assertEqual(float(item.text), 0)
+                self.assertEqual(float(item.text), 1)
 
         rect = children[3]
         key = "rectangle_3"
@@ -250,9 +231,9 @@ class TestOutputHandler(unittest.TestCase):
         self.assertExpectedAttrib(properties[4], name="penColor", stdset="0")
         self.assertPropertyColor(properties[4], 115, 255, 107)
         self.assertExpectedAttrib(properties[5], name="penWidth", stdset="0")
-        for item in properties[3].iter():
+        for item in properties[5].iter():
             if item.tag == "double":
-                self.assertEqual(float(item.text), 0)
+                self.assertEqual(float(item.text), 6)
         self.assertExpectedAttrib(properties[6], name="rules", stdset="0")
         child = self.getSubElement(properties[6], "string")
         rules = output_handler.jsonDecode(child.text)
@@ -287,7 +268,7 @@ class TestOutputHandler(unittest.TestCase):
         self.assertExpectedAttrib(properties[4], name="penColor", stdset="0")
         self.assertPropertyColor(properties[4], 115, 223, 255)
         self.assertExpectedAttrib(properties[5], name="penWidth", stdset="0")
-        for item in properties[3].iter():
+        for item in properties[5].iter():
             if item.tag == "double":
                 self.assertEqual(float(item.text), 0)
         self.assertExpectedAttrib(properties[6], name="rules", stdset="0")
@@ -306,6 +287,44 @@ class TestOutputHandler(unittest.TestCase):
             'expression': 'ch[0]==ch[1]'
             }
         self.assertExpectedDictInRef(rules[0], **expected)
+
+    def test_write_widget_text(self):
+        uiname = self.convertAdlFile("testDisplay.adl")
+        full_uiname = os.path.join(self.tempdir, uiname)
+        self.assertTrue(os.path.exists(full_uiname))
+
+        root = ElementTree.parse(full_uiname).getroot()
+        screen = self.getSubElement(root, "widget")
+        widgets = screen.findall("widget")
+        self.assertEqual(len(widgets), 64)
+
+        widget = widgets[3]
+        self.assertEqualClassName(widget, "PyDMLabel", "text")
+        prop = self.getNamedProperty(widget, "text")
+        self.assertEqualString(prop, "Test Display")
+        prop = self.getNamedProperty(widget, "alignment")
+        child = self.getSubElement(prop, "set")
+        self.assertIsNotNone(child)
+        self.assertEqual(child.text, "Qt::AlignCenter")
+
+    def test_write_widget_text_update(self):
+        uiname = self.convertAdlFile("testDisplay.adl")
+        full_uiname = os.path.join(self.tempdir, uiname)
+        self.assertTrue(os.path.exists(full_uiname))
+
+        root = ElementTree.parse(full_uiname).getroot()
+        screen = self.getSubElement(root, "widget")
+        widgets = screen.findall("widget")
+        self.assertEqual(len(widgets), 64)
+
+        widget = widgets[5]
+        self.assertEqualClassName(widget, "PyDMLineEdit", "text_update")
+        prop = self.getNamedProperty(widget, "readOnly")
+        child = self.getSubElement(prop, "bool")
+        self.assertIsNotNone(child)
+        self.assertEqual(child.text, "true")
+        prop = self.getNamedProperty(widget, "channel")
+        self.assertEqualString(prop, "ca://Xorbit:S1A:H1:CurrentAO")
 
 
 class Test_PYDM_Writer_Support(unittest.TestCase):
