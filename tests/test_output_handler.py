@@ -318,13 +318,28 @@ class TestOutputHandler(unittest.TestCase):
         self.assertEqual(len(widgets), 64)
 
         widget = widgets[5]
-        self.assertEqualClassName(widget, "PyDMLineEdit", "text_update")
+        key = "text_update"
+        self.assertEqualClassName(widget, "PyDMLabel", key)
+        expected = """PyDMLabel#%s {
+  color: rgb(88, 147, 255);
+  background-color: rgb(236, 236, 236);
+  }""" % key
+        self.assertEqualStyleSheet(widget, expected)
+
         prop = self.getNamedProperty(widget, "readOnly")
         child = self.getSubElement(prop, "bool")
         self.assertIsNotNone(child)
         self.assertEqual(child.text, "true")
+
         prop = self.getNamedProperty(widget, "channel")
         self.assertEqualString(prop, "ca://Xorbit:S1A:H1:CurrentAO")
+
+        prop = self.getNamedProperty(widget, "textInteractionFlags")
+        child = self.getSubElement(prop, "set")
+        self.assertIsNotNone(child)
+        self.assertEqual(
+            child.text, 
+            "Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse")
 
 
 class Test_PYDM_Writer_Support(unittest.TestCase):
