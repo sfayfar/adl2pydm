@@ -348,6 +348,31 @@ class Widget2Pydm(object):      # TODO: move to output_handler module
         if not showIcon:
             self.writer.writeProperty(qw, "showIcon", "false", tag="bool", stdset="0")
         self.write_colors_style(qw, block)
+        if hasattr(block, "displays"):
+            def rename(nm):
+                if len(nm) > 0:
+                    return os.path.splitext(nm)[0] + SCREEN_FILE_EXTENSION
+            def convert(args):
+                return args.replace("(", "{").replace(")", "}")
+            displays = {
+                "titles" : [d.get("label", "") for d in block.displays],
+                "filenames" : [rename(d.get("name", "")) for d in block.displays],
+                "macros" : [convert(d.get("args", "")) for d in block.displays]
+            }
+            for tag, items in displays.items():
+                prop = self.writer.writeOpenProperty(qw, tag, stdset="0")
+                stringlist = self.writer.writeOpenTag(prop, "stringlist")
+                for v in items:
+                    self.writeStringText(stringlist, text=v)
+
+        # TODO: conditional
+        self.writer.writeProperty(qw, "showIcon", "true", tag="bool")
+        self.writer.writeProperty(qw, "openInNewWindow", "true", tag="bool")
+    
+    def writeStringText(self, parent, tag="string", text=""):
+        s = self.writer.writeOpenTag(parent, tag)
+        s.text = text
+        return s
         
     def write_block_shell_command(self, parent, block, nm, qw):
         self.write_tooltip(qw, nm)
