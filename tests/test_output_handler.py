@@ -148,6 +148,26 @@ class TestOutputHandler(unittest.TestCase):
         # self.print_xml_children(prop, iter=True)
         self.assertEqualString(prop, "ca://Xorbit:S1A:H1:CurrentAO.SCAN")
 
+    def test_write_widget_image(self):
+        uiname = self.convertAdlFile("testDisplay.adl")
+        full_uiname = os.path.join(self.tempdir, uiname)
+        self.assertTrue(os.path.exists(full_uiname))
+
+        root = ElementTree.parse(full_uiname).getroot()
+        screen = self.getSubElement(root, "widget")
+        # self.print_xml_children(screen)
+        widgets = screen.findall("widget")
+        self.assertEqual(len(widgets), 64)
+
+        key = "image"
+        widget = widgets[0]
+        self.assertEqualClassName(widget, "PyDMDrawingImage", key)
+        self.print_xml_children(widget)
+
+        prop = self.getNamedProperty(widget, "filename")
+        # self.print_xml_children(prop, iter=True)
+        self.assertEqualString(prop, "apple.gif")
+
     def test_write_widget_menu(self):
         uiname = self.convertAdlFile("testDisplay.adl")
         full_uiname = os.path.join(self.tempdir, uiname)
