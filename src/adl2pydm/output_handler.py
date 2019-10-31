@@ -395,6 +395,7 @@ class Widget2Pydm(object):      # TODO: move to output_handler module
         pv = self.get_channel(block.contents["control"])    # TODO: format = string | compact
         self.write_channel(qw, pv)
         self.write_tooltip(qw, pv)
+        self.write_colors_style(qw, block)
     
     def write_block_text_update(self, parent, block, nm, qw):
         pv = self.get_channel(block.contents["monitor"])
