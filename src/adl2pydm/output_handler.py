@@ -251,6 +251,7 @@ class Widget2Pydm(object):      # TODO: move to output_handler module
         pv = self.get_channel(block.contents["control"])
         self.write_tooltip(qw, pv)
         self.write_channel(qw, pv)
+        self.write_colors_style(qw, block)
         
     def write_block_cartesian_plot(self, parent, block, nm, qw):
         self.write_tooltip(qw, nm)
