@@ -314,6 +314,37 @@ class TestOutputHandler(unittest.TestCase):
             }
         self.assertExpectedDictInRef(rules[0], **expected)
 
+    def test_write_widget_related_display(self):
+        uiname = self.convertAdlFile("testDisplay.adl")
+        full_uiname = os.path.join(self.tempdir, uiname)
+        self.assertTrue(os.path.exists(full_uiname))
+
+        root = ElementTree.parse(full_uiname).getroot()
+        screen = self.getSubElement(root, "widget")
+        # self.print_xml_children(screen)
+        widgets = screen.findall("widget")
+        self.assertEqual(len(widgets), 64)
+
+        widget = widgets[21]
+        key = "related_display"
+        self.assertEqualClassName(
+            widget, 
+            "PyDMRelatedDisplayButton", 
+            key)
+        # self.print_xml_children(widget)
+
+        prop = self.getNamedProperty(widget, "toolTip")
+        self.assertEqualString(prop, key)
+
+        prop = self.getNamedProperty(widget, "text")
+        self.assertEqualString(prop, key)
+
+        expected = """PyDMRelatedDisplayButton#%s {
+  color: rgb(0, 0, 0);
+  background-color: rgb(115, 223, 255);
+  }""" % key
+        self.assertEqualStyleSheet(widget, expected)
+
     def test_write_widget_text(self):
         uiname = self.convertAdlFile("testDisplay.adl")
         full_uiname = os.path.join(self.tempdir, uiname)
