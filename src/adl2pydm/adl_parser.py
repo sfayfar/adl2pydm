@@ -386,7 +386,6 @@ class MedmCartesianPlotWidget(MedmGenericWidget):
     
     def __init__(self, line, main, symbol):
         MedmGenericWidget.__init__(self, line, main, symbol)
-        self.traces = []
 
     def parseAdlBuffer(self, buf):          # lgtm [py/similar-function] 
         assignments, blocks = MedmBaseWidget.parseAdlBuffer(self, buf)
