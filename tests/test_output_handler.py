@@ -126,6 +126,28 @@ class TestOutputHandler(unittest.TestCase):
 
     # ----------------------------------------------------------
 
+    def test_write_widget_choice_button(self):
+        uiname = self.convertAdlFile("testDisplay.adl")
+        full_uiname = os.path.join(self.tempdir, uiname)
+        self.assertTrue(os.path.exists(full_uiname))
+
+        root = ElementTree.parse(full_uiname).getroot()
+        screen = self.getSubElement(root, "widget")
+        # self.print_xml_children(screen)
+        widgets = screen.findall("widget")
+        self.assertEqual(len(widgets), 64)
+
+        widget = widgets[31]
+        key = "choice_button"
+        self.assertEqualClassName(
+            widget, 
+            "PyDMEnumComboBox", 
+            key)
+
+        prop = self.getNamedProperty(widget, "channel")
+        # self.print_xml_children(prop, iter=True)
+        self.assertEqualString(prop, "ca://Xorbit:S1A:H1:CurrentAO.SCAN")
+
     def test_write_widget_message_button(self):
         uiname = self.convertAdlFile("testDisplay.adl")
         full_uiname = os.path.join(self.tempdir, uiname)
