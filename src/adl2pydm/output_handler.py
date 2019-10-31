@@ -110,7 +110,7 @@ class Widget2Pydm(object):      # TODO: move to output_handler module
             "cartesian plot" : self.write_block_cartesian_plot,
             "choice button" : self.write_block_choice_button,
             "composite" : self.write_block_composite,
-            #"embedded display" : dict(type="static", pydm_widget="PyDMEmbeddedDisplay"),
+            "embedded display" : self.write_block_embedded_display,
             "image" : self.write_block_image,
             "indicator" : self.write_block_indicator,
             "menu" : self.write_block_menu,
@@ -206,16 +206,22 @@ class Widget2Pydm(object):      # TODO: move to output_handler module
 
     def write_block(self, parent, block):
         nm = self.get_unique_widget_name(block.symbol.replace(" ", "_"))
+
+        if (block.symbol == "composite" 
+                and len(block.widgets) == 0 
+                and "composite file" in block.contents):
+            block.symbol = "embedded display"
+
         widget_info = adl_symbols.widgets.get(block.symbol)
         if widget_info is not None:
             cls = widget_info["pydm_widget"]
             if cls not in self.custom_widgets:
                 self.custom_widgets.append(cls)
-        
+
         handler = self.pydm_widget_handlers.get(block.symbol, self.write_block_default)
         cls = widget_info["pydm_widget"]
-        if block.symbol.find("chart") >= 0:
-            pass
+        # if block.symbol.find("chart") >= 0:
+        #     _z = 2
         # TODO: PyDMDrawingMMM (Line, Polygon, Oval, ...) need more decisions here 
         qw = self.writer.writeOpenTag(parent, "widget", cls=cls, name=nm)
         self.write_geometry(qw, block.geometry)
@@ -263,12 +269,29 @@ class Widget2Pydm(object):      # TODO: move to output_handler module
         # TODO: special handling needed
         # might have block.contents["dynamic attribute"] dict with chan, calc, and vis
         # might have block.contents["chan"] and block.contents["vis"]
-        # might have block.contents["composite file"] and block.contents["composite name"]
-        #    note that composite file is a list delimited by ";"
-
-        # FIXME: can't see these widgets yet
         for widget in block.widgets:
             self.write_block(qw, widget)
+        
+    def write_block_embedded_display(self, parent, block, nm, qw):
+        self.write_tooltip(qw, nm)
+        # has block.contents["composite file"] and block.contents["composite name"]
+        # Note: composite file is a list delimited by ";"
+        filelist = block.contents["composite file"].split(";")
+        if len(filelist) != 1:
+            if len(filelist) < 1:
+                emsg = "'composite file' list was empty"
+                emsg += " (file: %s, line %d)" % (block.main.given_filename, block.line_offset)
+                logger.error(emsg)
+                return
+            else:
+                emsg = "Rendering only first file from 'composite file'"
+                emsg += "=%s" % block.contents["composite file"]
+                emsg += " (file: %s, line %d)" % (block.main.given_filename, block.line_offset)
+                logger.warning(emsg)
+        self.writer.writeProperty(qw, "filename", filelist[0], stdset="0")
+        # TODO: special handling needed
+        # might have block.contents["dynamic attribute"] dict with chan, calc, and vis
+        # might have block.contents["chan"] and block.contents["vis"]
     
     def write_block_image(self, parent, block, nm, qw):
         image_name = block.contents.get("image name")
