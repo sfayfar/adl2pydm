@@ -180,13 +180,16 @@ class TestOutputHandler(unittest.TestCase):
         self.assertEqual(len(widgets), 19)
 
         key = "composite"
-        widget = widgets[2]
-        self.print_xml_children(widget)
+        widget = widgets[1]
+        # self.print_xml_children(widget)
         self.assertEqualClassName(widget, "PyDMEmbeddedDisplay", key)
-        self.assertEqual(len(widget), 3)
+        self.assertEqual(len(widget), 4)
 
         prop = self.getNamedProperty(widget, "filename")
-        self.assertEqualString(prop, "ADSetup.adl")
+        self.assertEqualString(prop, "configMenuHead_bare.ui")
+
+        prop = self.getNamedProperty(widget, "macros")
+        self.assertEqualString(prop, "P=${P},CONFIG=${CONFIG}")
 
     def test_write_widget_image(self):
         uiname = self.convertAdlFile("testDisplay.adl")
