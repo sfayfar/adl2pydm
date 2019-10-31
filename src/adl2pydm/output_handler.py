@@ -34,6 +34,20 @@ def jsonEncode(rules):
     return json.dumps(rules)
 
 
+def convertMacros(macros):
+    """
+    convert $(P)$(M) to ${P}${M}
+    """
+    return macros.replace("(", "{").replace(")", "}")
+
+
+def replaceExtension(filename):
+    """
+    convert filename.adl to filename.ui
+    """
+    return os.path.splitext(filename)[0] + SCREEN_FILE_EXTENSION
+
+
 def interpretAdlDynamicAttribute(attr):
     """
     interpret MEDM's "dynamic attribute" into PyDM's "rules"
@@ -52,7 +66,7 @@ def interpretAdlDynamicAttribute(attr):
     for nm in "chan chanB chanC chanD".split():
         if nm not in attr:
             break
-        pv = attr[nm].replace("(", "{").replace(")", "}")
+        pv = convertMacros(attr[nm])
         channels.append(dict(channel=pv, trigger=len(pv)>0))
 
     calc = attr.get("calc")
@@ -164,7 +178,7 @@ class Widget2Pydm(object):      # TODO: move to output_handler module
             if k in contents:
                 pv = contents[k]
         if pv is not None:
-            pv = pv.replace("(", "{").replace(")", "}")
+            pv = convertMacros(pv)
         return pv
     
     def write_ui(self, screen, output_path):
@@ -277,21 +291,32 @@ class Widget2Pydm(object):      # TODO: move to output_handler module
         # has block.contents["composite file"] and block.contents["composite name"]
         # Note: composite file is a list delimited by ";"
         filelist = block.contents["composite file"].split(";")
+        macros = None
         if len(filelist) != 1:
             if len(filelist) < 1:
                 emsg = "'composite file' list was empty"
                 emsg += " (file: %s, line %d)" % (block.main.given_filename, block.line_offset)
                 logger.error(emsg)
                 return
+            elif len(filelist) == 2:
+                macros = convertMacros(filelist[1])
             else:
                 emsg = "Rendering only first file from 'composite file'"
                 emsg += "=%s" % block.contents["composite file"]
                 emsg += " (file: %s, line %d)" % (block.main.given_filename, block.line_offset)
                 logger.warning(emsg)
-        self.writer.writeProperty(qw, "filename", filelist[0], stdset="0")
-        # TODO: special handling needed
-        # might have block.contents["dynamic attribute"] dict with chan, calc, and vis
-        # might have block.contents["chan"] and block.contents["vis"]
+        filename = replaceExtension(filelist[0])
+        self.writer.writeProperty(qw, "filename", filename, stdset="0")
+        if macros is not None:
+            macros = convertMacros(macros)
+            self.writer.writeProperty(qw, "macros", convertMacros(macros), stdset="0")
+        for item in ("dynamic attribute", "chan", "vis"):
+            # TODO: special handling needed
+            # rules = interpretAdlDynamicAttribute(attr)
+            if item in block.contents:
+                # might have block.contents["dynamic attribute"] dict with chan, calc, and vis
+                # might have block.contents["chan"] and block.contents["vis"]
+                raise NotImplementedError("'%s' in embedded display" % item)
     
     def write_block_image(self, parent, block, nm, qw):
         image_name = block.contents.get("image name")
@@ -374,15 +399,10 @@ class Widget2Pydm(object):      # TODO: move to output_handler module
             self.writer.writeProperty(qw, "showIcon", "false", tag="bool", stdset="0")
         self.write_colors_style(qw, block)
         if hasattr(block, "displays"):
-            def rename(nm):
-                if len(nm) > 0:
-                    return os.path.splitext(nm)[0] + SCREEN_FILE_EXTENSION
-            def convert(args):
-                return args.replace("(", "{").replace(")", "}")
             displays = {
                 "titles" : [d.get("label", "") for d in block.displays],
-                "filenames" : [rename(d.get("name", "")) for d in block.displays],
-                "macros" : [convert(d.get("args", "")) for d in block.displays]
+                "filenames" : [replaceExtension(d.get("name", "")) for d in block.displays],
+                "macros" : [convertMacros(d.get("args", "")) for d in block.displays]
             }
             for tag, items in displays.items():
                 prop = self.writer.writeOpenProperty(qw, tag, stdset="0")
