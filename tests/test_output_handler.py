@@ -169,7 +169,7 @@ class TestOutputHandler(unittest.TestCase):
         # Actually. MEDM writes as a composite
         # but we redirect (in the output_handler module) 
         # that to be an "embedded display".
-        uiname = self.convertAdlFile("simDetector-R3-3-31.adl")
+        uiname = self.convertAdlFile("configMenu.adl")
         full_uiname = os.path.join(self.tempdir, uiname)
         self.assertTrue(os.path.exists(full_uiname))
 
@@ -177,11 +177,11 @@ class TestOutputHandler(unittest.TestCase):
         screen = self.getSubElement(root, "widget")
         # self.print_xml_children(screen)
         widgets = screen.findall("widget")
-        self.assertEqual(len(widgets), 55)
+        self.assertEqual(len(widgets), 19)
 
         key = "composite"
         widget = widgets[2]
-        # self.print_xml_children(widget)
+        self.print_xml_children(widget)
         self.assertEqualClassName(widget, "PyDMEmbeddedDisplay", key)
         self.assertEqual(len(widget), 3)
 
