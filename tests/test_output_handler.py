@@ -433,6 +433,29 @@ class TestOutputHandler(unittest.TestCase):
         self.assertIsNotNone(child)
         self.assertEqual(child.text, "Qt::AlignCenter")
 
+    def test_write_widget_text_entry(self):
+        uiname = self.convertAdlFile("testDisplay.adl")
+        full_uiname = os.path.join(self.tempdir, uiname)
+        self.assertTrue(os.path.exists(full_uiname))
+
+        root = ElementTree.parse(full_uiname).getroot()
+        screen = self.getSubElement(root, "widget")
+        # self.print_xml_children(screen)
+        widgets = screen.findall("widget")
+        self.assertEqual(len(widgets), 64)
+
+        widget = widgets[9]
+        key = "text_entry"
+        self.assertEqualClassName(
+            widget, 
+            "PyDMLineEdit", 
+            key)
+        # self.print_xml_children(widget)
+
+        prop = self.getNamedProperty(widget, "channel")
+        # self.print_xml_children(prop, iter=True)
+        self.assertEqualString(prop, "ca://Xorbit:S1A:H1:CurrentAO")
+
     def test_write_widget_text_update(self):
         uiname = self.convertAdlFile("testDisplay.adl")
         full_uiname = os.path.join(self.tempdir, uiname)
