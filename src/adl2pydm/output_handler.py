@@ -293,6 +293,7 @@ class Widget2Pydm(object):      # TODO: move to output_handler module
         msg = block.contents.get("press_msg")
         if msg is not None:
             self.writer.writeProperty(qw, "pressValue", msg, stdset="0")
+        self.write_colors_style(qw, block)
         
     def write_block_meter(self, parent, block, nm, qw):
         pv = self.get_channel(block.contents["monitor"])
@@ -346,6 +347,7 @@ class Widget2Pydm(object):      # TODO: move to output_handler module
         self.writer.writeProperty(qw, "text", text, tag="string")
         if not showIcon:
             self.writer.writeProperty(qw, "showIcon", "false", tag="bool", stdset="0")
+        self.write_colors_style(qw, block)
         
     def write_block_shell_command(self, parent, block, nm, qw):
         self.write_tooltip(qw, nm)
