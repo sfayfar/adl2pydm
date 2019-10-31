@@ -345,6 +345,30 @@ class TestOutputHandler(unittest.TestCase):
   }""" % key
         self.assertEqualStyleSheet(widget, expected)
 
+        prop = self.getNamedProperty(widget, "openInNewWindow")
+        child = prop.find("bool")
+        self.assertEqual(child.text, "true")
+
+        prop = self.getNamedProperty(widget, "showIcon")
+        child = prop.find("bool")
+        self.assertEqual(child.text, "true")
+
+        prop = self.getNamedProperty(widget, "filenames")
+        stringlist = prop.find("stringlist")
+        self.assertEqual(len(stringlist), 1)
+        self.assertEqualString(stringlist, "junk.ui")
+
+        prop = self.getNamedProperty(widget, "titles")
+        stringlist = prop.find("stringlist")
+        self.assertEqual(len(stringlist), 1)
+        self.assertEqualString(stringlist, "Another Junk")
+
+        prop = self.getNamedProperty(widget, "macros")
+        stringlist = prop.find("stringlist")
+        self.assertEqual(len(stringlist), 1)
+        child = stringlist.find("string")
+        self.assertIsNone(child.text)
+
     def test_write_widget_text(self):
         uiname = self.convertAdlFile("testDisplay.adl")
         full_uiname = os.path.join(self.tempdir, uiname)
