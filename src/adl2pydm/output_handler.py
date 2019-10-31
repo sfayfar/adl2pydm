@@ -274,18 +274,59 @@ class Widget2Pydm(object):      # TODO: move to output_handler module
         self.write_colors_style(qw, block)
         
     def write_block_cartesian_plot(self, parent, block, nm, qw):
+        """
+        Could be either PyDMWaveformPlot or PyDMScatterPlot
+        """
+        import json
+        # print("line %d in file: %s" % (block.line_offset, block.main.given_filename))
+        # print("contents", json.dumps(block.contents, indent=2))
         self.write_tooltip(qw, nm)
-        # TODO: block.traces
-        # TODO: much unparsed content in block.contents
-        
+        self.writer.writeProperty(qw, "title", block.title, stdset="0")
+
+        if len(block.contents["traces"]) > 0:
+            prop = self.writer.writeOpenProperty(qw, "curves", stdset="0")
+            stringlist = self.writer.writeOpenTag(prop, "stringlist")
+            for v in block.contents["traces"]:
+                c = v["color"]
+                trace = dict(
+                    name = "%s v %s" % (v["ydata"], v["xdata"]),   # TODO: improve
+                    x_channel = "ca://" + v["xdata"],
+                    y_channel = "ca://" + v["ydata"],
+                    color = "#%02x%02x%02x" % (c.r, c.g, c.b),
+                    lineStyle = 1,          # NoLine Solid Dash Dot DashDot DashDotDot
+                    # "lineWidth": 1,       # TODO:
+                    # "symbol": null,       # TODO:
+                    # "symbolSize": 10,     # TODO:
+                    # "redraw_mode": 2      # TODO:
+                )
+                if block.contents["style"] == "point":
+                    trace["symbol"] = 1  # Circle
+                    trace["symbolSize"] = 10
+                elif block.contents["style"] == "line":
+                    trace["lineStyle"] = 1  # Solid
+                elif block.contents["style"] == "fill-under":
+                    # TODO: improve?  fill-under not available in PyDM
+                    trace["lineStyle"] = 1  # Solid
+                # TODO: block.contents["count"]
+                # TODO: block.contents["xlabel"]
+                # TODO: block.contents["ylabel"]
+                # TODO: block.contents["x_axis"]
+                # TODO: block.contents["y1_axis"]
+                # TODO: block.contents["y2_axis"]
+                self.writeStringText(stringlist, text=jsonEncode(trace))
+
     def write_block_composite(self, parent, block, nm, qw):
         self.write_tooltip(qw, nm)
-        # TODO: special handling needed
-        # might have block.contents["dynamic attribute"] dict with chan, calc, and vis
-        # might have block.contents["chan"] and block.contents["vis"]
         for widget in block.widgets:
             self.write_block(qw, widget)
-        
+        for item in ("dynamic attribute", "chan", "vis"):
+            # TODO: special handling needed
+            # rules = interpretAdlDynamicAttribute(attr)
+            if item in block.contents:
+                # might have block.contents["dynamic attribute"] dict with chan, calc, and vis
+                # might have block.contents["chan"] and block.contents["vis"]
+                raise NotImplementedError("'%s' in embedded display" % item)
+
     def write_block_embedded_display(self, parent, block, nm, qw):
         self.write_tooltip(qw, nm)
         # has block.contents["composite file"] and block.contents["composite name"]
