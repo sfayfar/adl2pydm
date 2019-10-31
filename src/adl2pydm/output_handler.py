@@ -365,9 +365,9 @@ class Widget2Pydm(object):      # TODO: move to output_handler module
                 for v in items:
                     self.writeStringText(stringlist, text=v)
 
-        # TODO: conditional
-        self.writer.writeProperty(qw, "showIcon", "true", tag="bool")
-        self.writer.writeProperty(qw, "openInNewWindow", "true", tag="bool")
+        # # TODO: conditional
+        # self.writer.writeProperty(qw, "showIcon", "true", tag="bool")
+        # self.writer.writeProperty(qw, "openInNewWindow", "true", tag="bool")
     
     def writeStringText(self, parent, tag="string", text=""):
         s = self.writer.writeOpenTag(parent, tag)
