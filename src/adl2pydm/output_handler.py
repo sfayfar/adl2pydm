@@ -397,9 +397,10 @@ class Widget2Pydm(object):      # TODO: move to output_handler module
         self.write_colors_style(qw, block)
         
     def write_block_meter(self, parent, block, nm, qw):
+        self.writer.writeProperty(qw, "title", block.title, stdset="0")
         pv = self.get_channel(block.contents["monitor"])
-        self.write_channel(qw, pv)
         self.write_tooltip(qw, pv)
+        self.write_channel(qw, pv)
         
     def write_block_polyline(self, parent, block, nm, qw):
         # TODO: PyDM widget choice needs help here
