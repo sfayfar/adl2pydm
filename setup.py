@@ -1,11 +1,12 @@
 """
-packaging setup for apstools
+packaging setup for adl2pydm
 """
 
 # Always prefer setuptools over distutils
 from setuptools import setup, find_namespace_packages
 from os import path
 import sys
+import versioneer
 
 here = path.abspath(path.dirname(__file__))
 sys.path.insert(0, path.join('src',))
@@ -31,10 +32,15 @@ setup(
     name             = package.__project__,
     #platforms        = package.__platforms__,
     package_dir      = {'': 'src'},
-    packages         = find_namespace_packages("src", exclude=package.__exclude_project_dirs__),
+    packages         = find_namespace_packages(
+                        "src", 
+                        exclude=package.__exclude_project_dirs__),
     url              = package.__url__,
-    version          = package.__version__,
-    zip_safe         = package.__zip_safe__,
     python_requires  = package.__python_version_required__,
+    zip_safe         = package.__zip_safe__,
+
     entry_points     = __entry_points__,
+
+    version          = versioneer.get_version(),
+    cmdclass         = versioneer.get_cmdclass(),
  )
