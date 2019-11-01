@@ -550,9 +550,16 @@ class Test_Files(unittest.TestCase):
 
         self.assertHasAttribute(w, "contents")
         self.assertIsInstance(w.contents, dict)
-        self.assertEqual(len(w.contents), 2)
+        self.assertEqual(len(w.contents), 3)
         self.assertEqualDictKeyValue(w.contents, "period", "1.000000")
         self.assertEqualDictKeyValue(w.contents, "units", "minute")
+        pens = w.contents.get("pens")
+        self.assertIsNotNone(pens)
+        self.assertEqual(len(pens), 2)
+        self.assertEqual(pens[0]["chan"], "$(P)$(Q):Output")
+        self.assertEqual(pens[1]["chan"], "$(P)$(Q):Readback")
+        self.assertEqualColor(pens[0]["color"], 0, 0, 0)
+        self.assertEqualColor(pens[1]["color"], 253, 0, 0)
 
     def test_parse_medm_widget_text(self):
         screen = self.parseFile("ADBase-R3-3-1.adl")
