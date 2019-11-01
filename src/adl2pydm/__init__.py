@@ -10,7 +10,7 @@ __url__         = u"https://github.com/BCDA-APS/adl2pydm"
 __license__     = u"(c) " + __copyright__
 __license__     += u" (see LICENSE.txt file for details)"
 __platforms__   = 'any'
-__zip_safe__    = True
+__zip_safe__    = False
 __exclude_project_dirs__ = ("tests",)
 __python_version_required__ = ">=2.7"
 
