@@ -289,7 +289,8 @@ class TestOutputHandler(unittest.TestCase):
         widgets = screen.findall("widget")
         self.assertEqual(len(widgets), 64)
 
-        widget = widgets[32]
+        key = "message_button"
+        widget = self.getNamedWidget(screen, key)
         self.assertEqualClassName(widget, "PyDMPushButton", "message_button")
         # self.print_xml_children(widget)
 
@@ -304,6 +305,22 @@ class TestOutputHandler(unittest.TestCase):
 
         prop = self.getNamedProperty(widget, "pressValue")
         self.assertEqualString(prop, "0.00")
+
+    def test_write_widget_meter(self):
+        uiname = self.convertAdlFile("testDisplay.adl")
+        full_uiname = os.path.join(self.tempdir, uiname)
+        self.assertTrue(os.path.exists(full_uiname))
+
+        root = ElementTree.parse(full_uiname).getroot()
+        screen = self.getSubElement(root, "widget")
+        widgets = screen.findall("widget")
+        self.assertEqual(len(widgets), 64)
+
+        key = "meter"
+        widget = self.getNamedWidget(screen, key)
+        self.assertEqualClassName(widget, "PyDMScaleIndicator", key)
+        prop = self.getNamedProperty(widget, "title")
+        self.assertEqualString(prop, "limits")
 
     def test_write_widget_rectangle(self):
         """
@@ -586,8 +603,9 @@ class TestOutputHandler(unittest.TestCase):
         widgets = screen.findall("widget")
         self.assertEqual(len(widgets), 64)
 
-        widget = widgets[3]
-        self.assertEqualClassName(widget, "PyDMLabel", "text")
+        key = "text"
+        widget = self.getNamedWidget(screen, key)
+        self.assertEqualClassName(widget, "PyDMLabel", key)
         prop = self.getNamedProperty(widget, "text")
         self.assertEqualString(prop, "Test Display")
         prop = self.getNamedProperty(widget, "alignment")
