@@ -47,8 +47,8 @@ class Test_Files(unittest.TestCase):
         ]
 
     def setUp(self):
-        self.path = os.path.abspath(os.path.dirname(adl_parser.__file__))
-        self.medm_path = os.path.join(self.path, "screens", "medm")
+        self.path = os.path.dirname(__file__)
+        self.medm_path = os.path.join(self.path, "medm")
     
     # def tearDown(self):
     #     pass

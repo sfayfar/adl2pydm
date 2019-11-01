@@ -49,21 +49,22 @@ class Test_Main(unittest.TestCase):
 
     def setUp(self):
         self.tempdir = tempfile.mkdtemp()
+
+        path = os.path.dirname(__file__)
+        self.assertTrue(os.path.exists(path))
+        
+        self.medm_path = os.path.join(path, "medm")
+        self.assertTrue(os.path.exists(self.medm_path))
     
     def tearDown(self):
         if os.path.exists(self.tempdir):
             shutil.rmtree(self.tempdir, ignore_errors=True)
     
     def test_cli_main(self):
-        path = os.path.abspath(os.path.dirname(cli.__file__))
-        self.assertTrue(os.path.exists(path))
-        
-        medm_path = os.path.join(path, "screens", "medm")
-        self.assertTrue(os.path.exists(medm_path))
-
         for fname in self.test_files:
-            full_name = os.path.join(medm_path, fname)
+            full_name = os.path.join(self.medm_path, fname)
             self.assertTrue(os.path.exists(full_name))
+            # print(full_name)
             
             sys.argv = [sys.argv[0], "-d", self.tempdir, full_name]
             cli.main()

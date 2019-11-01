@@ -159,9 +159,10 @@ class TestOutputHandler(unittest.TestCase):
         self.assertEqual(len(stringlist), 1)
         trace = output_handler.jsonDecode(stringlist[0].text)
         expected = dict(
-                name = "%s v %s" % (
+                name = "x=%s, y=%s" % (
+                    "Xorbit:S1A:H1:CurrentAI.BARR",
                     "Xorbit:S1A:H1:CurrentAI.IARR", 
-                    "Xorbit:S1A:H1:CurrentAI.BARR"),
+                    ),
                 x_channel = "ca://Xorbit:S1A:H1:CurrentAI.BARR",
                 y_channel = "ca://Xorbit:S1A:H1:CurrentAI.IARR",
                 color = "#%02x%02x%02x" % (0, 0, 0),
