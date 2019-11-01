@@ -180,6 +180,14 @@ class Widget2Pydm(object):      # TODO: move to output_handler module
         if pv is not None:
             pv = convertMacros(pv)
         return pv
+
+    def processDynamicAttributeAsRules(self, widget, block):
+        attr = block.contents.get("dynamic attribute", {})
+        if len(attr) > 0:
+            # see: http://slaclab.github.io/pydm/widgets/widget_rules/index.html
+            rules = interpretAdlDynamicAttribute(attr)
+            json_rules = jsonEncode(rules)
+            self.writer.writeProperty(widget, "rules", json_rules, stdset="0")
     
     def write_ui(self, screen, output_path):
         """main entry point to write the .ui file"""
@@ -289,9 +297,6 @@ class Widget2Pydm(object):      # TODO: move to output_handler module
             for v in block.contents["traces"]:
                 c = v["color"]
                 trace = dict(
-                    name = "%s v %s" % (v["ydata"], v["xdata"]),   # TODO: improve
-                    x_channel = "ca://" + v["xdata"],
-                    y_channel = "ca://" + v["ydata"],
                     color = "#%02x%02x%02x" % (c.r, c.g, c.b),
                     lineStyle = 1,          # NoLine Solid Dash Dot DashDot DashDotDot
                     # "lineWidth": 1,       # TODO:
@@ -299,6 +304,15 @@ class Widget2Pydm(object):      # TODO: move to output_handler module
                     # "symbolSize": 10,     # TODO:
                     # "redraw_mode": 2      # TODO:
                 )
+                names = []
+                if "xdata" in v:
+                    trace["x_channel"] = "ca://" + v["xdata"]
+                    names.append("x=" + v["xdata"])
+                if "ydata" in v:
+                    trace["y_channel"] = "ca://" + v["ydata"]
+                    names.append("y=" + v["ydata"])
+                trace["name"] = ", ".join(names)
+
                 if block.contents["style"] == "point":
                     trace["symbol"] = 1  # Circle
                     trace["symbolSize"] = 10
@@ -319,13 +333,7 @@ class Widget2Pydm(object):      # TODO: move to output_handler module
         self.write_tooltip(qw, nm)
         for widget in block.widgets:
             self.write_block(qw, widget)
-        for item in ("dynamic attribute", "chan", "vis"):
-            # TODO: special handling needed
-            # rules = interpretAdlDynamicAttribute(attr)
-            if item in block.contents:
-                # might have block.contents["dynamic attribute"] dict with chan, calc, and vis
-                # might have block.contents["chan"] and block.contents["vis"]
-                raise NotImplementedError("'%s' in embedded display" % item)
+        self.processDynamicAttributeAsRules(qw, block)
 
     def write_block_embedded_display(self, parent, block, nm, qw):
         self.write_tooltip(qw, nm)
@@ -423,12 +431,7 @@ class Widget2Pydm(object):      # TODO: move to output_handler module
             width = max(1, float(width))   # make sure the outline is seen
         self.writer.writeTaggedString(propty, "double", str(width))
 
-        attr = block.contents.get("dynamic attribute", {})
-        if len(attr) > 0:
-            # see: http://slaclab.github.io/pydm/widgets/widget_rules/index.html
-            rules = interpretAdlDynamicAttribute(attr)
-            json_rules = jsonEncode(rules)
-            self.writer.writeProperty(qw, "rules", json_rules, stdset="0")
+        self.processDynamicAttributeAsRules(qw, block)
 
     def write_block_related_display(self, parent, block, nm, qw):
         text = block.title or nm
