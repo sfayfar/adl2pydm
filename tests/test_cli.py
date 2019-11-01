@@ -61,12 +61,16 @@ class Test_Main(unittest.TestCase):
             shutil.rmtree(self.tempdir, ignore_errors=True)
     
     def test_cli_main(self):
-        for fname in self.test_files:
+        # all example MEDM screens must process without errors
+        for fname in os.listdir(self.medm_path):
+            if not fname.lower().endswith(".adl"):
+                continue
             full_name = os.path.join(self.medm_path, fname)
             self.assertTrue(os.path.exists(full_name))
             # print(full_name)
             
             sys.argv = [sys.argv[0], "-d", self.tempdir, full_name]
+            # print(fname)
             cli.main()
 
             uiname = os.path.splitext(fname)[0] + output_handler.SCREEN_FILE_EXTENSION

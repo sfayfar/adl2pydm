@@ -224,8 +224,12 @@ class MedmBaseWidget(object):
             clut = self.main.color_table    # Color LookUp Table
         for k, sk in xref.items():
             value = assignments.get(k)
-            if value is not None:
-                self.__setattr__(sk, clut[int(value)])  # FIXME: caServerApp/test.adl fails here with IndexError
+            if value is not None and value.isnumeric():
+                # TODO: what if value="alarm" (file: flipRotate.adl)
+                v = int(value)
+                if len(clut) > v:
+                    self.__setattr__(sk, clut[int(value)])
+                    # FIXME: caServerApp/test.adl fails here with IndexError
                 del assignments[k]
         return assignments
     
