@@ -518,7 +518,6 @@ class MedmStripChartWidget(MedmGenericWidget):
     
     def __init__(self, line, main, symbol):
         MedmGenericWidget.__init__(self, line, main, symbol)
-        self.pens = []
 
     def parseAdlBuffer(self, buf):          # lgtm [py/similar-function] 
         assignments, blocks = MedmBaseWidget.parseAdlBuffer(self, buf)
@@ -543,7 +542,7 @@ class MedmStripChartWidget(MedmGenericWidget):
         
         def sorter(value):
             return int(value)
-        self.pens = [pens[k] for k in sorted(pens.keys(), key=sorter)]
+        self.contents["pens"] = [pens[k] for k in sorted(pens.keys(), key=sorter)]
 
 
 class MedmTextWidget(MedmGenericWidget):
