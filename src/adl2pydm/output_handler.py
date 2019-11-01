@@ -54,7 +54,8 @@ def interpretAdlDynamicAttribute(attr):
 
     note difference in macro expression:
 
-    ====  ======
+    ==mov
+    ==  ======
     tool  macro
     ====  ======
     MEDM  `$(P)`
@@ -249,6 +250,8 @@ class Widget2Pydm(object):      # TODO: move to output_handler module
         self.write_geometry(qw, block.geometry)
         # self.write_colors_style(qw, block)
         handler(parent, block, nm, qw)
+
+        self.processDynamicAttributeAsRules(qw, block)
     
     def writePropertyTextAlignment(self, widget, attr):
         align =  {
@@ -333,7 +336,6 @@ class Widget2Pydm(object):      # TODO: move to output_handler module
         self.write_tooltip(qw, nm)
         for widget in block.widgets:
             self.write_block(qw, widget)
-        self.processDynamicAttributeAsRules(qw, block)
 
     def write_block_embedded_display(self, parent, block, nm, qw):
         self.write_tooltip(qw, nm)
@@ -431,8 +433,6 @@ class Widget2Pydm(object):      # TODO: move to output_handler module
             width = max(1, float(width))   # make sure the outline is seen
         self.writer.writeTaggedString(propty, "double", str(width))
 
-        self.processDynamicAttributeAsRules(qw, block)
-
     def write_block_related_display(self, parent, block, nm, qw):
         text = block.title or nm
         showIcon = not text.startswith("-")
@@ -469,9 +469,25 @@ class Widget2Pydm(object):      # TODO: move to output_handler module
         
     def write_block_strip_chart(self, parent, block, nm, qw):
         self.write_tooltip(qw, nm)
-        # TODO: block.pens
+        self.writer.writeProperty(qw, "title", block.title, stdset="0")
         # TODO: block.contents["period"]
-        # TODO: much unparsed content in block.contents
+
+        if len(block.contents["pens"]) > 0:
+            prop = self.writer.writeOpenProperty(qw, "curves", stdset="0")
+            stringlist = self.writer.writeOpenTag(prop, "stringlist")
+            for v in block.contents["pens"]:
+                c = v["color"]
+                trace = dict(
+                    color = "#%02x%02x%02x" % (c.r, c.g, c.b),
+                    # MEDM only supports Solid line with color, width=1
+                    lineStyle = 1,          # NoLine Solid Dash Dot DashDot DashDotDot
+                    lineWidth = 1,
+                )
+                if "chan" in v:
+                    trace["channel"] = "ca://" + v["chan"]
+                    trace["name"] = v["chan"]
+
+                self.writeStringText(stringlist, text=jsonEncode(trace))
 
     def write_block_text(self, parent, block, nm, qw):
         self.writer.writeProperty(qw, "text", block.title, tag="string")
