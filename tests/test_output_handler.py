@@ -59,6 +59,7 @@ class TestOutputHandler(unittest.TestCase):
                 return widget
 
     def getSubElement(self, parent, tag):
+        self.assertIsNotNone(parent, "parent not found")
         child = parent.find(tag)
         self.assertIsNotNone(child, tag + " subelement expected")
         return child
@@ -520,6 +521,60 @@ class TestOutputHandler(unittest.TestCase):
         self.assertEqual(len(stringlist), 1)
         child = stringlist.find("string")
         self.assertIsNone(child.text)
+
+    def test_write_widget_strip_chart(self):
+        uiname = self.convertAdlFile("testDisplay.adl")
+        full_uiname = os.path.join(self.tempdir, uiname)
+        self.assertTrue(os.path.exists(full_uiname))
+
+        root = ElementTree.parse(full_uiname).getroot()
+        screen = self.getSubElement(root, "widget")
+        # self.print_xml_children(screen)
+        widgets = screen.findall("widget")
+        self.assertEqual(len(widgets), 64)
+
+        key = "strip_chart"
+        widget = self.getNamedWidget(screen, key)
+        # self.print_xml_children(widget)
+        self.assertEqualClassName(
+            widget, 
+            "PyDMTimePlot", 
+            key)
+
+        prop = self.getNamedProperty(widget, "title")
+        # self.print_xml_children(prop, iter=True)
+        self.assertEqualString(prop, "Horizontal Correctors")
+
+        prop = self.getNamedProperty(widget, "curves")
+        stringlist = self.getSubElement(prop, "stringlist")
+        self.assertEqual(len(stringlist), 3)
+        trace = output_handler.jsonDecode(stringlist[0].text)
+        expected = {
+            "color": "#cd6100",
+            "lineStyle": 1,
+            "lineWidth": 1,
+            "channel": "ca://Xorbit:S1A:H1:CurrentAO",
+            "name": "Xorbit:S1A:H1:CurrentAO"
+            }
+        self.assertDictEqual(trace, expected)
+        trace = output_handler.jsonDecode(stringlist[1].text)
+        expected = {
+            "color": "#610a75",
+            "lineStyle": 1,
+            "lineWidth": 1,
+            "channel": "ca://Xorbit:S1A:H2:CurrentAO",
+            "name": "Xorbit:S1A:H2:CurrentAO"
+            }
+        self.assertDictEqual(trace, expected)
+        trace = output_handler.jsonDecode(stringlist[2].text)
+        expected = {
+            "color": "#4ea5f9",
+            "lineStyle": 1,
+            "lineWidth": 1,
+            "channel": "ca://Xorbit:S1A:H3:CurrentAO",
+            "name": "Xorbit:S1A:H3:CurrentAO"
+            }
+        self.assertDictEqual(trace, expected)
 
     def test_write_widget_text(self):
         uiname = self.convertAdlFile("testDisplay.adl")
