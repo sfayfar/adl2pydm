@@ -99,7 +99,7 @@ def interpretAdlDynamicAttribute(attr):
     return [rule]
 
 
-class Widget2Pydm(object):      # TODO: move to output_handler module
+class Widget2Pydm(object):
     """
     convert screen to PyDM structure and write the '.ui' file
     
@@ -275,9 +275,10 @@ class Widget2Pydm(object):      # TODO: move to output_handler module
         
     def write_block_byte_indicator(self, parent, block, nm, qw):
         self.write_tooltip(qw, nm)
-        # TODO: block.contents["direction"]
-        # TODO: block.contents["ebit"]
-        # TODO: block.contents["sbit"]
+        for item in "direction ebit sbit".split():
+            if item in block.contents:
+                logger.warning("block.contents['%s'] not handled" % item)
+            # TODO:
         
     def write_block_choice_button(self, parent, block, nm, qw):
         pv = self.get_channel(block.contents["control"])
@@ -324,12 +325,11 @@ class Widget2Pydm(object):      # TODO: move to output_handler module
                 elif block.contents["style"] == "fill-under":
                     # TODO: improve?  fill-under not available in PyDM
                     trace["lineStyle"] = 1  # Solid
-                # TODO: block.contents["count"]
-                # TODO: block.contents["xlabel"]
-                # TODO: block.contents["ylabel"]
-                # TODO: block.contents["x_axis"]
-                # TODO: block.contents["y1_axis"]
-                # TODO: block.contents["y2_axis"]
+                
+                for item in "count xlabel ylabel x_axis y1_axis y2_axis".split():
+                    if item in block.contents:
+                        # TODO:
+                        logger.warning("block.contents['%s'] not handled" % item)
                 self.writeStringText(stringlist, text=jsonEncode(trace))
 
     def write_block_composite(self, parent, block, nm, qw):
@@ -361,13 +361,6 @@ class Widget2Pydm(object):      # TODO: move to output_handler module
         if macros is not None:
             macros = convertMacros(macros)
             self.writer.writeProperty(qw, "macros", convertMacros(macros), stdset="0")
-        for item in ("dynamic attribute", "chan", "vis"):
-            # TODO: special handling needed
-            # rules = interpretAdlDynamicAttribute(attr)
-            if item in block.contents:
-                # might have block.contents["dynamic attribute"] dict with chan, calc, and vis
-                # might have block.contents["chan"] and block.contents["vis"]
-                raise NotImplementedError("'%s' in embedded display" % item)
     
     def write_block_image(self, parent, block, nm, qw):
         image_name = block.contents.get("image name")
@@ -466,7 +459,9 @@ class Widget2Pydm(object):      # TODO: move to output_handler module
     def write_block_strip_chart(self, parent, block, nm, qw):
         self.write_tooltip(qw, nm)
         self.writer.writeProperty(qw, "title", block.title, stdset="0")
-        # TODO: block.contents["period"]
+        if "period" in block.contents:
+            logger.warning("block.contents['%s'] not handled" % "period")
+            # TODO: block.contents["period"]
 
         if len(block.contents["pens"]) > 0:
             prop = self.writer.writeOpenProperty(qw, "curves", stdset="0")
@@ -512,7 +507,10 @@ class Widget2Pydm(object):      # TODO: move to output_handler module
         pv = self.get_channel(block.contents["control"])
         self.write_channel(qw, pv)
         self.write_tooltip(qw, pv)
-        # TODO: block.contents["dPrecision"]
+        item = "dPrecision"
+        if item in block.contents:
+            logger.warning("block.contents['%s'] not handled" % item)
+        # TODO:
 
     def write_block_wheel_switch(self, parent, block, nm, qw):
         pv = self.get_channel(block.contents["control"])
@@ -522,9 +520,12 @@ class Widget2Pydm(object):      # TODO: move to output_handler module
     # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
     def write_channel(self, parent, channel):
+        logger.debug("PV channel: " + channel)
         propty = self.writer.writeOpenProperty(parent, "channel", stdset="0")
         # stdset=0 signals this attribute is from PyDM, not Qt widget
-        self.writer.writeTaggedString(propty, value="ca://" + channel)
+        self.writer.writeTaggedString(
+            propty, 
+            value="ca://" + convertMacros(channel))
     
     def write_colors_style(self, parent, block):
         clr = block.color
