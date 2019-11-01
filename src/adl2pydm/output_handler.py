@@ -249,6 +249,7 @@ class Widget2Pydm(object):      # TODO: move to output_handler module
         qw = self.writer.writeOpenTag(parent, "widget", cls=cls, name=nm)
         self.write_geometry(qw, block.geometry)
         # self.write_colors_style(qw, block)
+        logger.debug("(#%d) %s: %s" % (block.line_offset, block.symbol, nm))
         handler(parent, block, nm, qw)
 
         self.processDynamicAttributeAsRules(qw, block)
@@ -288,7 +289,6 @@ class Widget2Pydm(object):      # TODO: move to output_handler module
         """
         Could be either PyDMWaveformPlot or PyDMScatterPlot
         """
-        import json
         # print("line %d in file: %s" % (block.line_offset, block.main.given_filename))
         # print("contents", json.dumps(block.contents, indent=2))
         self.write_tooltip(qw, nm)
@@ -459,11 +459,6 @@ class Widget2Pydm(object):      # TODO: move to output_handler module
         # self.writer.writeProperty(qw, "showIcon", "true", tag="bool")
         # self.writer.writeProperty(qw, "openInNewWindow", "true", tag="bool")
     
-    def writeStringText(self, parent, tag="string", text=""):
-        s = self.writer.writeOpenTag(parent, tag)
-        s.text = text
-        return s
-        
     def write_block_shell_command(self, parent, block, nm, qw):
         self.write_tooltip(qw, nm)
         # TODO: block.commands is a list
@@ -569,6 +564,11 @@ class Widget2Pydm(object):      # TODO: move to output_handler module
         self.writer.writeTaggedString(rect, "width", str(geom.width))
         self.writer.writeTaggedString(rect, "height", str(geom.height))
 
+    def writeStringText(self, parent, tag="string", text=""):
+        s = self.writer.writeOpenTag(parent, tag)
+        s.text = text
+        return s
+        
     def write_tooltip(self, parent, tip):
         propty = self.writer.writeOpenProperty(parent, "toolTip")
         self.writer.writeTaggedString(propty, value=tip)

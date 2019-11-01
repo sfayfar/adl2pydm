@@ -209,7 +209,7 @@ class MedmBaseWidget(object):
     def parseChildren(self, main, blocks, buf):
         for block in blocks:
             if block.symbol in adl_symbols.widgets:
-                logger.debug("Processing %s block" % block.symbol)
+                logger.debug("(#%d) %s" % (self.line_offset+block.start, block.symbol))
                 handler = self.medm_widget_handlers.get(block.symbol, MedmGenericWidget)
                 widget = handler(self.line_offset+block.start, main, block.symbol)
                 widget.parseAdlBuffer(buf[block.start+1:block.end])
