@@ -298,6 +298,19 @@ class Widget2Pydm(object):
         if len(block.contents["traces"]) > 0:
             prop = self.writer.writeOpenProperty(qw, "curves", stdset="0")
             stringlist = self.writer.writeOpenTag(prop, "stringlist")
+
+            # count: n where plot last n pts or plot n pts & stop
+            count = block.contents.get("count")
+            if count is not None:
+                count = int(count)
+
+            text = block.contents.get("xlabel")
+            if text is not None:
+                self.writer.writeProperty(qw, "xLabels", text)
+            text = block.contents.get("ylabel")
+            if text is not None:
+                self.writer.writeProperty(qw, "yLabels", text)
+
             for v in block.contents["traces"]:
                 c = v["color"]
                 trace = dict(
@@ -326,7 +339,11 @@ class Widget2Pydm(object):
                     # TODO: improve?  fill-under not available in PyDM
                     trace["lineStyle"] = 1  # Solid
                 
-                for item in "count xlabel ylabel x_axis y1_axis y2_axis".split():
+                if count is not None:
+                    trace["block_size"] = count
+
+                # x_axis y1_axis y2_axis: might have rangeStyle="auto-scale"
+                for item in "x_axis y1_axis y2_axis".split():
                     if item in block.contents:
                         # TODO:
                         logger.warning("block.contents['%s'] not handled" % item)
@@ -462,8 +479,16 @@ class Widget2Pydm(object):
         if "period" in block.contents:
             logger.warning("block.contents['%s'] not handled" % "period")
             # TODO: block.contents["period"]
+            # The period is the time between updates (s)
 
         if len(block.contents["pens"]) > 0:
+            text = block.contents.get("xlabel")
+            if text is not None:
+                self.writer.writeProperty(qw, "xLabels", text)
+            text = block.contents.get("ylabel")
+            if text is not None:
+                self.writer.writeProperty(qw, "yLabels", text)
+
             prop = self.writer.writeOpenProperty(qw, "curves", stdset="0")
             stringlist = self.writer.writeOpenTag(prop, "stringlist")
             for v in block.contents["pens"]:
@@ -481,7 +506,10 @@ class Widget2Pydm(object):
                 self.writeStringText(stringlist, text=jsonEncode(trace))
 
     def write_block_text(self, parent, block, nm, qw):
-        self.writer.writeProperty(qw, "text", block.title, tag="string")
+        text = block.title
+        if block.title is not None:
+            text = convertMacros(block.title)
+        self.writer.writeProperty(qw, "text", text, tag="string")
         self.write_tooltip(qw, nm)
         self.writePropertyTextAlignment(qw, block.contents)
     
