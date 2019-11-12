@@ -421,6 +421,7 @@ class Widget2Pydm(object):
         self.writer.writeProperty(qw, "text", block.title, tag="string")
         # TODO:
         """
+        # MEDM's Scale Monitor widget
     <widget class="PyDMScaleIndicator" name="PyDMScaleIndicator">
      <property name="toolTip">
       <string/>
