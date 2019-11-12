@@ -788,7 +788,7 @@ class TestOutputHandler(unittest.TestCase):
                 if item.tag == "height":
                     height = item.text
             prop = self.getNamedProperty(widget, "text")
-            self.assertEqualString(prop, f"height: {height}")
+            self.assertEqualString(prop, "height: " + height)
 
 
 class Test_PYDM_Writer_Support(unittest.TestCase):
