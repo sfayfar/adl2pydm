@@ -22,7 +22,7 @@ from adl2pydm import adl_parser
 class Test_Files(unittest.TestCase):
 
     test_files = [
-        "newDisplay.adl",                  # simple display
+        "text_examples.adl",               # simple display
         "xxx-R5-8-4.adl",                  # related display
         "xxx-R6-0.adl",
         # "base-3.15.5-caServerApp-test.adl"  #  FIXME: needs more work here (unusual structure, possibly stress test):  # info[, "<<color rules>>", "<<color map>>"
@@ -598,10 +598,10 @@ class Test_Files(unittest.TestCase):
         self.assertEqualDictKeyValue(control, "ctrl", "ID$(xx):UN:setavgAI.VAL")
 
     def test_parse_medm_widget_text_update(self):
-        screen = self.parseFile("newDisplay.adl")
-        w = self.pickWidget(screen, 1, 0, "text update", 90)
+        screen = self.parseFile("text_examples.adl")
+        w = self.pickWidget(screen, 17, 0, "text update", 90)
         
-        self.assertEqualGeometry(w, 40, 46, 195, 31)
+        self.assertEqualGeometry(w, 10, 46, 140, 24)
         self.assertEqualTitle(w, None)
         self.assertEqualColor(w.color, 0, 0, 0)
         self.assertEqualColor(w.background_color, 187, 187, 187)

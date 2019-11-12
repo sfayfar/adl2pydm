@@ -155,6 +155,18 @@ class TestOutputHandler(unittest.TestCase):
         # self.print_xml_children(prop, iter=True)
         self.assertEqualString(prop, "Calibration Curve (S1A:H1)")
 
+        prop = self.getNamedProperty(widget, "xLabels")
+        # self.print_xml_children(prop, iter=True)
+        self.assertEqualString(prop, "Magnetic Field")
+
+        prop = self.getNamedProperty(widget, "yLabels")
+        # self.print_xml_children(prop, iter=True)
+        self.assertEqualString(prop, "Current")
+
+        prop = self.getNamedProperty(widget, "title")
+        # self.print_xml_children(prop, iter=True)
+        self.assertEqualString(prop, "Calibration Curve (S1A:H1)")
+
         prop = self.getNamedProperty(widget, "curves")
         stringlist = self.getSubElement(prop, "stringlist")
         self.assertEqual(len(stringlist), 1)
@@ -168,6 +180,7 @@ class TestOutputHandler(unittest.TestCase):
                 y_channel = "ca://Xorbit:S1A:H1:CurrentAI.IARR",
                 color = "#%02x%02x%02x" % (0, 0, 0),
                 lineStyle = 1,
+                block_size = 8,
             )
         self.assertDictEqual(trace, expected)
 
@@ -539,6 +552,32 @@ class TestOutputHandler(unittest.TestCase):
         child = stringlist.find("string")
         self.assertIsNone(child.text)
 
+    def test_write_widget_strip_chart_axis_labels(self):
+        uiname = self.convertAdlFile("strip.adl")
+        full_uiname = os.path.join(self.tempdir, uiname)
+        self.assertTrue(os.path.exists(full_uiname))
+
+        root = ElementTree.parse(full_uiname).getroot()
+        screen = self.getSubElement(root, "widget")
+        widgets = screen.findall("widget")
+        self.assertEqual(len(widgets), 1)
+
+        key = "strip_chart"
+        widget = self.getNamedWidget(screen, key)
+        self.assertEqualClassName(
+            widget, 
+            "PyDMTimePlot", 
+            key)
+
+        prop = self.getNamedProperty(widget, "title")
+        self.assertEqualString(prop, "chart title text")
+
+        prop = self.getNamedProperty(widget, "xLabels")
+        self.assertEqualString(prop, "x axis text")
+
+        prop = self.getNamedProperty(widget, "yLabels")
+        self.assertEqualString(prop, "y axis text")
+
     def test_write_widget_strip_chart(self):
         uiname = self.convertAdlFile("testDisplay.adl")
         full_uiname = os.path.join(self.tempdir, uiname)
@@ -664,6 +703,56 @@ class TestOutputHandler(unittest.TestCase):
         self.assertEqual(
             child.text, 
             "Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse")
+
+    def test_write_widget_text_examples(self):
+        uiname = self.convertAdlFile("text_examples.adl")
+        full_uiname = os.path.join(self.tempdir, uiname)
+        self.assertTrue(os.path.exists(full_uiname))
+
+        root = ElementTree.parse(full_uiname).getroot()
+        screen = self.getSubElement(root, "widget")
+        # self.print_xml_children(screen)
+        widgets = screen.findall("widget")
+        self.assertEqual(len(widgets), 17)
+
+        key = "text_update"
+        widget = self.getNamedWidget(screen, key)
+        self.assertEqualClassName(
+            widget, 
+            "PyDMLabel", 
+            key)
+
+        key = "text"
+        widget = self.getNamedWidget(screen, key)
+        self.assertEqualClassName(
+            widget, 
+            "PyDMLabel", 
+            key)
+
+        prop = self.getNamedProperty(widget, "text")
+        # self.print_xml_children(prop, iter=True)
+        self.assertEqualString(prop, "macro P=${P}")
+
+        key = "text_update"
+        widget = self.getNamedWidget(screen, key)
+        self.assertEqualClassName(
+            widget, 
+            "PyDMLabel", 
+            key)
+
+        prop = self.getNamedProperty(widget, "channel")
+        # self.print_xml_children(prop, iter=True)
+        self.assertEqualString(prop, "ca://${P}")
+
+        # check that widget text will announce widget height
+        for widget in widgets[2:]:
+            geom = self.getNamedProperty(widget, "geometry")
+            height = None
+            for item in geom.iter():
+                if item.tag == "height":
+                    height = item.text
+            prop = self.getNamedProperty(widget, "text")
+            self.assertEqualString(prop, f"height: {height}")
 
 
 class Test_PYDM_Writer_Support(unittest.TestCase):
