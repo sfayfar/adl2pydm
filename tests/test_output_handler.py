@@ -72,6 +72,10 @@ class TestOutputHandler(unittest.TestCase):
             for i, child in enumerate(parent):#  .iter(tag):
                 print(i, child.tag, child.attrib)
 
+    def assertEqualChannel(self, parent, channel):
+        prop = self.getNamedProperty(parent, "channel")
+        self.assertEqualString(prop, channel)
+
     def assertEqualClassName(self, parent, cls, nm):
         self.assertExpectedAttrib(parent, **{"class":cls, "name":nm})
 
@@ -202,9 +206,7 @@ class TestOutputHandler(unittest.TestCase):
             "PyDMEnumComboBox", 
             key)
 
-        prop = self.getNamedProperty(widget, "channel")
-        # self.print_xml_children(prop, iter=True)
-        self.assertEqualString(prop, "ca://Xorbit:S1A:H1:CurrentAO.SCAN")
+        self.assertEqualChannel(widget, "ca://Xorbit:S1A:H1:CurrentAO.SCAN")
 
     def test_write_widget_composite(self):
         uiname = self.convertAdlFile("testDisplay.adl")
@@ -269,6 +271,48 @@ class TestOutputHandler(unittest.TestCase):
         # self.print_xml_children(prop, iter=True)
         self.assertEqualString(prop, "apple.gif")
 
+    def test_write_widget_indicator(self):
+        uiname = self.convertAdlFile("testDisplay.adl")
+        full_uiname = os.path.join(self.tempdir, uiname)
+        self.assertTrue(os.path.exists(full_uiname))
+
+        root = ElementTree.parse(full_uiname).getroot()
+        screen = self.getSubElement(root, "widget")
+        # self.print_xml_children(screen)
+        widgets = screen.findall("widget")
+        self.assertEqual(len(widgets), 64)
+
+        key = "indicator"
+        widget = self.getNamedWidget(screen, key)
+        # self.print_xml_children(widget)
+        self.assertEqualClassName(
+            widget, 
+            "PyDMScaleIndicator", 
+            key)
+        
+        self.assertEqualChannel(widget, "ca://Xorbit:S1A:H1:CurrentAO")
+
+    def test_write_widget_byte(self):
+        uiname = self.convertAdlFile("testDisplay.adl")
+        full_uiname = os.path.join(self.tempdir, uiname)
+        self.assertTrue(os.path.exists(full_uiname))
+
+        root = ElementTree.parse(full_uiname).getroot()
+        screen = self.getSubElement(root, "widget")
+        # self.print_xml_children(screen)
+        widgets = screen.findall("widget")
+        self.assertEqual(len(widgets), 64)
+
+        key = "byte"
+        widget = self.getNamedWidget(screen, key)
+        # self.print_xml_children(widget)
+        self.assertEqualClassName(
+            widget, 
+            "PyDMByteIndicator", 
+            key)
+        
+        self.assertEqualChannel(widget, "ca://evans:test:MBBOD")
+
     def test_write_widget_menu(self):
         uiname = self.convertAdlFile("testDisplay.adl")
         full_uiname = os.path.join(self.tempdir, uiname)
@@ -288,9 +332,7 @@ class TestOutputHandler(unittest.TestCase):
             key)
         # self.print_xml_children(widget)
 
-        prop = self.getNamedProperty(widget, "channel")
-        # self.print_xml_children(prop, iter=True)
-        self.assertEqualString(prop, "ca://Xorbit:S1A:H1:CurrentAO.SCAN")
+        self.assertEqualChannel(widget, "ca://Xorbit:S1A:H1:CurrentAO.SCAN")
 
     def test_write_widget_message_button(self):
         uiname = self.convertAdlFile("testDisplay.adl")
@@ -313,8 +355,7 @@ class TestOutputHandler(unittest.TestCase):
         prop = self.getNamedProperty(widget, "toolTip")
         self.assertEqualString(prop, "Xorbit:S1A:H1:CurrentAO")
 
-        prop = self.getNamedProperty(widget, "channel")
-        self.assertEqualString(prop, "ca://Xorbit:S1A:H1:CurrentAO")
+        self.assertEqualChannel(widget, "ca://Xorbit:S1A:H1:CurrentAO")
 
         prop = self.getNamedProperty(widget, "pressValue")
         self.assertEqualString(prop, "0.00")
@@ -671,9 +712,7 @@ class TestOutputHandler(unittest.TestCase):
             key)
         # self.print_xml_children(widget)
 
-        prop = self.getNamedProperty(widget, "channel")
-        # self.print_xml_children(prop, iter=True)
-        self.assertEqualString(prop, "ca://Xorbit:S1A:H1:CurrentAO")
+        self.assertEqualChannel(widget, "ca://Xorbit:S1A:H1:CurrentAO")
 
     def test_write_widget_text_update(self):
         uiname = self.convertAdlFile("testDisplay.adl")
@@ -694,8 +733,7 @@ class TestOutputHandler(unittest.TestCase):
   }""" % key
         self.assertEqualStyleSheet(widget, expected)
 
-        prop = self.getNamedProperty(widget, "channel")
-        self.assertEqualString(prop, "ca://Xorbit:S1A:H1:CurrentAO")
+        self.assertEqualChannel(widget, "ca://Xorbit:S1A:H1:CurrentAO")
 
         prop = self.getNamedProperty(widget, "textInteractionFlags")
         child = self.getSubElement(prop, "set")
@@ -740,9 +778,7 @@ class TestOutputHandler(unittest.TestCase):
             "PyDMLabel", 
             key)
 
-        prop = self.getNamedProperty(widget, "channel")
-        # self.print_xml_children(prop, iter=True)
-        self.assertEqualString(prop, "ca://${P}")
+        self.assertEqualChannel(widget, "ca://${P}")
 
         # check that widget text will announce widget height
         for widget in widgets[2:]:
