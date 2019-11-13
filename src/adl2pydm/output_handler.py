@@ -274,41 +274,41 @@ class Widget2Pydm(object):
         #self.writer.writeProperty(qw, "midLineWidth", "2", tag="number")
         
     def write_block_byte_indicator(self, parent, block, nm, qw):
+        direction = block.contents.get("direction", "right")
+        ebit = int(block.contents.get("ebit", 0))
+        sbit = int(block.contents.get("sbit", 0))
+        numBits = max(ebit, sbit) - min(ebit, sbit)
+        if numBits < 1:
+            wmsg = "number of bits = %d" % numBits
+            logger.warning(wmsg)
+
         self.write_tooltip(qw, nm)
         pv = self.get_channel(block.contents["monitor"])
         self.write_channel(qw, pv)
-        for item in "direction ebit sbit".split():
-            if item in block.contents:
-                logger.warning("block.contents['%s'] not handled" % item)
-            # TODO:
-        """
-  <widget class="PyDMByteIndicator" name="PyDMByteIndicator">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>10</y>
-     <width>81</width>
-     <height>71</height>
-    </rect>
-   </property>
-   <property name="toolTip">
-    <string/>
-   </property>
-   <property name="channel" stdset="0">
-    <string>IOC:mbbo</string>
-   </property>
-   <property name="showLabels" stdset="0">
-    <bool>true</bool>
-   </property>
-   <property name="circles" stdset="0">
-    <bool>false</bool>
-   </property>
-   <property name="numBits" stdset="0">
-    <number>4</number>
-   </property>
-  </widget>
- </widget>
-        """
+
+        color = self.writer.writeOpenProperty(qw, "onColor", stdset="0")
+        self.write_color_element(color, block.color)
+        color = self.writer.writeOpenProperty(qw, "offColor", stdset="0")
+        self.write_color_element(color, block.background_color)
+        block.color = None
+        block.background_color = None
+
+        self.writer.writeProperty(
+            qw, 
+            "orientation", 
+            {"right": "Qt::Horizontal", "down": "Qt::Vertical"}[direction], 
+            stdset="0")
+
+        self.writer.writeProperty(qw, "showLabels", "false", tag="bool", stdset="0")
+
+        self.writer.writeProperty(
+            qw, 
+            "bigEndian", 
+            str(sbit < ebit).lower(), 
+            tag="bool", 
+            stdset="0")
+
+        self.writer.writeProperty(qw, "numBits", numBits, tag="number", stdset="0")
         
     def write_block_choice_button(self, parent, block, nm, qw):
         pv = self.get_channel(block.contents["control"])
@@ -764,7 +764,7 @@ class PYDM_Writer(object):
     def writeTaggedString(self, parent, tag="string", value=None):
         element = ElementTree.SubElement(parent, tag)
         if value is not None:
-            element.text = value
+            element.text = str(value)
         return element
 
     def writeCloseProperty(self):
