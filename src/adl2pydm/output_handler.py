@@ -277,7 +277,7 @@ class Widget2Pydm(object):
         direction = block.contents.get("direction", "right")
         ebit = int(block.contents.get("ebit", 0))
         sbit = int(block.contents.get("sbit", 0))
-        numBits = max(ebit, sbit) - min(ebit, sbit)
+        numBits = 1 + max(ebit, sbit) - min(ebit, sbit)
         if numBits < 1:
             wmsg = "number of bits = %d" % numBits
             logger.warning(wmsg)
