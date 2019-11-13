@@ -256,8 +256,6 @@ class Test_Files(unittest.TestCase):
         self.assertEqualDictKeyValue(w.contents, "ebit", "3")
         self.assertEqualDictKeyValue(w.contents, "sbit", "0")
 
-        self.assertEqual(int("1"), 1)
-
     def test_parse_medm_widget_cartesian_plot(self):
         screen = self.parseFile("beamHistory_full-R3-5.adl")
         w = self.pickWidget(screen, 47, 13, "cartesian plot", 551)
