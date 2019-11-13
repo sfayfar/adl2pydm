@@ -232,6 +232,32 @@ class Test_Files(unittest.TestCase):
         self.assertEqual(len(monitor), 1)
         self.assertEqualDictKeyValue(monitor, "chan", "$(P)$(H)bitFlag$(A)")
 
+    def test_parse_medm_widget_byte_additional(self):
+        # see: https://github.com/BCDA-APS/adl2pydm/issues/32
+        screen = self.parseFile("byte-monitor.adl")
+        w = self.pickWidget(screen, 4, 0, "byte", 90)
+        self.assertIsInstance(w.contents, dict)
+        self.assertEqual(len(w.contents), 2)
+        self.assertNotIn("direction", w.contents)
+        self.assertNotIn("ebit", w.contents)
+        self.assertEqualDictKeyValue(w.contents, "sbit", "3")
+
+        w = self.pickWidget(screen, 4, 1, "byte", 104)
+        self.assertEqualDictKeyValue(w.contents, "ebit", "3")
+        self.assertEqualDictKeyValue(w.contents, "sbit", "0")
+
+        w = self.pickWidget(screen, 4, 2, "byte", 119)
+        self.assertEqualDictKeyValue(w.contents, "direction", "down")
+        self.assertNotIn("ebit", w.contents)
+        self.assertEqualDictKeyValue(w.contents, "sbit", "3")
+
+        w = self.pickWidget(screen, 4, 3, "byte", 134)
+        self.assertEqualDictKeyValue(w.contents, "direction", "down")
+        self.assertEqualDictKeyValue(w.contents, "ebit", "3")
+        self.assertEqualDictKeyValue(w.contents, "sbit", "0")
+
+        self.assertEqual(int("1"), 1)
+
     def test_parse_medm_widget_cartesian_plot(self):
         screen = self.parseFile("beamHistory_full-R3-5.adl")
         w = self.pickWidget(screen, 47, 13, "cartesian plot", 551)
