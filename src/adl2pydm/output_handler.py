@@ -47,14 +47,13 @@ def replaceExtension(filename):
     return os.path.splitext(filename)[0] + SCREEN_FILE_EXTENSION
 
 
-def interpretAdlDynamicAttribute(attr):
+def convertDynamicAttribute_to_Rules(attr):
     """
     interpret MEDM's "dynamic attribute" into PyDM's "rules"
 
     note difference in macro expression:
 
-    ==mov
-    ==  ======
+    ====  ======
     tool  macro
     ====  ======
     MEDM  `$(P)`
@@ -118,7 +117,7 @@ class Widget2Pydm(object):
         self.custom_widgets = []
         self.unique_widget_names = {}
         self.pydm_widget_handlers = {
-            #"arc" : dict(type="static", pydm_widget="PyDMDrawingArc"),
+            "arc" : self.write_block_arc,
             #"bar" : dict(type="monitor", pydm_widget="PyDMDrawingRectangle"),
             "byte" : self.write_block_byte_indicator,
             "cartesian plot" : self.write_block_cartesian_plot,
@@ -185,9 +184,70 @@ class Widget2Pydm(object):
         attr = block.contents.get("dynamic attribute", {})
         if len(attr) > 0:
             # see: http://slaclab.github.io/pydm/widgets/widget_rules/index.html
-            rules = interpretAdlDynamicAttribute(attr)
+            rules = convertDynamicAttribute_to_Rules(attr)
             json_rules = jsonEncode(rules)
             self.writer.writeProperty(widget, "rules", json_rules, stdset="0")
+        
+    def write_basic_attribute(self, parent, block, nm, qw):
+        attr = block.contents.get("basic attribute", {})
+        propty = self.writer.writeOpenProperty(qw, "brush", stdset="0")
+        fill = dict(
+            solid = "SolidPattern", 
+            outline = "NoBrush")[attr.get("fill", "solid")]
+        brush = self.writer.writeOpenTag(propty, "brush", brushstyle=fill)
+        self.write_color_element(brush, block.color, alpha="255")
+
+        propty = self.writer.writeOpenProperty(qw, "penStyle", stdset="0")
+        pen = dict(
+            solid = "Qt::SolidLine",
+            dash = "Qt::DashLine"
+        )[attr.get("style", "solid")]
+        self.writer.writeTaggedString(propty, "enum", pen)
+
+        propty = self.writer.writeOpenProperty(qw, "penColor", stdset="0")
+        self.write_color_element(propty, block.color)
+
+        propty = self.writer.writeOpenProperty(qw, "penWidth", stdset="0")
+        width = attr.get("width", 0)
+        if fill == "NoBrush":
+            width = max(1, float(width))   # make sure the outline is seen
+        self.writer.writeTaggedString(propty, "double", str(width))
+
+        block.color = None
+
+    def write_block(self, parent, block):
+        nm = self.get_unique_widget_name(block.symbol.replace(" ", "_"))
+
+        if (block.symbol == "composite" 
+                and len(block.widgets) == 0 
+                and "composite file" in block.contents):
+            block.symbol = "embedded display"
+
+        widget_info = symbols.adl_widgets.get(block.symbol)
+        if widget_info is not None:
+            cls = widget_info["pydm_widget"]
+            if cls not in self.custom_widgets:
+                self.custom_widgets.append(cls)
+
+        handler = self.pydm_widget_handlers.get(block.symbol, self.write_block_default)
+        cls = widget_info["pydm_widget"]
+        # if block.symbol.find("chart") >= 0:
+        #     _z = 2
+        # TODO: PyDMDrawingMMM (Line, Polygon, Oval, ...) need more decisions here 
+        qw = self.writer.writeOpenTag(parent, "widget", cls=cls, name=nm)
+        self.write_geometry(qw, block.geometry)
+        # self.write_colors_style(qw, block)
+        logger.debug("(#%d) %s: %s" % (block.line_offset, block.symbol, nm))
+        handler(parent, block, nm, qw)
+
+        self.processDynamicAttributeAsRules(qw, block)
+        
+    def write_color_element(self, xml_element, color, **kwargs):
+        if color is not None:
+            item = self.writer.writeOpenTag(xml_element, "color", **kwargs)
+            self.writer.writeTaggedString(item, "red", str(color.r))
+            self.writer.writeTaggedString(item, "green", str(color.g))
+            self.writer.writeTaggedString(item, "blue", str(color.b))
     
     def write_ui(self, screen, output_path):
         """main entry point to write the .ui file"""
@@ -218,40 +278,6 @@ class Widget2Pydm(object):
         # TODO: write .ui file <connections/> elements here (#10)
         
         self.writer.closeFile()
-        
-    def write_color_element(self, xml_element, color, **kwargs):
-        if color is not None:
-            item = self.writer.writeOpenTag(xml_element, "color", **kwargs)
-            self.writer.writeTaggedString(item, "red", str(color.r))
-            self.writer.writeTaggedString(item, "green", str(color.g))
-            self.writer.writeTaggedString(item, "blue", str(color.b))
-
-    def write_block(self, parent, block):
-        nm = self.get_unique_widget_name(block.symbol.replace(" ", "_"))
-
-        if (block.symbol == "composite" 
-                and len(block.widgets) == 0 
-                and "composite file" in block.contents):
-            block.symbol = "embedded display"
-
-        widget_info = symbols.adl_widgets.get(block.symbol)
-        if widget_info is not None:
-            cls = widget_info["pydm_widget"]
-            if cls not in self.custom_widgets:
-                self.custom_widgets.append(cls)
-
-        handler = self.pydm_widget_handlers.get(block.symbol, self.write_block_default)
-        cls = widget_info["pydm_widget"]
-        # if block.symbol.find("chart") >= 0:
-        #     _z = 2
-        # TODO: PyDMDrawingMMM (Line, Polygon, Oval, ...) need more decisions here 
-        qw = self.writer.writeOpenTag(parent, "widget", cls=cls, name=nm)
-        self.write_geometry(qw, block.geometry)
-        # self.write_colors_style(qw, block)
-        logger.debug("(#%d) %s: %s" % (block.line_offset, block.symbol, nm))
-        handler(parent, block, nm, qw)
-
-        self.processDynamicAttributeAsRules(qw, block)
     
     def writePropertyBoolean(self, widget, tag, value, **kwargs):
         self.writer.writeProperty(widget, tag, str(value).lower(), tag="bool", **kwargs)
@@ -274,7 +300,28 @@ class Widget2Pydm(object):
         #self.writer.writeProperty(qw, "frameShadow", "QFrame::Raised", tag="enum")
         #self.writer.writeProperty(qw, "lineWidth", "2", tag="number")
         #self.writer.writeProperty(qw, "midLineWidth", "2", tag="number")
-        
+
+    def write_block_arc(self, parent, block, nm, qw):
+        self.write_basic_attribute(parent, block, nm, qw)
+
+        beginAngle = block.contents.get("beginAngle", 0)
+        pathAngle = block.contents.get("pathAngle", 0)
+
+        if beginAngle != 0:
+            self.writer.writeProperty(
+                qw, 
+                "startAngle", 
+                str(beginAngle),
+                tag="double", 
+                stdset="0")
+        if pathAngle != 0:
+            self.writer.writeProperty(
+                qw, 
+                "spanAngle", 
+                str(-pathAngle),
+                tag="double", 
+                stdset="0")
+
     def write_block_byte_indicator(self, parent, block, nm, qw):
         direction = block.contents.get("direction", "right")
         ebit = int(block.contents.get("ebit", 0))
@@ -486,30 +533,7 @@ class Widget2Pydm(object):
 
     def write_block_rectangle(self, parent, block, nm, qw):
         self.write_tooltip(qw, nm)
-
-        attr = block.contents.get("basic attribute", {})
-        propty = self.writer.writeOpenProperty(qw, "brush", stdset="0")
-        fill = dict(
-            solid = "SolidPattern", 
-            outline = "NoBrush")[attr.get("fill", "solid")]
-        brush = self.writer.writeOpenTag(propty, "brush", brushstyle=fill)
-        self.write_color_element(brush, block.color, alpha="255")
-
-        propty = self.writer.writeOpenProperty(qw, "penStyle", stdset="0")
-        pen = dict(
-            solid = "Qt::SolidLine",
-            dash = "Qt::DashLine"
-        )[attr.get("style", "solid")]
-        self.writer.writeTaggedString(propty, "enum", pen)
-
-        propty = self.writer.writeOpenProperty(qw, "penColor", stdset="0")
-        self.write_color_element(propty, block.color)
-
-        propty = self.writer.writeOpenProperty(qw, "penWidth", stdset="0")
-        width = attr.get("width", 0)
-        if fill == "NoBrush":
-            width = max(1, float(width))   # make sure the outline is seen
-        self.writer.writeTaggedString(propty, "double", str(width))
+        self.write_basic_attribute(parent, block, nm, qw)
 
     def write_block_related_display(self, parent, block, nm, qw):
         text = block.title or nm
