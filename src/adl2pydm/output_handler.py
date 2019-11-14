@@ -12,8 +12,7 @@ import os
 from xml.dom import minidom
 from xml.etree import ElementTree
 
-from . import adl_symbols
-from . import pydm_symbols
+from . import symbols
 
 
 QT_STYLESHEET_FILE = "stylesheet.qss"
@@ -235,7 +234,7 @@ class Widget2Pydm(object):
                 and "composite file" in block.contents):
             block.symbol = "embedded display"
 
-        widget_info = adl_symbols.widgets.get(block.symbol)
+        widget_info = symbols.adl_widgets.get(block.symbol)
         if widget_info is not None:
             cls = widget_info["pydm_widget"]
             if cls not in self.custom_widgets:
@@ -648,7 +647,7 @@ class Widget2Pydm(object):
     def write_customwidgets(self, parent):
         cw_set = self.writer.writeOpenTag(parent, "customwidgets")
         for widget in self.custom_widgets:
-            item = pydm_symbols.pydm_custom_widgets.get(widget)
+            item = symbols.pydm_widgets.get(widget)
             if item is None:
                 continue
             cw = self.writer.writeOpenTag(cw_set, "customwidget")

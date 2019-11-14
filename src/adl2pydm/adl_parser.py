@@ -35,7 +35,7 @@ from collections import namedtuple, OrderedDict
 import logging
 import os
 
-from . import adl_symbols
+from . import symbols
 
 
 logger = logging.getLogger(__name__)
@@ -208,7 +208,7 @@ class MedmBaseWidget(object):
     
     def parseChildren(self, main, blocks, buf):
         for block in blocks:
-            if block.symbol in adl_symbols.widgets:
+            if block.symbol in symbols.adl_widgets:
                 logger.debug("(#%d) %s" % (self.line_offset+block.start, block.symbol))
                 handler = self.medm_widget_handlers.get(block.symbol, MedmGenericWidget)
                 widget = handler(self.line_offset+block.start, main, block.symbol)
@@ -304,7 +304,7 @@ class MedmMainWidget(MedmBaseWidget):
         blocks = [
             block 
             for block in blocks 
-            if block.symbol in adl_symbols.widgets
+            if block.symbol in symbols.adl_widgets
             ]
         self.parseChildren(self, blocks, buf)
     
