@@ -300,6 +300,25 @@ class TestOutputHandler(unittest.TestCase):
         
         self.assertEqualChannel(widget, "ca://Xorbit:S1A:H1:CurrentAO")
 
+        key = "meter"
+        widget = self.getNamedWidget(screen, key)
+        # self.print_xml_children(widget)
+        self.assertEqualClassName(
+            widget, 
+            "PyDMScaleIndicator", 
+            key)
+        
+        self.assertEqualChannel(widget, "ca://Xorbit:S1A:H1:CurrentAO")
+
+        # meter widget has no title
+        prop = self.getNamedProperty(widget, "title")
+        self.assertIsNone(prop)
+
+        # if not found, then gets default value in PyDM
+        for item in "limitsFromChannel userUpperLimit userLowerLimit".split():
+            prop = self.getNamedProperty(widget, item)
+            self.assertIsNone(prop, item)
+
     def test_write_widget_byte(self):
         uiname = self.convertAdlFile("byte-monitor.adl")
         full_uiname = os.path.join(self.tempdir, uiname)
@@ -336,7 +355,7 @@ class TestOutputHandler(unittest.TestCase):
         self.assertEqualBool(prop, False)
 
         prop = self.getNamedProperty(widget, "numBits")
-        self.assertEqualNumber(prop, 3)
+        self.assertEqualNumber(prop, 4)
 
         key = "byte_1"
         widget = self.getNamedWidget(screen, key)
@@ -363,7 +382,7 @@ class TestOutputHandler(unittest.TestCase):
         self.assertEqualBool(prop, True)
 
         prop = self.getNamedProperty(widget, "numBits")
-        self.assertEqualNumber(prop, 3)
+        self.assertEqualNumber(prop, 4)
 
         key = "byte_2"
         widget = self.getNamedWidget(screen, key)
@@ -390,7 +409,7 @@ class TestOutputHandler(unittest.TestCase):
         self.assertEqualBool(prop, False)
 
         prop = self.getNamedProperty(widget, "numBits")
-        self.assertEqualNumber(prop, 3)
+        self.assertEqualNumber(prop, 4)
 
         key = "byte_3"
         widget = self.getNamedWidget(screen, key)
@@ -417,7 +436,7 @@ class TestOutputHandler(unittest.TestCase):
         self.assertEqualBool(prop, True)
 
         prop = self.getNamedProperty(widget, "numBits")
-        self.assertEqualNumber(prop, 3)
+        self.assertEqualNumber(prop, 4)
 
     def test_write_widget_menu(self):
         uiname = self.convertAdlFile("testDisplay.adl")
@@ -467,20 +486,34 @@ class TestOutputHandler(unittest.TestCase):
         self.assertEqualString(prop, "0.00")
 
     def test_write_widget_meter(self):
-        uiname = self.convertAdlFile("testDisplay.adl")
+        uiname = self.convertAdlFile("meter.adl")
         full_uiname = os.path.join(self.tempdir, uiname)
         self.assertTrue(os.path.exists(full_uiname))
 
         root = ElementTree.parse(full_uiname).getroot()
         screen = self.getSubElement(root, "widget")
         widgets = screen.findall("widget")
-        self.assertEqual(len(widgets), 64)
+        self.assertEqual(len(widgets), 1)
 
         key = "meter"
         widget = self.getNamedWidget(screen, key)
         self.assertEqualClassName(widget, "PyDMScaleIndicator", key)
+
+        # meter widget has no title
         prop = self.getNamedProperty(widget, "title")
-        self.assertEqualString(prop, "limits")
+        self.assertIsNone(prop)
+
+        prop = self.getNamedProperty(widget, "limitsFromChannel")
+        self.assertEqualBool(prop, False)
+
+        prop = self.getNamedProperty(widget, "userUpperLimit")
+        child = self.getSubElement(prop, "double")
+        self.assertEqual(float(child.text), 10)
+
+        prop = self.getNamedProperty(widget, "userLowerLimit")
+        child = self.getSubElement(prop, "double")
+        self.assertEqual(float(child.text), -10)
+
 
     def test_write_widget_rectangle(self):
         """
