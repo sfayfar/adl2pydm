@@ -388,8 +388,8 @@ class TestOutputHandler(unittest.TestCase):
         key = "composite"
         widget = self.getNamedWidget(screen, key)
         self.assertEqualClassName(widget, "PyDMFrame", key)
-        self.assertEqual(len(widget), 7)
         # self.print_xml_children(widget)
+        self.assertEqual(len(widget), 6)
 
     def test_write_widget_embedded_display(self):
         # Actually. MEDM writes as a composite
@@ -578,8 +578,10 @@ class TestOutputHandler(unittest.TestCase):
   background-color: rgb(133, 133, 133);
   }"""
         self.assertEqualStyleSheet(screen, expected)
-        self.assertExpectedAttrib(properties[2], name="windowTitle")
-        self.assertEqualString(properties[2], "rectangle")
+
+        prop = self.getNamedProperty(screen, "windowTitle")
+        self.assertExpectedAttrib(prop, name="windowTitle")
+        self.assertEqualString(prop, "rectangle")
 
         children = screen.findall("widget")
         self.assertEqual(len(children), 5)
@@ -630,19 +632,27 @@ class TestOutputHandler(unittest.TestCase):
         self.assertEqualToolTip(rect, key)
         properties = rect.findall("property")
         self.assertEqual(len(properties), 6)
-        self.assertExpectedAttrib(properties[2], name="brush", stdset="0")
-        for item in properties[2].iter():
+
+        prop = self.getNamedProperty(rect, "brush")
+        self.assertExpectedAttrib(prop, stdset="0")
+        for item in prop.iter():
             if item.tag == "brush":
                 self.assertExpectedAttrib(item, brushstyle="NoBrush")
-        self.assertPropertyColor(properties[2], 249, 218, 60, alpha="255")
-        self.assertExpectedAttrib(properties[3], name="penStyle", stdset="0")
-        for item in properties[3].iter():
+        self.assertPropertyColor(prop, 249, 218, 60, alpha="255")
+
+        prop = self.getNamedProperty(rect, "penStyle")
+        self.assertExpectedAttrib(prop, stdset="0")
+        for item in prop.iter():
             if item.tag == "enum":
                 self.assertEqual(item.text, "Qt::DashLine")
-        self.assertExpectedAttrib(properties[4], name="penColor", stdset="0")
-        self.assertPropertyColor(properties[4], 249, 218, 60)
-        self.assertExpectedAttrib(properties[5], name="penWidth", stdset="0")
-        for item in properties[5].iter():
+
+        prop = self.getNamedProperty(rect, "penColor")
+        self.assertExpectedAttrib(prop, name="penColor", stdset="0")
+        self.assertPropertyColor(prop, 249, 218, 60)
+
+        prop = self.getNamedProperty(rect, "penWidth")
+        self.assertExpectedAttrib(prop, name="penWidth", stdset="0")
+        for item in prop.iter():
             if item.tag == "double":
                 self.assertEqual(float(item.text), 1)
 
@@ -653,23 +663,33 @@ class TestOutputHandler(unittest.TestCase):
         self.assertEqualToolTip(rect, key)
         properties = rect.findall("property")
         self.assertEqual(len(properties), 7)
-        self.assertExpectedAttrib(properties[2], name="brush", stdset="0")
-        for item in properties[2].iter():
+
+        prop = self.getNamedProperty(rect, "brush")
+        self.assertExpectedAttrib(prop, stdset="0")
+        for item in prop.iter():
             if item.tag == "brush":
                 self.assertExpectedAttrib(item, brushstyle="NoBrush")
-        self.assertPropertyColor(properties[2], 115, 255, 107, alpha="255")
-        self.assertExpectedAttrib(properties[3], name="penStyle", stdset="0")
-        for item in properties[3].iter():
+        self.assertPropertyColor(prop, 115, 255, 107, alpha="255")
+
+        prop = self.getNamedProperty(rect, "penStyle")
+        self.assertExpectedAttrib(prop, stdset="0")
+        for item in prop.iter():
             if item.tag == "enum":
                 self.assertEqual(item.text, "Qt::SolidLine")
-        self.assertExpectedAttrib(properties[4], name="penColor", stdset="0")
-        self.assertPropertyColor(properties[4], 115, 255, 107)
-        self.assertExpectedAttrib(properties[5], name="penWidth", stdset="0")
-        for item in properties[5].iter():
+
+        prop = self.getNamedProperty(rect, "penColor")
+        self.assertExpectedAttrib(prop, stdset="0")
+        self.assertPropertyColor(prop, 115, 255, 107)
+
+        prop = self.getNamedProperty(rect, "penWidth")
+        self.assertExpectedAttrib(prop, stdset="0")
+        for item in prop.iter():
             if item.tag == "double":
                 self.assertEqual(float(item.text), 6)
-        self.assertExpectedAttrib(properties[6], name="rules", stdset="0")
-        child = self.getSubElement(properties[6], "string")
+
+        prop = self.getNamedProperty(rect, "rules")
+        self.assertExpectedAttrib(prop, stdset="0")
+        child = self.getSubElement(prop, "string")
         rules = output_handler.jsonDecode(child.text)
         self.assertEqual(len(rules), 1)
         expected = {
@@ -690,23 +710,33 @@ class TestOutputHandler(unittest.TestCase):
         self.assertEqualToolTip(rect, key)
         properties = rect.findall("property")
         self.assertEqual(len(properties), 7)
-        self.assertExpectedAttrib(properties[2], name="brush", stdset="0")
-        for item in properties[2].iter():
+
+        prop = self.getNamedProperty(rect, "brush")
+        self.assertExpectedAttrib(prop, stdset="0")
+        for item in prop.iter():
             if item.tag == "brush":
                 self.assertExpectedAttrib(item, brushstyle="SolidPattern")
-        self.assertPropertyColor(properties[2], 115, 223, 255, alpha="255")
-        self.assertExpectedAttrib(properties[3], name="penStyle", stdset="0")
-        for item in properties[3].iter():
+        self.assertPropertyColor(prop, 115, 223, 255, alpha="255")
+
+        prop = self.getNamedProperty(rect, "penStyle")
+        self.assertExpectedAttrib(prop, stdset="0")
+        for item in prop.iter():
             if item.tag == "enum":
                 self.assertEqual(item.text, "Qt::SolidLine")
-        self.assertExpectedAttrib(properties[4], name="penColor", stdset="0")
-        self.assertPropertyColor(properties[4], 115, 223, 255)
-        self.assertExpectedAttrib(properties[5], name="penWidth", stdset="0")
-        for item in properties[5].iter():
+
+        prop = self.getNamedProperty(rect, "penColor")
+        self.assertExpectedAttrib(prop, stdset="0")
+        self.assertPropertyColor(prop, 115, 223, 255)
+
+        prop = self.getNamedProperty(rect, "penWidth")
+        self.assertExpectedAttrib(prop, stdset="0")
+        for item in prop.iter():
             if item.tag == "double":
                 self.assertEqual(float(item.text), 0)
-        self.assertExpectedAttrib(properties[6], name="rules", stdset="0")
-        child = self.getSubElement(properties[6], "string")
+
+        prop = self.getNamedProperty(rect, "rules")
+        self.assertExpectedAttrib(prop, stdset="0")
+        child = self.getSubElement(prop, "string")
         rules = output_handler.jsonDecode(child.text)
         self.assertEqual(len(rules), 1)
         expected = {
