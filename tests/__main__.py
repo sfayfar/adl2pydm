@@ -17,10 +17,12 @@ def suite(*args, **kw):
     from tests import test_cli
     from tests import test_output_handler
     from tests import test_simple
+    from tests import test_symbols
     from tests import test_testDisplay
 
     test_list = [
         test_simple,
+        test_symbols,
         test_adl_parser,
         test_cli,
         test_output_handler,
