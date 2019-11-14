@@ -49,6 +49,8 @@ Geometry = namedtuple('Geometry', 'x y width height')
 """MEDM's points item: points = [Point]"""
 Point = namedtuple('Point', 'x y')
 
+# Internally the angles are specified in integer 1/64-degree units.
+MEDM_ANGLE_UNITS = 1.0/64
 
 class Block(object):
     """ADL file block structure"""
@@ -198,6 +200,11 @@ class MedmBaseWidget(object):
                 aa = self.locateAssignments(buf[block.start+1:block.end])
                 aa = self.parseColorAssignments(aa)
                 self.contents[symbol] = aa
+
+        for angle_name in "begin path".split():
+            if angle_name in self.contents:
+                angle = self.contents.pop(angle_name)
+                self.contents[angle_name + "Angle"] = int(angle)*MEDM_ANGLE_UNITS
 
         block = self.getNamedBlock("points", blocks)
         if block is not None:
