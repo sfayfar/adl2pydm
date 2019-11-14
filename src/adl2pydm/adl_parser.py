@@ -177,15 +177,20 @@ class MedmBaseWidget(object):
                     break
             del blocks[i]
         
+        if "label" in assignments:
+            self.title = assignments.pop("label")
+
         # stash remaining contents
         contents = dict(**assignments)
         for block in blocks:            # TODO: improve
             contents[block.symbol] = "".join(buf[block.start+1:block.end])
         self.contents = contents
 
-        if "label" in assignments:
-            self.title = assignments["label"]
-            del self.contents["label"], assignments["label"]
+        limits = self.contents.get("limits", "").strip()
+        if len(limits) > 0:
+            for line in self.contents.pop("limits").splitlines():
+                k, v = line.strip().split("=")
+                self.contents[k] = v.strip('"')
 
         for symbol in ("basic attribute", "dynamic attribute", "control", "monitor", "param"):
             block = self.getNamedBlock(symbol, blocks)

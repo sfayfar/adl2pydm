@@ -438,31 +438,26 @@ class Widget2Pydm(object):
 
         precision = block.contents.get("precision")        # TODO: needs an example from .adl
         if precision is not None:
-            z = -2
+            logger.warning("precision needs an example .adl file")
 
-        limits = block.contents.get("limits")
-        if limits is not None and len(limits) > 0:
-            for line in limits.splitlines():
-                k, v = line.strip().split("=")
-                block.contents[k] = v.strip('"')   # TODO: belongs with tables.py
-            if (
-                block.contents.get("hoprSrc") == "default"
-                or 
-                block.contents.get("loprSrc") == "default"
-            ):
-                self.writePropertyBoolean(qw, "limitsFromChannel", False, stdset="0")
-                self.writer.writeProperty(
-                    qw, 
-                    "userUpperLimit", 
-                    block.contents.get("hoprDefault", str(0.0)), 
-                    tag="double", 
-                    stdset="0")
-                self.writer.writeProperty(
-                    qw, 
-                    "userLowerLimit", 
-                    block.contents.get("loprDefault", str(0.0)), 
-                    tag="double", 
-                    stdset="0")
+        if (
+            block.contents.get("hoprSrc") == "default"
+            or 
+            block.contents.get("loprSrc") == "default"
+        ):
+            self.writePropertyBoolean(qw, "limitsFromChannel", False, stdset="0")
+            self.writer.writeProperty(
+                qw, 
+                "userUpperLimit", 
+                block.contents.get("hoprDefault", str(0.0)), 
+                tag="double", 
+                stdset="0")
+            self.writer.writeProperty(
+                qw, 
+                "userLowerLimit", 
+                block.contents.get("loprDefault", str(0.0)), 
+                tag="double", 
+                stdset="0")
         
     def write_block_menu(self, parent, block, nm, qw):
         pv = self.get_channel(block.contents["control"])
