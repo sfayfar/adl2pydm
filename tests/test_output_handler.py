@@ -144,6 +144,164 @@ class TestOutputHandler(unittest.TestCase):
 
     # ----------------------------------------------------------
 
+    def test_write_widget_arc(self):
+        uiname = self.convertAdlFile("testDisplay.adl")
+        full_uiname = os.path.join(self.tempdir, uiname)
+        self.assertTrue(os.path.exists(full_uiname))
+
+        root = ElementTree.parse(full_uiname).getroot()
+        screen = self.getSubElement(root, "widget")
+        # self.print_xml_children(screen)
+        widgets = screen.findall("widget")
+        self.assertEqual(len(widgets), 64)
+
+        key = "arc"
+        widget = self.getNamedWidget(screen, key)
+        self.assertEqualClassName(
+            widget, 
+            "PyDMDrawingPie", 
+            key)
+        # self.print_xml_children(widget)
+
+        prop = self.getNamedProperty(widget, "penStyle")
+        self.assertIsNotNone(prop)
+        child = self.getSubElement(prop, "enum")
+        self.assertEqual(child.text, "Qt::SolidLine")
+
+        prop = self.getNamedProperty(widget, "startAngle")
+        self.assertIsNone(prop)     # default: 0
+
+        prop = self.getNamedProperty(widget, "spanAngle")
+        self.assertIsNotNone(prop)
+        child = self.getSubElement(prop, "double")
+        self.assertEqual(float(child.text), -320)
+
+        prop = self.getNamedProperty(widget, "brush")
+        self.assertIsNotNone(prop)
+        for item in prop.iter():
+            if item.tag == "brush":
+                self.assertExpectedAttrib(item, brushstyle="SolidPattern")
+        self.assertPropertyColor(prop, 251, 243, 74, alpha="255")
+
+    def test_write_widget_byte(self):
+        uiname = self.convertAdlFile("byte-monitor.adl")
+        full_uiname = os.path.join(self.tempdir, uiname)
+        self.assertTrue(os.path.exists(full_uiname))
+
+        root = ElementTree.parse(full_uiname).getroot()
+        screen = self.getSubElement(root, "widget")
+        # self.print_xml_children(screen, iter=True)
+        widgets = screen.findall("widget")
+        self.assertEqual(len(widgets), 4)
+
+        key = "byte"
+        widget = self.getNamedWidget(screen, key)
+        # self.print_xml_children(widget)
+        self.assertEqualClassName(
+            widget, 
+            "PyDMByteIndicator", 
+            key)
+        
+        self.assertEqualChannel(widget, "ca://sky:interp_mode")
+
+        prop = self.getNamedProperty(widget, "onColor")
+        self.assertPropertyColor(prop, 0, 0, 0)
+        prop = self.getNamedProperty(widget, "offColor")
+        self.assertPropertyColor(prop, 187, 187, 187)
+
+        prop = self.getNamedProperty(widget, "orientation")
+        self.assertEqualString(prop, "Qt::Horizontal")
+
+        prop = self.getNamedProperty(widget, "showLabels")
+        self.assertEqualBool(prop, False)
+
+        prop = self.getNamedProperty(widget, "bigEndian")
+        self.assertEqualBool(prop, False)
+
+        prop = self.getNamedProperty(widget, "numBits")
+        self.assertEqualNumber(prop, 4)
+
+        key = "byte_1"
+        widget = self.getNamedWidget(screen, key)
+        # self.print_xml_children(widget)
+        self.assertEqualClassName(
+            widget, 
+            "PyDMByteIndicator", 
+            key)
+        
+        self.assertEqualChannel(widget, "ca://sky:interp_mode")
+
+        prop = self.getNamedProperty(widget, "onColor")
+        self.assertPropertyColor(prop, 0, 0, 0)
+        prop = self.getNamedProperty(widget, "offColor")
+        self.assertPropertyColor(prop, 187, 187, 187)
+
+        prop = self.getNamedProperty(widget, "orientation")
+        self.assertEqualString(prop, "Qt::Horizontal")
+
+        prop = self.getNamedProperty(widget, "showLabels")
+        self.assertEqualBool(prop, False)
+
+        prop = self.getNamedProperty(widget, "bigEndian")
+        self.assertEqualBool(prop, True)
+
+        prop = self.getNamedProperty(widget, "numBits")
+        self.assertEqualNumber(prop, 4)
+
+        key = "byte_2"
+        widget = self.getNamedWidget(screen, key)
+        # self.print_xml_children(widget)
+        self.assertEqualClassName(
+            widget, 
+            "PyDMByteIndicator", 
+            key)
+        
+        self.assertEqualChannel(widget, "ca://sky:interp_mode")
+
+        prop = self.getNamedProperty(widget, "onColor")
+        self.assertPropertyColor(prop, 0, 0, 0)
+        prop = self.getNamedProperty(widget, "offColor")
+        self.assertPropertyColor(prop, 187, 187, 187)
+
+        prop = self.getNamedProperty(widget, "orientation")
+        self.assertEqualString(prop, "Qt::Vertical")
+
+        prop = self.getNamedProperty(widget, "showLabels")
+        self.assertEqualBool(prop, False)
+
+        prop = self.getNamedProperty(widget, "bigEndian")
+        self.assertEqualBool(prop, False)
+
+        prop = self.getNamedProperty(widget, "numBits")
+        self.assertEqualNumber(prop, 4)
+
+        key = "byte_3"
+        widget = self.getNamedWidget(screen, key)
+        # self.print_xml_children(widget)
+        self.assertEqualClassName(
+            widget, 
+            "PyDMByteIndicator", 
+            key)
+        
+        self.assertEqualChannel(widget, "ca://sky:interp_mode")
+
+        prop = self.getNamedProperty(widget, "onColor")
+        self.assertPropertyColor(prop, 0, 0, 0)
+        prop = self.getNamedProperty(widget, "offColor")
+        self.assertPropertyColor(prop, 187, 187, 187)
+
+        prop = self.getNamedProperty(widget, "orientation")
+        self.assertEqualString(prop, "Qt::Vertical")
+
+        prop = self.getNamedProperty(widget, "showLabels")
+        self.assertEqualBool(prop, False)
+
+        prop = self.getNamedProperty(widget, "bigEndian")
+        self.assertEqualBool(prop, True)
+
+        prop = self.getNamedProperty(widget, "numBits")
+        self.assertEqualNumber(prop, 4)
+
     def test_write_widget_cartesian_plot(self):
         uiname = self.convertAdlFile("testDisplay.adl")
         full_uiname = os.path.join(self.tempdir, uiname)
@@ -319,125 +477,6 @@ class TestOutputHandler(unittest.TestCase):
             prop = self.getNamedProperty(widget, item)
             self.assertIsNone(prop, item)
 
-    def test_write_widget_byte(self):
-        uiname = self.convertAdlFile("byte-monitor.adl")
-        full_uiname = os.path.join(self.tempdir, uiname)
-        self.assertTrue(os.path.exists(full_uiname))
-
-        root = ElementTree.parse(full_uiname).getroot()
-        screen = self.getSubElement(root, "widget")
-        # self.print_xml_children(screen, iter=True)
-        widgets = screen.findall("widget")
-        self.assertEqual(len(widgets), 4)
-
-        key = "byte"
-        widget = self.getNamedWidget(screen, key)
-        # self.print_xml_children(widget)
-        self.assertEqualClassName(
-            widget, 
-            "PyDMByteIndicator", 
-            key)
-        
-        self.assertEqualChannel(widget, "ca://sky:interp_mode")
-
-        prop = self.getNamedProperty(widget, "onColor")
-        self.assertPropertyColor(prop, 0, 0, 0)
-        prop = self.getNamedProperty(widget, "offColor")
-        self.assertPropertyColor(prop, 187, 187, 187)
-
-        prop = self.getNamedProperty(widget, "orientation")
-        self.assertEqualString(prop, "Qt::Horizontal")
-
-        prop = self.getNamedProperty(widget, "showLabels")
-        self.assertEqualBool(prop, False)
-
-        prop = self.getNamedProperty(widget, "bigEndian")
-        self.assertEqualBool(prop, False)
-
-        prop = self.getNamedProperty(widget, "numBits")
-        self.assertEqualNumber(prop, 4)
-
-        key = "byte_1"
-        widget = self.getNamedWidget(screen, key)
-        # self.print_xml_children(widget)
-        self.assertEqualClassName(
-            widget, 
-            "PyDMByteIndicator", 
-            key)
-        
-        self.assertEqualChannel(widget, "ca://sky:interp_mode")
-
-        prop = self.getNamedProperty(widget, "onColor")
-        self.assertPropertyColor(prop, 0, 0, 0)
-        prop = self.getNamedProperty(widget, "offColor")
-        self.assertPropertyColor(prop, 187, 187, 187)
-
-        prop = self.getNamedProperty(widget, "orientation")
-        self.assertEqualString(prop, "Qt::Horizontal")
-
-        prop = self.getNamedProperty(widget, "showLabels")
-        self.assertEqualBool(prop, False)
-
-        prop = self.getNamedProperty(widget, "bigEndian")
-        self.assertEqualBool(prop, True)
-
-        prop = self.getNamedProperty(widget, "numBits")
-        self.assertEqualNumber(prop, 4)
-
-        key = "byte_2"
-        widget = self.getNamedWidget(screen, key)
-        # self.print_xml_children(widget)
-        self.assertEqualClassName(
-            widget, 
-            "PyDMByteIndicator", 
-            key)
-        
-        self.assertEqualChannel(widget, "ca://sky:interp_mode")
-
-        prop = self.getNamedProperty(widget, "onColor")
-        self.assertPropertyColor(prop, 0, 0, 0)
-        prop = self.getNamedProperty(widget, "offColor")
-        self.assertPropertyColor(prop, 187, 187, 187)
-
-        prop = self.getNamedProperty(widget, "orientation")
-        self.assertEqualString(prop, "Qt::Vertical")
-
-        prop = self.getNamedProperty(widget, "showLabels")
-        self.assertEqualBool(prop, False)
-
-        prop = self.getNamedProperty(widget, "bigEndian")
-        self.assertEqualBool(prop, False)
-
-        prop = self.getNamedProperty(widget, "numBits")
-        self.assertEqualNumber(prop, 4)
-
-        key = "byte_3"
-        widget = self.getNamedWidget(screen, key)
-        # self.print_xml_children(widget)
-        self.assertEqualClassName(
-            widget, 
-            "PyDMByteIndicator", 
-            key)
-        
-        self.assertEqualChannel(widget, "ca://sky:interp_mode")
-
-        prop = self.getNamedProperty(widget, "onColor")
-        self.assertPropertyColor(prop, 0, 0, 0)
-        prop = self.getNamedProperty(widget, "offColor")
-        self.assertPropertyColor(prop, 187, 187, 187)
-
-        prop = self.getNamedProperty(widget, "orientation")
-        self.assertEqualString(prop, "Qt::Vertical")
-
-        prop = self.getNamedProperty(widget, "showLabels")
-        self.assertEqualBool(prop, False)
-
-        prop = self.getNamedProperty(widget, "bigEndian")
-        self.assertEqualBool(prop, True)
-
-        prop = self.getNamedProperty(widget, "numBits")
-        self.assertEqualNumber(prop, 4)
-
     def test_write_widget_menu(self):
         uiname = self.convertAdlFile("testDisplay.adl")
         full_uiname = os.path.join(self.tempdir, uiname)
@@ -562,19 +601,25 @@ class TestOutputHandler(unittest.TestCase):
         self.assertEqualToolTip(rect, key)
         properties = rect.findall("property")
         self.assertEqual(len(properties), 6)
-        self.assertExpectedAttrib(properties[2], name="brush", stdset="0")
-        for item in properties[2].iter():
+
+        prop = self.getNamedProperty(rect, "brush")
+        for item in prop.iter():
             if item.tag == "brush":
                 self.assertExpectedAttrib(item, brushstyle="NoBrush")
-        self.assertPropertyColor(properties[2], 253, 0, 0, alpha="255")
-        self.assertExpectedAttrib(properties[3], name="penStyle", stdset="0")
-        for item in properties[3].iter():
+        self.assertPropertyColor(prop, 253, 0, 0, alpha="255")
+
+        prop = self.getNamedProperty(rect, "penStyle")
+        self.assertExpectedAttrib(prop, stdset="0")
+        for item in prop.iter():
             if item.tag == "enum":
                 self.assertEqual(item.text, "Qt::SolidLine")
-        self.assertExpectedAttrib(properties[4], name="penColor", stdset="0")
-        self.assertPropertyColor(properties[4], 253, 0, 0)
-        self.assertExpectedAttrib(properties[5], name="penWidth", stdset="0")
-        for item in properties[5].iter():
+
+        prop = self.getNamedProperty(rect, "penColor")
+        self.assertPropertyColor(prop, 253, 0, 0)
+
+        prop = self.getNamedProperty(rect, "penWidth")
+        self.assertExpectedAttrib(prop, stdset="0")
+        for item in prop.iter():
             if item.tag == "double":
                 self.assertEqual(float(item.text), 1)
 
