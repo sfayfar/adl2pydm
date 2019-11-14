@@ -56,7 +56,7 @@ PyDM_CustomWidget = namedtuple('PyDM_CustomWidget', 'cls extends header')
 
 
 adl_widgets = {
-    "arc" : dict(type="static", pydm_widget="PyDMDrawingArc"),
+    "arc" : dict(type="static", pydm_widget="PyDMDrawingPie"),
     "bar" : dict(type="monitor", pydm_widget="PyDMDrawingRectangle"),
     "byte" : dict(type="monitor", pydm_widget="PyDMByteIndicator"),
     "cartesian plot" : dict(type="monitor", pydm_widget="PyDMScatterPlot"),
