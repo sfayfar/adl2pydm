@@ -445,7 +445,7 @@ class Widget2Pydm(object):
         if limits is not None and len(limits) > 0:
             for line in limits.splitlines():
                 k, v = line.strip().split("=")
-                block.contents[k] = v.strip('"')   # TODO: belongs with adl_parser
+                block.contents[k] = v.strip('"')   # TODO: belongs with tables.py
             if (
                 block.contents.get("hoprSrc") == "default"
                 or 

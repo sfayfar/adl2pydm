@@ -11,7 +11,7 @@ import argparse
 import logging
 import os
 
-from . import adl_parser
+from . import tables
 from . import output_handler
 
 
@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 def processFile(adl_filename, output_path=None):
     output_path = output_path or os.path.dirname(adl_filename)
 
-    screen = adl_parser.MedmMainWidget(adl_filename)
+    screen = tables.MedmMainWidget(adl_filename)
     buf = screen.getAdlLines(adl_filename)
     screen.parseAdlBuffer(buf)
     
