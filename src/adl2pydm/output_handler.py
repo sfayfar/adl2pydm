@@ -254,6 +254,9 @@ class Widget2Pydm(object):
 
         self.processDynamicAttributeAsRules(qw, block)
     
+    def writePropertyBoolean(self, widget, tag, value, **kwargs):
+        self.writer.writeProperty(widget, tag, str(value).lower(), tag="bool", **kwargs)
+    
     def writePropertyTextAlignment(self, widget, attr):
         align =  {
             "horiz. left": "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter",
@@ -293,21 +296,10 @@ class Widget2Pydm(object):
         block.color = None
         block.background_color = None
 
-        self.writer.writeProperty(
-            qw, 
-            "orientation", 
-            {"right": "Qt::Horizontal", "down": "Qt::Vertical"}[direction], 
-            stdset="0")
-
-        self.writer.writeProperty(qw, "showLabels", "false", tag="bool", stdset="0")
-
-        self.writer.writeProperty(
-            qw, 
-            "bigEndian", 
-            str(sbit < ebit).lower(), 
-            tag="bool", 
-            stdset="0")
-
+        orientation = {"right": "Qt::Horizontal", "down": "Qt::Vertical"}[direction]
+        self.writer.writeProperty(qw, "orientation", orientation, stdset="0")
+        self.writePropertyBoolean(qw, "showLabels", False, stdset="0")
+        self.writePropertyBoolean(qw, "bigEndian", sbit < ebit, stdset="0")
         self.writer.writeProperty(qw, "numBits", numBits, tag="number", stdset="0")
         
     def write_block_choice_button(self, parent, block, nm, qw):
@@ -415,25 +407,61 @@ class Widget2Pydm(object):
         self.write_tooltip(qw, nm)
         
     def write_block_indicator(self, parent, block, nm, qw):
+        """
+        Also known as an Indicator.  
+        The scale monitor has attributes:
+        
+        * Object (X Position, Y Position, Width, Height)
+        * Monitor (Readback Channel, Foreground, Background)
+        * Limits (Low Limit, High Limit, Precision)
+        * Label
+        * Direction
+        * Color Mode
+        
+        The Scale Monitor displays the value of the process variable on a scale.  
+        The limits of the scale are the HOPR and LOPR values for the record 
+        associated with the process variable by default but may be set via 
+        the PV Limits Dialog Box.
+
+        The Meter has attributes:
+        
+        * Object (X Position, Y Position, Width, Height)
+        * Monitor (Readback Channel, Foreground, Background)
+        * Limits (Low Limit, High Limit, Precision)
+        * Label
+        * Color Mode
+        
+        It displays the value of the process variable on a meter with a dial.
+        """
         pv = self.get_channel(block.contents["monitor"])
+        self.write_tooltip(qw, pv)
         self.write_channel(qw, pv)
-        self.write_tooltip(qw, nm)
-        self.writer.writeProperty(qw, "text", block.title, tag="string")
-        # TODO:
-        """
-        # MEDM's Scale Monitor widget
-    <widget class="PyDMScaleIndicator" name="PyDMScaleIndicator">
-     <property name="toolTip">
-      <string/>
-     </property>
-     <property name="precision" stdset="0">
-      <number>0</number>
-     </property>
-     <property name="channel" stdset="0">
-      <string>sky:userCalc2.A</string>
-     </property>
-    </widget>
-        """
+
+        precision = block.contents.get("precision")        # TODO: needs an example from .adl
+        if precision is not None:
+            z = -2
+
+        limits = block.contents.get("limits")
+        if limits is not None and len(limits) > 0:
+            for line in limits.splitlines():
+                k, v = line.strip().split("=")
+                block.contents[k] = v.strip('"')   # TODO: belongs with adl_parser
+            if (
+                block.contents.get("hoprSrc") == "default"
+                or 
+                block.contents.get("loprSrc") == "default"
+            ):
+                self.writePropertyBoolean(qw, "limitsFromChannel", False, stdset="0")
+                self.writer.writeProperty(
+                    qw, 
+                    "userUpperLimit", 
+                    block.contents.get("hoprDefault", str(0.0)), 
+                    tag="double")
+                self.writer.writeProperty(
+                    qw, 
+                    "userLowerLimit", 
+                    block.contents.get("loprDefault", str(0.0)), 
+                    tag="double")
         
     def write_block_menu(self, parent, block, nm, qw):
         pv = self.get_channel(block.contents["control"])
@@ -452,10 +480,8 @@ class Widget2Pydm(object):
         self.write_colors_style(qw, block)
         
     def write_block_meter(self, parent, block, nm, qw):
-        self.writer.writeProperty(qw, "title", block.title, stdset="0")
-        pv = self.get_channel(block.contents["monitor"])
-        self.write_tooltip(qw, pv)
-        self.write_channel(qw, pv)
+        # handle same as indicator since PyDM does not have a meter widget
+        self.write_block_indicator(parent, block, nm, qw)
         
     def write_block_polyline(self, parent, block, nm, qw):
         # TODO: PyDM widget choice needs help here
@@ -496,7 +522,7 @@ class Widget2Pydm(object):
         self.write_tooltip(qw, text)
         self.writer.writeProperty(qw, "text", text, tag="string")
         if not showIcon:
-            self.writer.writeProperty(qw, "showIcon", "false", tag="bool", stdset="0")
+            self.writePropertyBoolean(qw, "showIcon", False, stdset="0")
         self.write_colors_style(qw, block)
         if hasattr(block, "displays"):
             displays = {
@@ -511,8 +537,8 @@ class Widget2Pydm(object):
                     self.writeStringText(stringlist, text=v)
 
         # # TODO: conditional
-        # self.writer.writeProperty(qw, "showIcon", "true", tag="bool")
-        # self.writer.writeProperty(qw, "openInNewWindow", "true", tag="bool")
+        # self.writePropertyBoolean(qw, "showIcon", True)
+        # self.writePropertyBoolean(qw, "openInNewWindow", True)
     
     def write_block_shell_command(self, parent, block, nm, qw):
         self.write_tooltip(qw, nm)
