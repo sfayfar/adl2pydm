@@ -189,7 +189,9 @@ class Widget2Pydm(object):
             self.writer.writeProperty(widget, "rules", json_rules, stdset="0")
         
     def write_basic_attribute(self, parent, block, nm, qw):
-        attr = block.contents.get("basic attribute", {})
+        attr = block.contents.get("basic attribute")
+        if attr is None:
+            return
         propty = self.writer.writeOpenProperty(qw, "brush", stdset="0")
         fill = dict(
             solid = "SolidPattern", 
@@ -248,6 +250,9 @@ class Widget2Pydm(object):
             self.writer.writeTaggedString(item, "blue", str(color.b))
         
     def write_dynamic_attribute(self, parent, block, nm, qw):
+        attr = block.contents.get("dynamic attribute")
+        if attr is None:
+            return
         self.processDynamicAttributeAsRules(qw, block)
     
     def write_ui(self, screen, output_path):
@@ -296,6 +301,8 @@ class Widget2Pydm(object):
         
     def write_block_default(self, parent, block, nm, qw):
         self.write_tooltip(qw, "TBA widget: " + nm)
+        self.write_basic_attribute(parent, block, nm, qw)
+        self.write_dynamic_attribute(parent, block, nm, qw)
         # what styling is effective?
         #self.writer.writeProperty(qw, "frameShape", "QFrame::StyledPanel", tag="enum")
         #self.writer.writeProperty(qw, "frameShadow", "QFrame::Raised", tag="enum")
@@ -360,8 +367,8 @@ class Widget2Pydm(object):
         """
         Could be either PyDMWaveformPlot or PyDMScatterPlot
         """
-        # print("line %d in file: %s" % (block.line_offset, block.main.given_filename))
-        # print("contents", json.dumps(block.contents, indent=2))
+        logger.debug("line %d in file: %s" % (block.line_offset, block.main.given_filename))
+        logger.debug("contents:\n" + json.dumps(block.contents, indent=2))
         self.write_tooltip(qw, nm)
         self.writer.writeProperty(qw, "title", block.title, stdset="0")
 
@@ -421,6 +428,7 @@ class Widget2Pydm(object):
 
     def write_block_composite(self, parent, block, nm, qw):
         # self.write_tooltip(qw, nm)
+        self.write_dynamic_attribute(parent, block, nm, qw)
         for widget in block.widgets:
             self.write_block(qw, widget)
 
@@ -452,6 +460,7 @@ class Widget2Pydm(object):
     def write_block_image(self, parent, block, nm, qw):
         image_name = block.contents.get("image name")
         self.writer.writeProperty(qw, "filename", image_name, tag="string", stdset="0")
+        self.write_dynamic_attribute(parent, block, nm, qw)
         self.write_tooltip(qw, nm)
         
     def write_block_indicator(self, parent, block, nm, qw):
@@ -604,6 +613,8 @@ class Widget2Pydm(object):
         if block.title is not None:
             text = convertMacros(block.title)
         self.writer.writeProperty(qw, "text", text, tag="string")
+        self.write_basic_attribute(parent, block, nm, qw)
+        self.write_dynamic_attribute(parent, block, nm, qw)
         self.write_tooltip(qw, nm)
         self.writePropertyTextAlignment(qw, block.contents)
     
