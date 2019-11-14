@@ -13,15 +13,15 @@ if _path not in sys.path:
 
 def suite(*args, **kw):
 
+    from tests import test_adl_parser
     from tests import test_cli
     from tests import test_output_handler
     from tests import test_simple
     from tests import test_testDisplay
-    from tests import test_tables
 
     test_list = [
         test_simple,
-        test_tables,
+        test_adl_parser,
         test_cli,
         test_output_handler,
         test_testDisplay,

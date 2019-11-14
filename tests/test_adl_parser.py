@@ -16,7 +16,7 @@ _path = os.path.join(_test_path, '..', 'src')
 if _path not in sys.path:
     sys.path.insert(0, _path)
 
-from adl2pydm import tables
+from adl2pydm import adl_parser
 
 
 class Test_Files(unittest.TestCase):
@@ -56,7 +56,7 @@ class Test_Files(unittest.TestCase):
     def parseFile(self, short_name):
         full_name = os.path.join(self.medm_path, short_name)
         
-        screen = tables.MedmMainWidget()
+        screen = adl_parser.MedmMainWidget()
         buf = screen.getAdlLines(full_name)
         screen.parseAdlBuffer(buf)
         return screen
@@ -67,7 +67,7 @@ class Test_Files(unittest.TestCase):
             self.assertIsNone(g)
             self.assertIsNone(b)
         else:
-            self.assertIsInstance(color, tables.Color)
+            self.assertIsInstance(color, adl_parser.Color)
             self.assertEqual(color.r, r)
             self.assertEqual(color.b, b)
             self.assertEqual(color.g, g)
@@ -86,7 +86,7 @@ class Test_Files(unittest.TestCase):
         self.assertEqual(geom.height, h)
 
     def assertEqualPoint(self, point, x, y):
-        self.assertIsInstance(point, tables.Point)
+        self.assertIsInstance(point, adl_parser.Point)
         self.assertEqual(point.x, x)
         self.assertEqual(point.y, y)
 
@@ -111,9 +111,9 @@ class Test_Files(unittest.TestCase):
         self.assertTrue(os.path.exists(self.path))
         self.assertTrue(os.path.exists(self.medm_path))
 
-    def test_tables(self):
+    def test_adl_parser(self):
         for fname in self.test_files:
-            screen = tables.MedmMainWidget()
+            screen = adl_parser.MedmMainWidget()
             self.assertEqual(screen.line_offset, 1)
 
             full_name = os.path.join(self.medm_path, fname)
