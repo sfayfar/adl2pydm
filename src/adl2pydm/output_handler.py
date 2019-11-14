@@ -240,14 +240,15 @@ class Widget2Pydm(object):
         logger.debug("(#%d) %s: %s" % (block.line_offset, block.symbol, nm))
         handler(parent, block, nm, qw)
 
-        self.processDynamicAttributeAsRules(qw, block)
-        
     def write_color_element(self, xml_element, color, **kwargs):
         if color is not None:
             item = self.writer.writeOpenTag(xml_element, "color", **kwargs)
             self.writer.writeTaggedString(item, "red", str(color.r))
             self.writer.writeTaggedString(item, "green", str(color.g))
             self.writer.writeTaggedString(item, "blue", str(color.b))
+        
+    def write_dynamic_attribute(self, parent, block, nm, qw):
+        self.processDynamicAttributeAsRules(qw, block)
     
     def write_ui(self, screen, output_path):
         """main entry point to write the .ui file"""
@@ -303,6 +304,7 @@ class Widget2Pydm(object):
 
     def write_block_arc(self, parent, block, nm, qw):
         self.write_basic_attribute(parent, block, nm, qw)
+        self.write_dynamic_attribute(parent, block, nm, qw)
 
         beginAngle = block.contents.get("beginAngle", 0)
         pathAngle = block.contents.get("pathAngle", 0)
@@ -418,7 +420,7 @@ class Widget2Pydm(object):
                 self.writeStringText(stringlist, text=jsonEncode(trace))
 
     def write_block_composite(self, parent, block, nm, qw):
-        self.write_tooltip(qw, nm)
+        # self.write_tooltip(qw, nm)
         for widget in block.widgets:
             self.write_block(qw, widget)
 
@@ -532,8 +534,9 @@ class Widget2Pydm(object):
         self.write_tooltip(qw, nm)
 
     def write_block_rectangle(self, parent, block, nm, qw):
-        self.write_tooltip(qw, nm)
         self.write_basic_attribute(parent, block, nm, qw)
+        self.write_dynamic_attribute(parent, block, nm, qw)
+        self.write_tooltip(qw, nm)
 
     def write_block_related_display(self, parent, block, nm, qw):
         text = block.title or nm
