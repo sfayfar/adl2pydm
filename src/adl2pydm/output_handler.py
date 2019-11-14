@@ -456,12 +456,14 @@ class Widget2Pydm(object):
                     qw, 
                     "userUpperLimit", 
                     block.contents.get("hoprDefault", str(0.0)), 
-                    tag="double")
+                    tag="double", 
+                    stdset="0")
                 self.writer.writeProperty(
                     qw, 
                     "userLowerLimit", 
                     block.contents.get("loprDefault", str(0.0)), 
-                    tag="double")
+                    tag="double", 
+                    stdset="0")
         
     def write_block_menu(self, parent, block, nm, qw):
         pv = self.get_channel(block.contents["control"])
