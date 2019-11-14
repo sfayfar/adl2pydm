@@ -76,12 +76,27 @@ class TestOutputHandler(unittest.TestCase):
         child = self.getSubElement(prop, "bool")
         self.assertEqual(child.text, str(value).lower())
 
+    def assertEqualBrush(self, parent, brushstyle, r, g, b):
+        prop = self.getNamedProperty(parent, "brush")
+        self.assertIsNotNone(prop)
+        self.assertExpectedAttrib(prop, stdset="0")
+        for item in prop.iter():
+            if item.tag == "brush":
+                self.assertExpectedAttrib(item, brushstyle=brushstyle)
+        self.assertPropertyColor(prop, r, g, b, alpha="255")
+
     def assertEqualChannel(self, parent, channel):
-        prop = self.getNamedProperty(parent, "channel")
-        self.assertEqualString(prop, channel)
+        self.assertEqualPropertyString(parent, "channel", channel)
 
     def assertEqualClassName(self, parent, cls, nm):
         self.assertExpectedAttrib(parent, **{"class":cls, "name":nm})
+
+    def assertEqualDouble(self, prop, number):
+        self.assertIsNotNone(prop)
+        self.assertExpectedAttrib(prop, stdset="0")
+        for item in prop.iter():
+            if item.tag == "double":
+                self.assertEqual(float(item.text), number)
 
     def assertEqualGeometry(self, parent, x, y, w, h):
         prop = self.getNamedProperty(parent, "geometry")
@@ -102,9 +117,50 @@ class TestOutputHandler(unittest.TestCase):
         child = self.getSubElement(prop, "number")
         self.assertEqual(child.text, str(number))
 
+    def assertEqualPenColor(self, parent, r, g, b):
+        prop = self.getNamedProperty(parent, "penColor")
+        self.assertIsNotNone(prop)
+        self.assertExpectedAttrib(prop, stdset="0")
+        self.assertPropertyColor(prop, r, g, b)
+
+    def assertEqualPenStyle(self, parent, value):
+        prop = self.getNamedProperty(parent, "penStyle")
+        self.assertIsNotNone(prop)
+        self.assertExpectedAttrib(prop, stdset="0")
+        for item in prop.iter():
+            if item.tag == "enum":
+                self.assertEqual(item.text, value)
+
+    def assertEqualPenWidth(self, parent, number):
+        prop = self.getNamedProperty(parent, "penWidth")
+        self.assertEqualDouble(prop, number)
+
     def assertEqualString(self, parent, text=""):
         child = self.getSubElement(parent, "string")
         self.assertEqual(child.text, str(text))
+
+    def assertEqualTitle(self, parent, title):
+        prop = self.getNamedProperty(parent, "title")
+        if title is None:
+            self.assertIsNone(prop)
+        else:
+            self.assertIsNotNone(prop)
+            self.assertEqualString(prop, title)
+
+    def assertEqualPropertyBool(self, parent, propName, expected):
+        prop = self.getNamedProperty(parent, propName)
+        self.assertIsNotNone(prop)
+        self.assertEqualBool(prop, expected)
+
+    def assertEqualPropertyDouble(self, parent, propName, expected):
+        prop = self.getNamedProperty(parent, propName)
+        self.assertIsNotNone(prop)
+        self.assertEqualDouble(prop, expected)
+
+    def assertEqualPropertyNumber(self, parent, propName, expected):
+        prop = self.getNamedProperty(parent, propName)
+        self.assertIsNotNone(prop)
+        self.assertEqualNumber(prop, expected)
 
     def assertEqualPropertyString(self, parent, propName, expected):
         prop = self.getNamedProperty(parent, propName)
@@ -127,6 +183,10 @@ class TestOutputHandler(unittest.TestCase):
         for k, v in kwargs.items():
             self.assertTrue(k in ref)
             self.assertEqual(v, ref[k])
+
+    def assertIsNoneProperty(self, parent, propName):
+        prop = self.getNamedProperty(parent, propName)
+        self.assertIsNone(prop)
 
     def assertPropertyColor(self, parent, r, g, b, **kwargs):
         self.assertEqual(parent.tag, "property")
@@ -163,25 +223,10 @@ class TestOutputHandler(unittest.TestCase):
             key)
         # self.print_xml_children(widget)
 
-        prop = self.getNamedProperty(widget, "penStyle")
-        self.assertIsNotNone(prop)
-        child = self.getSubElement(prop, "enum")
-        self.assertEqual(child.text, "Qt::SolidLine")
-
-        prop = self.getNamedProperty(widget, "startAngle")
-        self.assertIsNone(prop)     # default: 0
-
-        prop = self.getNamedProperty(widget, "spanAngle")
-        self.assertIsNotNone(prop)
-        child = self.getSubElement(prop, "double")
-        self.assertEqual(float(child.text), -320)
-
-        prop = self.getNamedProperty(widget, "brush")
-        self.assertIsNotNone(prop)
-        for item in prop.iter():
-            if item.tag == "brush":
-                self.assertExpectedAttrib(item, brushstyle="SolidPattern")
-        self.assertPropertyColor(prop, 251, 243, 74, alpha="255")
+        self.assertEqualPenStyle(widget, "Qt::SolidLine")
+        self.assertIsNoneProperty(widget, "startAngle")   # default: 0
+        self.assertEqualPropertyDouble(widget, "spanAngle", -320)
+        self.assertEqualBrush(widget, "SolidPattern", 251, 243, 74)
 
     def test_write_widget_byte(self):
         uiname = self.convertAdlFile("byte-monitor.adl")
@@ -208,18 +253,10 @@ class TestOutputHandler(unittest.TestCase):
         self.assertPropertyColor(prop, 0, 0, 0)
         prop = self.getNamedProperty(widget, "offColor")
         self.assertPropertyColor(prop, 187, 187, 187)
-
-        prop = self.getNamedProperty(widget, "orientation")
-        self.assertEqualString(prop, "Qt::Horizontal")
-
-        prop = self.getNamedProperty(widget, "showLabels")
-        self.assertEqualBool(prop, False)
-
-        prop = self.getNamedProperty(widget, "bigEndian")
-        self.assertEqualBool(prop, False)
-
-        prop = self.getNamedProperty(widget, "numBits")
-        self.assertEqualNumber(prop, 4)
+        self.assertEqualPropertyString(widget, "orientation", "Qt::Horizontal")
+        self.assertEqualPropertyBool(widget, "showLabels", False)
+        self.assertEqualPropertyBool(widget, "bigEndian", False)
+        self.assertEqualPropertyNumber(widget, "numBits", 4)
 
         key = "byte_1"
         widget = self.getNamedWidget(screen, key)
@@ -235,18 +272,10 @@ class TestOutputHandler(unittest.TestCase):
         self.assertPropertyColor(prop, 0, 0, 0)
         prop = self.getNamedProperty(widget, "offColor")
         self.assertPropertyColor(prop, 187, 187, 187)
-
-        prop = self.getNamedProperty(widget, "orientation")
-        self.assertEqualString(prop, "Qt::Horizontal")
-
-        prop = self.getNamedProperty(widget, "showLabels")
-        self.assertEqualBool(prop, False)
-
-        prop = self.getNamedProperty(widget, "bigEndian")
-        self.assertEqualBool(prop, True)
-
-        prop = self.getNamedProperty(widget, "numBits")
-        self.assertEqualNumber(prop, 4)
+        self.assertEqualPropertyString(widget, "orientation", "Qt::Horizontal")
+        self.assertEqualPropertyBool(widget, "showLabels", False)
+        self.assertEqualPropertyBool(widget, "bigEndian", True)
+        self.assertEqualPropertyNumber(widget, "numBits", 4)
 
         key = "byte_2"
         widget = self.getNamedWidget(screen, key)
@@ -262,18 +291,10 @@ class TestOutputHandler(unittest.TestCase):
         self.assertPropertyColor(prop, 0, 0, 0)
         prop = self.getNamedProperty(widget, "offColor")
         self.assertPropertyColor(prop, 187, 187, 187)
-
-        prop = self.getNamedProperty(widget, "orientation")
-        self.assertEqualString(prop, "Qt::Vertical")
-
-        prop = self.getNamedProperty(widget, "showLabels")
-        self.assertEqualBool(prop, False)
-
-        prop = self.getNamedProperty(widget, "bigEndian")
-        self.assertEqualBool(prop, False)
-
-        prop = self.getNamedProperty(widget, "numBits")
-        self.assertEqualNumber(prop, 4)
+        self.assertEqualPropertyString(widget, "orientation", "Qt::Vertical")
+        self.assertEqualPropertyBool(widget, "showLabels", False)
+        self.assertEqualPropertyBool(widget, "bigEndian", False)
+        self.assertEqualPropertyNumber(widget, "numBits", 4)
 
         key = "byte_3"
         widget = self.getNamedWidget(screen, key)
@@ -289,18 +310,10 @@ class TestOutputHandler(unittest.TestCase):
         self.assertPropertyColor(prop, 0, 0, 0)
         prop = self.getNamedProperty(widget, "offColor")
         self.assertPropertyColor(prop, 187, 187, 187)
-
-        prop = self.getNamedProperty(widget, "orientation")
-        self.assertEqualString(prop, "Qt::Vertical")
-
-        prop = self.getNamedProperty(widget, "showLabels")
-        self.assertEqualBool(prop, False)
-
-        prop = self.getNamedProperty(widget, "bigEndian")
-        self.assertEqualBool(prop, True)
-
-        prop = self.getNamedProperty(widget, "numBits")
-        self.assertEqualNumber(prop, 4)
+        self.assertEqualPropertyString(widget, "orientation", "Qt::Vertical")
+        self.assertEqualPropertyBool(widget, "showLabels", False)
+        self.assertEqualPropertyBool(widget, "bigEndian", True)
+        self.assertEqualPropertyNumber(widget, "numBits", 4)
 
     def test_write_widget_cartesian_plot(self):
         uiname = self.convertAdlFile("testDisplay.adl")
@@ -321,21 +334,9 @@ class TestOutputHandler(unittest.TestCase):
             "PyDMScatterPlot", 
             key)
 
-        prop = self.getNamedProperty(widget, "title")
-        # self.print_xml_children(prop, iter=True)
-        self.assertEqualString(prop, "Calibration Curve (S1A:H1)")
-
-        prop = self.getNamedProperty(widget, "xLabels")
-        # self.print_xml_children(prop, iter=True)
-        self.assertEqualString(prop, "Magnetic Field")
-
-        prop = self.getNamedProperty(widget, "yLabels")
-        # self.print_xml_children(prop, iter=True)
-        self.assertEqualString(prop, "Current")
-
-        prop = self.getNamedProperty(widget, "title")
-        # self.print_xml_children(prop, iter=True)
-        self.assertEqualString(prop, "Calibration Curve (S1A:H1)")
+        self.assertEqualTitle(widget, "Calibration Curve (S1A:H1)")
+        self.assertEqualPropertyString(widget, "xLabels", "Magnetic Field")
+        self.assertEqualPropertyString(widget, "yLabels", "Current")
 
         prop = self.getNamedProperty(widget, "curves")
         stringlist = self.getSubElement(prop, "stringlist")
@@ -410,12 +411,8 @@ class TestOutputHandler(unittest.TestCase):
         # self.print_xml_children(widget)
         self.assertEqualClassName(widget, "PyDMEmbeddedDisplay", key)
         self.assertEqual(len(widget), 4)
-
-        prop = self.getNamedProperty(widget, "filename")
-        self.assertEqualString(prop, "configMenuHead_bare.ui")
-
-        prop = self.getNamedProperty(widget, "macros")
-        self.assertEqualString(prop, "P=${P},CONFIG=${CONFIG}")
+        self.assertEqualPropertyString(widget, "filename", "configMenuHead_bare.ui")
+        self.assertEqualPropertyString(widget, "macros", "P=${P},CONFIG=${CONFIG}")
 
     def test_write_widget_image(self):
         uiname = self.convertAdlFile("testDisplay.adl")
@@ -433,9 +430,7 @@ class TestOutputHandler(unittest.TestCase):
         self.assertEqualClassName(widget, "PyDMDrawingImage", key)
         # self.print_xml_children(widget)
 
-        prop = self.getNamedProperty(widget, "filename")
-        # self.print_xml_children(prop, iter=True)
-        self.assertEqualString(prop, "apple.gif")
+        self.assertEqualPropertyString(widget, "filename", "apple.gif")
 
     def test_write_widget_indicator(self):
         uiname = self.convertAdlFile("testDisplay.adl")
@@ -469,8 +464,7 @@ class TestOutputHandler(unittest.TestCase):
         self.assertEqualChannel(widget, "ca://Xorbit:S1A:H1:CurrentAO")
 
         # meter widget has no title
-        prop = self.getNamedProperty(widget, "title")
-        self.assertIsNone(prop)
+        self.assertEqualTitle(widget, None)
 
         # if not found, then gets default value in PyDM
         for item in "limitsFromChannel userUpperLimit userLowerLimit".split():
@@ -511,18 +505,10 @@ class TestOutputHandler(unittest.TestCase):
         key = "message_button"
         widget = self.getNamedWidget(screen, key)
         self.assertEqualClassName(widget, "PyDMPushButton", "message_button")
-        # self.print_xml_children(widget)
-
-        prop = self.getNamedProperty(widget, "text")
-        self.assertEqualString(prop, "S1A:H1 Reset")
-
-        prop = self.getNamedProperty(widget, "toolTip")
-        self.assertEqualString(prop, "Xorbit:S1A:H1:CurrentAO")
-
+        self.assertEqualPropertyString(widget, "text", "S1A:H1 Reset")
+        self.assertEqualPropertyString(widget, "toolTip", "Xorbit:S1A:H1:CurrentAO")
         self.assertEqualChannel(widget, "ca://Xorbit:S1A:H1:CurrentAO")
-
-        prop = self.getNamedProperty(widget, "pressValue")
-        self.assertEqualString(prop, "0.00")
+        self.assertEqualPropertyString(widget, "pressValue", "0.00")
 
     def test_write_widget_meter(self):
         uiname = self.convertAdlFile("meter.adl")
@@ -537,22 +523,10 @@ class TestOutputHandler(unittest.TestCase):
         key = "meter"
         widget = self.getNamedWidget(screen, key)
         self.assertEqualClassName(widget, "PyDMScaleIndicator", key)
-
-        # meter widget has no title
-        prop = self.getNamedProperty(widget, "title")
-        self.assertIsNone(prop)
-
-        prop = self.getNamedProperty(widget, "limitsFromChannel")
-        self.assertEqualBool(prop, False)
-
-        prop = self.getNamedProperty(widget, "userUpperLimit")
-        child = self.getSubElement(prop, "double")
-        self.assertEqual(float(child.text), 10)
-
-        prop = self.getNamedProperty(widget, "userLowerLimit")
-        child = self.getSubElement(prop, "double")
-        self.assertEqual(float(child.text), -10)
-
+        self.assertEqualTitle(widget, None) # meter widget has no title
+        self.assertEqualPropertyBool(widget, "limitsFromChannel", False)
+        self.assertEqualPropertyDouble(widget, "userUpperLimit", 10)
+        self.assertEqualPropertyDouble(widget, "userLowerLimit", -10)
 
     def test_write_widget_rectangle(self):
         """
@@ -603,27 +577,10 @@ class TestOutputHandler(unittest.TestCase):
         self.assertEqualToolTip(rect, key)
         properties = rect.findall("property")
         self.assertEqual(len(properties), 6)
-
-        prop = self.getNamedProperty(rect, "brush")
-        for item in prop.iter():
-            if item.tag == "brush":
-                self.assertExpectedAttrib(item, brushstyle="NoBrush")
-        self.assertPropertyColor(prop, 253, 0, 0, alpha="255")
-
-        prop = self.getNamedProperty(rect, "penStyle")
-        self.assertExpectedAttrib(prop, stdset="0")
-        for item in prop.iter():
-            if item.tag == "enum":
-                self.assertEqual(item.text, "Qt::SolidLine")
-
-        prop = self.getNamedProperty(rect, "penColor")
-        self.assertPropertyColor(prop, 253, 0, 0)
-
-        prop = self.getNamedProperty(rect, "penWidth")
-        self.assertExpectedAttrib(prop, stdset="0")
-        for item in prop.iter():
-            if item.tag == "double":
-                self.assertEqual(float(item.text), 1)
+        self.assertEqualBrush(rect, "NoBrush", 253, 0, 0)
+        self.assertEqualPenStyle(rect, "Qt::SolidLine")
+        self.assertEqualPenColor(rect, 253, 0, 0)
+        self.assertEqualPenWidth(rect, 1)
 
         key = "rectangle_2"
         rect = children[2]
@@ -632,29 +589,10 @@ class TestOutputHandler(unittest.TestCase):
         self.assertEqualToolTip(rect, key)
         properties = rect.findall("property")
         self.assertEqual(len(properties), 6)
-
-        prop = self.getNamedProperty(rect, "brush")
-        self.assertExpectedAttrib(prop, stdset="0")
-        for item in prop.iter():
-            if item.tag == "brush":
-                self.assertExpectedAttrib(item, brushstyle="NoBrush")
-        self.assertPropertyColor(prop, 249, 218, 60, alpha="255")
-
-        prop = self.getNamedProperty(rect, "penStyle")
-        self.assertExpectedAttrib(prop, stdset="0")
-        for item in prop.iter():
-            if item.tag == "enum":
-                self.assertEqual(item.text, "Qt::DashLine")
-
-        prop = self.getNamedProperty(rect, "penColor")
-        self.assertExpectedAttrib(prop, name="penColor", stdset="0")
-        self.assertPropertyColor(prop, 249, 218, 60)
-
-        prop = self.getNamedProperty(rect, "penWidth")
-        self.assertExpectedAttrib(prop, name="penWidth", stdset="0")
-        for item in prop.iter():
-            if item.tag == "double":
-                self.assertEqual(float(item.text), 1)
+        self.assertEqualBrush(rect, "NoBrush", 249, 218, 60)
+        self.assertEqualPenStyle(rect, "Qt::DashLine")
+        self.assertEqualPenColor(rect, 249, 218, 60)
+        self.assertEqualPenWidth(rect, 1)
 
         key = "rectangle_3"
         rect = children[3]
@@ -663,29 +601,10 @@ class TestOutputHandler(unittest.TestCase):
         self.assertEqualToolTip(rect, key)
         properties = rect.findall("property")
         self.assertEqual(len(properties), 7)
-
-        prop = self.getNamedProperty(rect, "brush")
-        self.assertExpectedAttrib(prop, stdset="0")
-        for item in prop.iter():
-            if item.tag == "brush":
-                self.assertExpectedAttrib(item, brushstyle="NoBrush")
-        self.assertPropertyColor(prop, 115, 255, 107, alpha="255")
-
-        prop = self.getNamedProperty(rect, "penStyle")
-        self.assertExpectedAttrib(prop, stdset="0")
-        for item in prop.iter():
-            if item.tag == "enum":
-                self.assertEqual(item.text, "Qt::SolidLine")
-
-        prop = self.getNamedProperty(rect, "penColor")
-        self.assertExpectedAttrib(prop, stdset="0")
-        self.assertPropertyColor(prop, 115, 255, 107)
-
-        prop = self.getNamedProperty(rect, "penWidth")
-        self.assertExpectedAttrib(prop, stdset="0")
-        for item in prop.iter():
-            if item.tag == "double":
-                self.assertEqual(float(item.text), 6)
+        self.assertEqualBrush(rect, "NoBrush", 115, 255, 107)
+        self.assertEqualPenStyle(rect, "Qt::SolidLine")
+        self.assertEqualPenColor(rect, 115, 255, 107)
+        self.assertEqualPenWidth(rect, 6)
 
         prop = self.getNamedProperty(rect, "rules")
         self.assertExpectedAttrib(prop, stdset="0")
@@ -710,29 +629,10 @@ class TestOutputHandler(unittest.TestCase):
         self.assertEqualToolTip(rect, key)
         properties = rect.findall("property")
         self.assertEqual(len(properties), 7)
-
-        prop = self.getNamedProperty(rect, "brush")
-        self.assertExpectedAttrib(prop, stdset="0")
-        for item in prop.iter():
-            if item.tag == "brush":
-                self.assertExpectedAttrib(item, brushstyle="SolidPattern")
-        self.assertPropertyColor(prop, 115, 223, 255, alpha="255")
-
-        prop = self.getNamedProperty(rect, "penStyle")
-        self.assertExpectedAttrib(prop, stdset="0")
-        for item in prop.iter():
-            if item.tag == "enum":
-                self.assertEqual(item.text, "Qt::SolidLine")
-
-        prop = self.getNamedProperty(rect, "penColor")
-        self.assertExpectedAttrib(prop, stdset="0")
-        self.assertPropertyColor(prop, 115, 223, 255)
-
-        prop = self.getNamedProperty(rect, "penWidth")
-        self.assertExpectedAttrib(prop, stdset="0")
-        for item in prop.iter():
-            if item.tag == "double":
-                self.assertEqual(float(item.text), 0)
+        self.assertEqualBrush(rect, "SolidPattern", 115, 223, 255)
+        self.assertEqualPenStyle(rect, "Qt::SolidLine")
+        self.assertEqualPenColor(rect, 115, 223, 255)
+        self.assertEqualPenWidth(rect, 0)
 
         prop = self.getNamedProperty(rect, "rules")
         self.assertExpectedAttrib(prop, stdset="0")
@@ -771,11 +671,8 @@ class TestOutputHandler(unittest.TestCase):
             key)
         # self.print_xml_children(widget)
 
-        prop = self.getNamedProperty(widget, "toolTip")
-        self.assertEqualString(prop, key)
-
-        prop = self.getNamedProperty(widget, "text")
-        self.assertEqualString(prop, key)
+        self.assertEqualPropertyString(widget, "toolTip", key)
+        self.assertEqualPropertyString(widget, "text", key)
 
         expected = """PyDMRelatedDisplayButton#%s {
   color: rgb(0, 0, 0);
@@ -783,13 +680,10 @@ class TestOutputHandler(unittest.TestCase):
   }""" % key
         self.assertEqualStyleSheet(widget, expected)
 
-        # prop = self.getNamedProperty(widget, "openInNewWindow")
-        # child = prop.find("bool")
-        # self.assertEqual(child.text, "true")
-
-        # prop = self.getNamedProperty(widget, "showIcon")
-        # child = prop.find("bool")
-        # self.assertEqual(child.text, "true")
+        self.assertIsNoneProperty(widget, "openInNewWindow")
+        # self.assertEqualPropertyBool(widget, "openInNewWindow", True)
+        self.assertIsNoneProperty(widget, "showIcon")
+        # self.assertEqualPropertyBool(widget, "showIcon", True)
 
         prop = self.getNamedProperty(widget, "filenames")
         stringlist = prop.find("stringlist")
@@ -824,14 +718,9 @@ class TestOutputHandler(unittest.TestCase):
             "PyDMTimePlot", 
             key)
 
-        prop = self.getNamedProperty(widget, "title")
-        self.assertEqualString(prop, "chart title text")
-
-        prop = self.getNamedProperty(widget, "xLabels")
-        self.assertEqualString(prop, "x axis text")
-
-        prop = self.getNamedProperty(widget, "yLabels")
-        self.assertEqualString(prop, "y axis text")
+        self.assertEqualTitle(widget, "chart title text")
+        self.assertEqualPropertyString(widget, "xLabels", "x axis text")
+        self.assertEqualPropertyString(widget, "yLabels", "y axis text")
 
     def test_write_widget_strip_chart(self):
         uiname = self.convertAdlFile("testDisplay.adl")
@@ -852,9 +741,7 @@ class TestOutputHandler(unittest.TestCase):
             "PyDMTimePlot", 
             key)
 
-        prop = self.getNamedProperty(widget, "title")
-        # self.print_xml_children(prop, iter=True)
-        self.assertEqualString(prop, "Horizontal Correctors")
+        self.assertEqualTitle(widget, "Horizontal Correctors")
 
         prop = self.getNamedProperty(widget, "curves")
         stringlist = self.getSubElement(prop, "stringlist")
@@ -900,8 +787,9 @@ class TestOutputHandler(unittest.TestCase):
         key = "text"
         widget = self.getNamedWidget(screen, key)
         self.assertEqualClassName(widget, "PyDMLabel", key)
-        prop = self.getNamedProperty(widget, "text")
-        self.assertEqualString(prop, "Test Display")
+
+        self.assertEqualPropertyString(widget, "text", "Test Display")
+
         prop = self.getNamedProperty(widget, "alignment")
         child = self.getSubElement(prop, "set")
         self.assertIsNotNone(child)
@@ -981,9 +869,7 @@ class TestOutputHandler(unittest.TestCase):
             "PyDMLabel", 
             key)
 
-        prop = self.getNamedProperty(widget, "text")
-        # self.print_xml_children(prop, iter=True)
-        self.assertEqualString(prop, "macro P=${P}")
+        self.assertEqualPropertyString(widget, "text", "macro P=${P}")
 
         key = "text_update"
         widget = self.getNamedWidget(screen, key)
@@ -1001,8 +887,7 @@ class TestOutputHandler(unittest.TestCase):
             for item in geom.iter():
                 if item.tag == "height":
                     height = item.text
-            prop = self.getNamedProperty(widget, "text")
-            self.assertEqualString(prop, "height: " + height)
+            self.assertEqualPropertyString(widget, "text", "height: " + height)
 
 
 class Test_PYDM_Writer_Support(unittest.TestCase):
