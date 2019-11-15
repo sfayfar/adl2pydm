@@ -576,4 +576,4 @@ class MedmTextWidget(MedmGenericWidget):
 class MedmTextEntryWidget(MedmGenericWidget): pass
 class MedmTextUpdateWidget(MedmGenericWidget): pass
 class MedmValuatorWidget(MedmGenericWidget): pass
-class MedmWheelSwitchWidget(MedmGenericWidget): debug = True # TODO: need example in .adl file!
+class MedmWheelSwitchWidget(MedmGenericWidget): ...
