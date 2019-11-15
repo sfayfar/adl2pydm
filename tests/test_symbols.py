@@ -37,7 +37,7 @@ class Test_Module(unittest.TestCase):
         # "arc" : dict(type="static", pydm_widget="PyDMDrawingArc"),
         w = symbols.adl_widgets["arc"]
         self.assertEqual(w["type"], "static")
-        self.assertEqual(w["pydm_widget"], "PyDMDrawingArc")
+        self.assertEqual(w["pydm_widget"], "PyDMDrawingPie")
         self.assertEqual(w["type"], "static")
 
         self.assertEqual(len(symbols.pydm_widgets), 32)

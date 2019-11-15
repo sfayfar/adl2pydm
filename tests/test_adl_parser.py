@@ -177,8 +177,8 @@ class Test_Files(unittest.TestCase):
         self.assertTrue(hasattr(w, "contents"))
         self.assertIsInstance(w.contents, dict)
         self.assertEqual(len(w.contents), 4)
-        self.assertEqualDictKeyValue(w.contents, "begin", "0")
-        self.assertEqualDictKeyValue(w.contents, "path", "23040")
+        self.assertEqualDictKeyValue(w.contents, "beginAngle", 0.0)
+        self.assertEqualDictKeyValue(w.contents, "pathAngle", 360.0)
 
         self.assertIn("basic attribute", w.contents)
         attr = w.contents["basic attribute"]
@@ -373,14 +373,15 @@ class Test_Files(unittest.TestCase):
         w = self.pickWidget(screen, 12, 5, "indicator", 156)
         
         self.assertEqualGeometry(w, 178, 52, 250, 25)
-        self.assertEqualTitle(w, "no decorations")
+        self.assertEqualTitle(w, None)
         self.assertEqualColor(w.color, 0, 0, 0)
         self.assertEqualColor(w.background_color, 115, 223, 255)
 
         self.assertIsInstance(w.contents, dict)
-        self.assertEqual(len(w.contents), 2)
+        self.assertEqual(len(w.contents), 3)
 
-        self.assertEqualDictKeyValue(w.contents, "limits", "")
+        # self.assertEqualDictKeyValue(w.contents, "beginAngle", 0.0)
+        # self.assertEqualDictKeyValue(w.contents, "pathAngle", 360.0)
         self.assertIn("monitor", w.contents)
         monitor = w.contents["monitor"]
         self.assertEqual(len(monitor), 1)
@@ -415,7 +416,7 @@ class Test_Files(unittest.TestCase):
         self.assertEqualColor(w.background_color, 160, 18, 7)
 
         self.assertIsInstance(w.contents, dict)
-        self.assertEqual(len(w.contents), 4)
+        self.assertEqual(len(w.contents), 5)
         self.assertEqualDictKeyValue(w.contents, "clrmod", "static")
         self.assertEqualDictKeyValue(w.contents, "press_msg", "1")
         self.assertEqualDictKeyValue(w.contents, "release_msg", "")
@@ -646,26 +647,31 @@ class Test_Files(unittest.TestCase):
         
         self.assertEqualGeometry(w, 52, 247, 100, 20)
         self.assertIsInstance(w.contents, dict)
-        self.assertEqual(len(w.contents), 2)
+        self.assertEqual(len(w.contents), 3)
         self.assertEqualDictKeyValue(w.contents, "dPrecision", "0.010000")
         self.assertIn("control", w.contents)
         control = w.contents["control"]
         self.assertEqual(len(control), 1)
         self.assertEqualDictKeyValue(control, "chan", "$(P)$(HSC)l")
-        self.assertEqualTitle(w, "no decorations")
+        self.assertEqualTitle(w, None)
 
     def test_parse_medm_widget_wheel_switch(self):
         screen = self.parseFile("wheel_switch.adl")
         w = self.pickWidget(screen, 1, 0, "wheel switch", 90)
         
-        self.assertEqualGeometry(w, 48, 29, 144, 48)
+        self.assertEqualGeometry(w, 19, 16, 185, 91)
         self.assertEqualTitle(w, None)
         self.assertIsInstance(w.contents, dict)
-        self.assertEqual(len(w.contents), 2)
-        self.assertEqualDictKeyValue(w.contents, "limits", "")
+        self.assertEqual(len(w.contents), 7)
+        self.assertEqualDictKeyValue(w.contents, "hoprSrc", "default")
+        self.assertEqualDictKeyValue(w.contents, "loprSrc", "default")
+        self.assertEqualDictKeyValue(w.contents, "precSrc", "default")
+        self.assertEqualDictKeyValue(w.contents, "hoprDefault", "10")
+        self.assertEqualDictKeyValue(w.contents, "loprDefault", "-10")
+        self.assertEqualDictKeyValue(w.contents, "precDefault", "3")
         control = w.contents["control"]
         self.assertEqual(len(control), 1)
-        self.assertEqualDictKeyValue(control, "chan", "$(P)$(M)")
+        self.assertEqualDictKeyValue(control, "chan", "sky:userCalc2.A")
 
 
 def suite(*args, **kw):
