@@ -179,8 +179,11 @@ class MedmBaseWidget(object):
                     break
             del blocks[i]
         
-        if "label" in assignments:
-            self.title = assignments.pop("label")
+        reservedLabels = "channel limits outline none".split()
+        reservedLabels.append("no decorations")
+        label = assignments.get("label")
+        if label is not None and label not in reservedLabels:
+            self.title = label
 
         # stash remaining contents
         contents = dict(**assignments)
