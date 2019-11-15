@@ -687,6 +687,19 @@ class Widget2Pydm(object):
         pv = self.get_channel(block.contents["control"])
         self.write_channel(qw, pv)
         self.write_tooltip(qw, pv)
+        self.write_limits(qw, block)
+        # TODO: format - maybe not support in Qt QDoubleSpinBox
+        # https://doc.qt.io/qt-5/qdoublespinbox.html#details
+        # If the Format is not specified, then the WheelSwitch calculates it based on the low and high limits and the precision.
+        # https://epics.anl.gov/EpicsDocumentation/ExtensionsManuals/MEDM/MEDM.html#Label
+        """
+   <property name="precision" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="showStepExponent" stdset="0">
+    <bool>true</bool>
+   </property>
+        """
 
     # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
