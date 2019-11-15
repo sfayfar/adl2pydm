@@ -50,7 +50,48 @@ Geometry = namedtuple('Geometry', 'x y width height')
 Point = namedtuple('Point', 'x y')
 
 # Internally the angles are specified in integer 1/64-degree units.
-MEDM_ANGLE_UNITS = 1.0/64
+MEDM_DEGREE_UNITS = 64.0
+
+
+def deg_to_adl(deg):
+    """
+    Converts from degrees to MEDM degrees.
+
+    1 deg = 64 MEDMdeg
+
+    Parameters
+    ----------
+    deg : float
+        The value to convert.
+
+    Returns
+    -------
+    int
+        The value converted.
+    """
+    # Angles for MEDM are in units of 1/64 of a degree
+    return int(deg * MEDM_DEGREE_UNITS)
+
+
+def adl_to_deg(deg):
+    """
+    Converts from MEDM degrees to degrees.
+
+    1 deg = 64 MEDMdeg
+
+    Parameters
+    ----------
+    deg : float, int, str
+        The value to convert.
+
+    Returns
+    -------
+    float
+        The value converted.
+    """
+    # Angles for MEDM are in units of 1/64 of a degree
+    return float(deg) / MEDM_DEGREE_UNITS
+
 
 class Block(object):
     """ADL file block structure"""
@@ -207,7 +248,7 @@ class MedmBaseWidget(object):
         for angle_name in "begin path".split():
             if angle_name in self.contents:
                 angle = self.contents.pop(angle_name)
-                self.contents[angle_name + "Angle"] = int(angle)*MEDM_ANGLE_UNITS
+                self.contents[angle_name + "Angle"] = adl_to_deg(angle)
 
         block = self.getNamedBlock("points", blocks)
         if block is not None:
