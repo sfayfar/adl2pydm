@@ -509,8 +509,6 @@ class Widget2Pydm(object):
             or 
             block.contents.get("loprSrc") == "default"
         ):
-            self.writePropertyBoolean(qw, "userDefinedLimits", True, stdset="0")
-
             # TODO: precDefault gives info about the step size if precSrc == "default"
 
             label = block.contents.get("label")
@@ -543,6 +541,7 @@ class Widget2Pydm(object):
                 emsg = "limits for %s widget not handled" % qw.attrib["class"]
                 raise NotImplementedError(emsg)
 
+            self.writePropertyBoolean(qw, "userDefinedLimits", True, stdset="0")
             self.writer.writeProperty(
                 qw, 
                 hiLimitName, 
