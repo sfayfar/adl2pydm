@@ -576,4 +576,4 @@ class MedmTextWidget(MedmGenericWidget):
 class MedmTextEntryWidget(MedmGenericWidget): pass
 class MedmTextUpdateWidget(MedmGenericWidget): pass
 class MedmValuatorWidget(MedmGenericWidget): pass
-class MedmWheelSwitchWidget(MedmGenericWidget): ...
+class MedmWheelSwitchWidget(MedmGenericWidget): pass
