@@ -249,6 +249,12 @@ class Widget2Pydm(object):
             self.writer.writeTaggedString(item, "green", str(color.g))
             self.writer.writeTaggedString(item, "blue", str(color.b))
         
+    def write_direction(self, parent, block, nm, qw):
+        # up & left only used in Bar Monitor
+        direction = block.contents.get("direction", "right")
+        orientation = {"right": "Qt::Horizontal", "down": "Qt::Vertical"}[direction]
+        self.writer.writeProperty(qw, "orientation", orientation, stdset="0")
+
     def write_dynamic_attribute(self, parent, block, nm, qw):
         attr = block.contents.get("dynamic attribute")
         if attr is None:
@@ -332,7 +338,6 @@ class Widget2Pydm(object):
                 stdset="0")
 
     def write_block_byte_indicator(self, parent, block, nm, qw):
-        direction = block.contents.get("direction", "right")
         ebit = int(block.contents.get("ebit", 0))
         sbit = int(block.contents.get("sbit", 0))
         numBits = 1 + max(ebit, sbit) - min(ebit, sbit)
@@ -351,8 +356,7 @@ class Widget2Pydm(object):
         block.color = None
         block.background_color = None
 
-        orientation = {"right": "Qt::Horizontal", "down": "Qt::Vertical"}[direction]
-        self.writer.writeProperty(qw, "orientation", orientation, stdset="0")
+        self.write_direction(parent, block, nm, qw)
         self.writePropertyBoolean(qw, "showLabels", False, stdset="0")
         self.writePropertyBoolean(qw, "bigEndian", sbit < ebit, stdset="0")
         self.writer.writeProperty(qw, "numBits", numBits, tag="number", stdset="0")
@@ -493,26 +497,58 @@ class Widget2Pydm(object):
         pv = self.get_channel(block.contents["monitor"])
         self.write_tooltip(qw, pv)
         self.write_channel(qw, pv)
+        self.write_limits(qw, block)
 
         precision = block.contents.get("precision")        # TODO: needs an example from .adl
         if precision is not None:
             logger.warning("precision needs an example .adl file")
 
+    def write_limits(self, qw, block):
         if (
             block.contents.get("hoprSrc") == "default"
             or 
             block.contents.get("loprSrc") == "default"
         ):
-            self.writePropertyBoolean(qw, "limitsFromChannel", False, stdset="0")
+            self.writePropertyBoolean(qw, "userDefinedLimits", True, stdset="0")
+
+            # TODO: precDefault gives info about the step size if precSrc == "default"
+
+            label = block.contents.get("label")
+            # https://epics.anl.gov/EpicsDocumentation/ExtensionsManuals/MEDM/MEDM.html#Label
+            if label is None:
+                show = dict(limits=True, values=False)
+            elif label == "no decorations":
+                # TODO: For the Bar Monitor, only the background and the bar show
+                show = dict(limits=True, values=False)
+            elif label == "outline":
+                show = dict(limits=True, values=False)
+            elif label == "limits":
+                show = dict(limits=True, values=True)
+            elif label == "channel":
+                show = dict(limits=True, values=True)
+            self.writePropertyBoolean(qw, "showLimitLabels", show["limits"], stdset="0")
+            self.writePropertyBoolean(qw, "showValueLabel", show["values"], stdset="0")
+
+            if qw.attrib["class"] == "PyDMScaleIndicator":
+                self.writePropertyBoolean(qw, "limitsFromChannel", False, stdset="0")
+                hiLimitName = "userUpperLimit"
+                loLimitName = "userLowerLimit"
+            elif qw.attrib["class"] == "PyDMSlider":
+                hiLimitName = "userMaximum"
+                loLimitName = "userMinimum"
+            else:
+                emsg = "limits for %s widget not handled" % qw.attrib["class"]
+                raise NotImplementedError(emsg)
+
             self.writer.writeProperty(
                 qw, 
-                "userUpperLimit", 
+                hiLimitName, 
                 block.contents.get("hoprDefault", str(0.0)), 
                 tag="double", 
                 stdset="0")
             self.writer.writeProperty(
                 qw, 
-                "userLowerLimit", 
+                loLimitName, 
                 block.contents.get("loprDefault", str(0.0)), 
                 tag="double", 
                 stdset="0")
@@ -640,10 +676,12 @@ class Widget2Pydm(object):
         pv = self.get_channel(block.contents["control"])
         self.write_channel(qw, pv)
         self.write_tooltip(qw, pv)
-        item = "dPrecision"
-        if item in block.contents:
-            logger.warning("block.contents['%s'] not handled" % item)
-        # TODO:
+        self.write_direction(parent, block, nm, qw)
+        self.write_limits(qw, block)
+        
+        precision = block.contents.get("dPrecision")
+        if precision is not None:
+            self.writer.writeProperty(qw, "precision", str(precision), tag="number")
 
     def write_block_wheel_switch(self, parent, block, nm, qw):
         pv = self.get_channel(block.contents["control"])
