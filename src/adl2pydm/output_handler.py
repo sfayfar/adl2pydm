@@ -188,7 +188,7 @@ class Widget2Pydm(object):
             json_rules = jsonEncode(rules)
             self.writer.writeProperty(widget, "rules", json_rules, stdset="0")
         
-    def write_basic_attribute(self, parent, block, nm, qw):
+    def write_basic_attribute(self, qw, block):
         attr = block.contents.get("basic attribute")
         if attr is None:
             return
@@ -231,7 +231,9 @@ class Widget2Pydm(object):
             if cls not in self.custom_widgets:
                 self.custom_widgets.append(cls)
 
-        handler = self.pydm_widget_handlers.get(block.symbol, self.write_block_default)
+        handler = self.pydm_widget_handlers.get(
+            block.symbol, 
+            self.write_block_default)
         cls = widget_info["pydm_widget"]
         # if block.symbol.find("chart") >= 0:
         #     _z = 2
@@ -239,8 +241,9 @@ class Widget2Pydm(object):
         qw = self.writer.writeOpenTag(parent, "widget", cls=cls, name=nm)
         self.write_geometry(qw, block.geometry)
         # self.write_colors_style(qw, block)
-        logger.debug("(#%d) %s: %s" % (block.line_offset, block.symbol, nm))
         handler(parent, block, nm, qw)
+        msg = "(#%d) %s -> %s: %s" % (block.line_offset, block.symbol, cls, nm)
+        logger.debug(msg)
 
     def write_color_element(self, xml_element, color, **kwargs):
         if color is not None:
@@ -249,13 +252,13 @@ class Widget2Pydm(object):
             self.writer.writeTaggedString(item, "green", str(color.g))
             self.writer.writeTaggedString(item, "blue", str(color.b))
         
-    def write_direction(self, parent, block, nm, qw):
+    def write_direction(self, qw, block):
         # up & left only used in Bar Monitor
         direction = block.contents.get("direction", "right")
         orientation = {"right": "Qt::Horizontal", "down": "Qt::Vertical"}[direction]
         self.writer.writeProperty(qw, "orientation", orientation, stdset="0")
 
-    def write_dynamic_attribute(self, parent, block, nm, qw):
+    def write_dynamic_attribute(self, qw, block):
         attr = block.contents.get("dynamic attribute")
         if attr is None:
             return
@@ -307,8 +310,8 @@ class Widget2Pydm(object):
         
     def write_block_default(self, parent, block, nm, qw):
         self.write_tooltip(qw, "TBA widget: " + nm)
-        self.write_basic_attribute(parent, block, nm, qw)
-        self.write_dynamic_attribute(parent, block, nm, qw)
+        self.write_basic_attribute(qw, block)
+        self.write_dynamic_attribute(qw, block)
         # what styling is effective?
         #self.writer.writeProperty(qw, "frameShape", "QFrame::StyledPanel", tag="enum")
         #self.writer.writeProperty(qw, "frameShadow", "QFrame::Raised", tag="enum")
@@ -316,8 +319,8 @@ class Widget2Pydm(object):
         #self.writer.writeProperty(qw, "midLineWidth", "2", tag="number")
 
     def write_block_arc(self, parent, block, nm, qw):
-        self.write_basic_attribute(parent, block, nm, qw)
-        self.write_dynamic_attribute(parent, block, nm, qw)
+        self.write_basic_attribute(qw, block)
+        self.write_dynamic_attribute(qw, block)
 
         beginAngle = block.contents.get("beginAngle", 0)
         pathAngle = block.contents.get("pathAngle", 0)
@@ -356,7 +359,7 @@ class Widget2Pydm(object):
         block.color = None
         block.background_color = None
 
-        self.write_direction(parent, block, nm, qw)
+        self.write_direction(qw, block)
         self.writePropertyBoolean(qw, "showLabels", False, stdset="0")
         self.writePropertyBoolean(qw, "bigEndian", sbit < ebit, stdset="0")
         self.writer.writeProperty(qw, "numBits", numBits, tag="number", stdset="0")
@@ -372,7 +375,7 @@ class Widget2Pydm(object):
         Could be either PyDMWaveformPlot or PyDMScatterPlot
         """
         logger.debug("line %d in file: %s" % (block.line_offset, block.main.given_filename))
-        logger.debug("contents:\n" + json.dumps(block.contents, indent=2))
+        # logger.debug("contents:\n" + json.dumps(block.contents, indent=2))
         self.write_tooltip(qw, nm)
         self.writer.writeProperty(qw, "title", block.title, stdset="0")
 
@@ -432,7 +435,7 @@ class Widget2Pydm(object):
 
     def write_block_composite(self, parent, block, nm, qw):
         # self.write_tooltip(qw, nm)
-        self.write_dynamic_attribute(parent, block, nm, qw)
+        self.write_dynamic_attribute(qw, block)
         for widget in block.widgets:
             self.write_block(qw, widget)
 
@@ -464,96 +467,19 @@ class Widget2Pydm(object):
     def write_block_image(self, parent, block, nm, qw):
         image_name = block.contents.get("image name")
         self.writer.writeProperty(qw, "filename", image_name, tag="string", stdset="0")
-        self.write_dynamic_attribute(parent, block, nm, qw)
+        self.write_dynamic_attribute(qw, block)
         self.write_tooltip(qw, nm)
         
     def write_block_indicator(self, parent, block, nm, qw):
-        """
-        Also known as an Indicator.  
-        The scale monitor has attributes:
-        
-        * Object (X Position, Y Position, Width, Height)
-        * Monitor (Readback Channel, Foreground, Background)
-        * Limits (Low Limit, High Limit, Precision)
-        * Label
-        * Direction
-        * Color Mode
-        
-        The Scale Monitor displays the value of the process variable on a scale.  
-        The limits of the scale are the HOPR and LOPR values for the record 
-        associated with the process variable by default but may be set via 
-        the PV Limits Dialog Box.
-
-        The Meter has attributes:
-        
-        * Object (X Position, Y Position, Width, Height)
-        * Monitor (Readback Channel, Foreground, Background)
-        * Limits (Low Limit, High Limit, Precision)
-        * Label
-        * Color Mode
-        
-        It displays the value of the process variable on a meter with a dial.
-        """
         pv = self.get_channel(block.contents["monitor"])
         self.write_tooltip(qw, pv)
         self.write_channel(qw, pv)
         self.write_limits(qw, block)
+        self.write_direction(qw, block)
 
         precision = block.contents.get("precision")        # TODO: needs an example from .adl
         if precision is not None:
             logger.warning("precision needs an example .adl file")
-
-    def write_limits(self, qw, block):
-        if (
-            block.contents.get("hoprSrc") == "default"
-            or 
-            block.contents.get("loprSrc") == "default"
-        ):
-            # TODO: precDefault gives info about the step size if precSrc == "default"
-
-            label = block.contents.get("label")
-            # https://epics.anl.gov/EpicsDocumentation/ExtensionsManuals/MEDM/MEDM.html#Label
-            if label is None:
-                show = dict(limits=True, values=False)
-            elif label == "no decorations":
-                # TODO: For the Bar Monitor, only the background and the bar show
-                show = dict(limits=True, values=False)
-            elif label == "outline":
-                show = dict(limits=True, values=False)
-            elif label == "limits":
-                show = dict(limits=True, values=True)
-            elif label == "channel":
-                show = dict(limits=True, values=True)
-            self.writePropertyBoolean(qw, "showLimitLabels", show["limits"], stdset="0")
-            self.writePropertyBoolean(qw, "showValueLabel", show["values"], stdset="0")
-
-            if qw.attrib["class"] == "PyDMScaleIndicator":
-                self.writePropertyBoolean(qw, "limitsFromChannel", False, stdset="0")
-                hiLimitName = "userUpperLimit"
-                loLimitName = "userLowerLimit"
-            elif qw.attrib["class"] == "PyDMSlider":
-                hiLimitName = "userMaximum"
-                loLimitName = "userMinimum"
-            elif qw.attrib["class"] == "PyDMSpinbox":
-                hiLimitName = "maximum"
-                loLimitName = "minimum"
-            else:
-                emsg = "limits for %s widget not handled" % qw.attrib["class"]
-                raise NotImplementedError(emsg)
-
-            self.writePropertyBoolean(qw, "userDefinedLimits", True, stdset="0")
-            self.writer.writeProperty(
-                qw, 
-                hiLimitName, 
-                block.contents.get("hoprDefault", str(0.0)), 
-                tag="double", 
-                stdset="0")
-            self.writer.writeProperty(
-                qw, 
-                loLimitName, 
-                block.contents.get("loprDefault", str(0.0)), 
-                tag="double", 
-                stdset="0")
         
     def write_block_menu(self, parent, block, nm, qw):
         pv = self.get_channel(block.contents["control"])
@@ -581,18 +507,16 @@ class Widget2Pydm(object):
         self.write_tooltip(qw, nm)
 
     def write_block_rectangle(self, parent, block, nm, qw):
-        self.write_basic_attribute(parent, block, nm, qw)
-        self.write_dynamic_attribute(parent, block, nm, qw)
+        self.write_basic_attribute(qw, block)
+        self.write_dynamic_attribute(qw, block)
         self.write_tooltip(qw, nm)
 
     def write_block_related_display(self, parent, block, nm, qw):
         text = block.title or nm
-        showIcon = not text.startswith("-")
         text = text.lstrip("-")
         self.write_tooltip(qw, text)
         self.writer.writeProperty(qw, "text", text, tag="string")
-        if not showIcon:
-            self.writePropertyBoolean(qw, "showIcon", False, stdset="0")
+        self.writePropertyBoolean(qw, "showIcon", not text.startswith("-"), stdset="0")
         self.write_colors_style(qw, block)
         if hasattr(block, "displays"):
             displays = {
@@ -607,7 +531,6 @@ class Widget2Pydm(object):
                     self.writeStringText(stringlist, text=v)
 
         # # TODO: conditional
-        # self.writePropertyBoolean(qw, "showIcon", True)
         # self.writePropertyBoolean(qw, "openInNewWindow", True)
     
     def write_block_shell_command(self, parent, block, nm, qw):
@@ -651,8 +574,8 @@ class Widget2Pydm(object):
         if block.title is not None:
             text = convertMacros(block.title)
         self.writer.writeProperty(qw, "text", text, tag="string")
-        self.write_basic_attribute(parent, block, nm, qw)
-        self.write_dynamic_attribute(parent, block, nm, qw)
+        self.write_basic_attribute(qw, block)
+        self.write_dynamic_attribute(qw, block)
         self.write_tooltip(qw, nm)
         self.writePropertyTextAlignment(qw, block.contents)
     
@@ -666,11 +589,8 @@ class Widget2Pydm(object):
         pv = self.get_channel(block.contents["monitor"])
         self.write_tooltip(qw, "PV: " + pv)
         self.writePropertyTextAlignment(qw, block.contents)
-        self.writer.writeProperty(
-            qw, 
-            "textInteractionFlags", 
-            "Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse",
-            tag="set")
+        flags = "Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse"
+        self.writer.writeProperty(qw, "textInteractionFlags", flags, tag="set")
         self.write_channel(qw, pv)
         self.write_colors_style(qw, block)
         
@@ -678,7 +598,7 @@ class Widget2Pydm(object):
         pv = self.get_channel(block.contents["control"])
         self.write_channel(qw, pv)
         self.write_tooltip(qw, pv)
-        self.write_direction(parent, block, nm, qw)
+        self.write_direction(qw, block)
         self.write_limits(qw, block)
         
         precision = block.contents.get("dPrecision")
@@ -690,27 +610,15 @@ class Widget2Pydm(object):
         self.write_channel(qw, pv)
         self.write_tooltip(qw, pv)
         self.write_limits(qw, block)
-        # TODO: format - maybe not support in Qt QDoubleSpinBox
-        # https://doc.qt.io/qt-5/qdoublespinbox.html#details
-        # If the Format is not specified, then the WheelSwitch calculates it based on the low and high limits and the precision.
-        # https://epics.anl.gov/EpicsDocumentation/ExtensionsManuals/MEDM/MEDM.html#Label
-        """
-   <property name="precision" stdset="0">
-    <number>0</number>
-   </property>
-   <property name="showStepExponent" stdset="0">
-    <bool>true</bool>
-   </property>
-   <property name="minimum">
-    <double>-5.000000000000000</double>
-   </property>
-   <property name="maximum">
-    <double>5.000000000000000</double>
-   </property>
-   <property name="singleStep">
-    <double>0.100000000000000</double>
-   </property>
-        """
+
+        format = block.contents.get("format")
+        if format is not None:
+            wmsg = "wheel switch format is unsupported now: " + format
+            logger.warning(wmsg)
+            # TODO: format - maybe not supported in Qt QDoubleSpinBox
+            # https://doc.qt.io/qt-5/qdoublespinbox.html#details
+            # If the Format is not specified, then the WheelSwitch calculates it based on the low and high limits and the precision.
+            # https://epics.anl.gov/EpicsDocumentation/ExtensionsManuals/MEDM/MEDM.html#Label
 
     # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -759,6 +667,60 @@ class Widget2Pydm(object):
         self.writer.writeTaggedString(rect, "y", str(geom.y))
         self.writer.writeTaggedString(rect, "width", str(geom.width))
         self.writer.writeTaggedString(rect, "height", str(geom.height))
+
+    def write_limits(self, qw, block):
+        if (
+            block.contents.get("hoprSrc") == "default"
+            or 
+            block.contents.get("loprSrc") == "default"
+        ):
+            # TODO: precDefault gives info about the step size if precSrc == "default"
+            precSrc = block.contents.get("precSrc")
+            precDefault = block.contents.get("precDefault")
+
+            label = block.contents.get("label")
+            # https://epics.anl.gov/EpicsDocumentation/ExtensionsManuals/MEDM/MEDM.html#Label
+            if label is None:
+                show = dict(limits=True, values=False)
+            elif label == "no decorations":
+                # TODO: For the Bar Monitor, only the background and the bar show
+                show = dict(limits=True, values=False)
+            elif label == "outline":
+                show = dict(limits=True, values=False)
+            elif label == "limits":
+                show = dict(limits=True, values=True)
+            elif label == "channel":
+                show = dict(limits=True, values=True)
+            self.writePropertyBoolean(qw, "showLimitLabels", show["limits"], stdset="0")
+            self.writePropertyBoolean(qw, "showValueLabel", show["values"], stdset="0")
+
+            if qw.attrib["class"] == "PyDMScaleIndicator":
+                self.writePropertyBoolean(qw, "limitsFromChannel", False, stdset="0")
+                hiLimitName = "userUpperLimit"
+                loLimitName = "userLowerLimit"
+            elif qw.attrib["class"] == "PyDMSlider":
+                hiLimitName = "userMaximum"
+                loLimitName = "userMinimum"
+            elif qw.attrib["class"] == "PyDMSpinbox":
+                hiLimitName = "maximum"
+                loLimitName = "minimum"
+            else:
+                emsg = "limits for %s widget not handled" % qw.attrib["class"]
+                raise NotImplementedError(emsg)
+
+            self.writePropertyBoolean(qw, "userDefinedLimits", True, stdset="0")
+            self.writer.writeProperty(
+                qw, 
+                hiLimitName, 
+                block.contents.get("hoprDefault", str(0.0)), 
+                tag="double", 
+                stdset="0")
+            self.writer.writeProperty(
+                qw, 
+                loLimitName, 
+                block.contents.get("loprDefault", str(0.0)), 
+                tag="double", 
+                stdset="0")
 
     def writeStringText(self, parent, tag="string", text=""):
         s = self.writer.writeOpenTag(parent, tag)
