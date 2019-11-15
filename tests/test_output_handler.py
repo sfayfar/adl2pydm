@@ -682,8 +682,7 @@ class TestOutputHandler(unittest.TestCase):
 
         self.assertIsNoneProperty(widget, "openInNewWindow")
         # self.assertEqualPropertyBool(widget, "openInNewWindow", True)
-        self.assertIsNoneProperty(widget, "showIcon")
-        # self.assertEqualPropertyBool(widget, "showIcon", True)
+        self.assertEqualPropertyBool(widget, "showIcon", True)
 
         prop = self.getNamedProperty(widget, "filenames")
         stringlist = prop.find("stringlist")
@@ -808,10 +807,7 @@ class TestOutputHandler(unittest.TestCase):
 
         key = "text_entry"
         widget = self.getNamedWidget(screen, key)
-        self.assertEqualClassName(
-            widget, 
-            "PyDMLineEdit", 
-            key)
+        self.assertEqualClassName(widget, "PyDMLineEdit", key)
         # self.print_xml_children(widget)
 
         self.assertEqualChannel(widget, "ca://Xorbit:S1A:H1:CurrentAO")
