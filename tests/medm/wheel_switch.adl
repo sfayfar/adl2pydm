@@ -1,17 +1,17 @@
 
 file {
-	name="/home/mintadmin/wheelSwitch.adl"
+	name="/tmp/wheel_switch.adl"
 	version=030114
 }
 display {
 	object {
-		x=3
-		y=28
-		width=504
-		height=191
+		x=0
+		y=25
+		width=243
+		height=139
 	}
 	clr=14
-	bclr=57
+	bclr=4
 	cmap=""
 	gridSpacing=5
 	gridOn=0
@@ -89,16 +89,22 @@ display {
 }
 "wheel switch" {
 	object {
-		x=48
-		y=29
-		width=144
-		height=48
+		x=19
+		y=16
+		width=185
+		height=91
 	}
 	control {
-		chan="$(P)$(M)"
-		clr=54
-		bclr=50
+		chan="sky:userCalc2.A"
+		clr=14
+		bclr=45
 	}
 	limits {
+		loprSrc="default"
+		loprDefault=-10
+		hoprSrc="default"
+		hoprDefault=10
+		precSrc="default"
+		precDefault=3
 	}
 }
