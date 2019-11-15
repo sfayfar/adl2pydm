@@ -115,7 +115,7 @@ class TestOutputHandler(unittest.TestCase):
 
     def assertEqualNumber(self, prop, number):
         child = self.getSubElement(prop, "number")
-        self.assertEqual(child.text, str(number))
+        self.assertEqual(float(child.text), float(number))
 
     def assertEqualPenColor(self, parent, r, g, b):
         prop = self.getNamedProperty(parent, "penColor")
@@ -843,6 +843,65 @@ class TestOutputHandler(unittest.TestCase):
         self.assertEqual(
             child.text, 
             "Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse")
+
+    def test_write_widget_valuator(self):
+        uiname = self.convertAdlFile("testDisplay.adl")
+        full_uiname = os.path.join(self.tempdir, uiname)
+        self.assertTrue(os.path.exists(full_uiname))
+
+        root = ElementTree.parse(full_uiname).getroot()
+        screen = self.getSubElement(root, "widget")
+        # self.print_xml_children(screen)
+        widgets = screen.findall("widget")
+        self.assertEqual(len(widgets), 64)
+
+        key = "valuator"
+        widget = self.getNamedWidget(screen, key)
+        # self.print_xml_children(widget)
+        self.assertEqualClassName(
+            widget, 
+            "PyDMSlider", 
+            key)
+
+        self.assertEqualChannel(widget, "ca://Xorbit:S1A:H1:CurrentAO")
+        self.assertEqualPropertyString(widget, "orientation", "Qt::Horizontal")
+        self.assertEqualPropertyNumber(widget, "precision", 1)
+        for propName in """showLimitLabels 
+                           showValueLabel 
+                           userDefinedLimits
+                           userMaximum
+                           userMinimum
+                           """.split():
+            self.assertIsNoneProperty(widget, propName)
+
+    def test_write_widget_valuator_variations(self):
+        uiname = self.convertAdlFile("slider.adl")
+        full_uiname = os.path.join(self.tempdir, uiname)
+        self.assertTrue(os.path.exists(full_uiname))
+
+        root = ElementTree.parse(full_uiname).getroot()
+        screen = self.getSubElement(root, "widget")
+        # self.print_xml_children(screen)
+        widgets = screen.findall("widget")
+        self.assertEqual(len(widgets), 1)
+
+        key = "valuator"
+        widget = self.getNamedWidget(screen, key)
+        # self.print_xml_children(widget)
+        self.assertEqualClassName(
+            widget, 
+            "PyDMSlider", 
+            key)
+
+        self.assertEqualChannel(widget, "ca://sky:userCalc2.A")
+        self.assertEqualPropertyString(widget, "orientation", "Qt::Horizontal")
+        self.assertEqualPropertyNumber(widget, "precision", 0.1)
+        # self.print_xml_children(widget)
+        self.assertEqualPropertyBool(widget, "userDefinedLimits", True)
+        self.assertEqualPropertyDouble(widget, "userMaximum", 10)
+        self.assertEqualPropertyDouble(widget, "userMinimum", -10)
+        self.assertEqualPropertyBool(widget, "showLimitLabels", True)
+        self.assertEqualPropertyBool(widget, "showValueLabel", True)
 
     def test_write_widget_text_examples(self):
         uiname = self.convertAdlFile("text_examples.adl")
