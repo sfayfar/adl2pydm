@@ -536,6 +536,9 @@ class Widget2Pydm(object):
             elif qw.attrib["class"] == "PyDMSlider":
                 hiLimitName = "userMaximum"
                 loLimitName = "userMinimum"
+            elif qw.attrib["class"] == "PyDMSpinbox":
+                hiLimitName = "maximum"
+                loLimitName = "minimum"
             else:
                 emsg = "limits for %s widget not handled" % qw.attrib["class"]
                 raise NotImplementedError(emsg)
@@ -698,6 +701,15 @@ class Widget2Pydm(object):
    </property>
    <property name="showStepExponent" stdset="0">
     <bool>true</bool>
+   </property>
+   <property name="minimum">
+    <double>-5.000000000000000</double>
+   </property>
+   <property name="maximum">
+    <double>5.000000000000000</double>
+   </property>
+   <property name="singleStep">
+    <double>0.100000000000000</double>
    </property>
         """
 

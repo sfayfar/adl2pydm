@@ -874,27 +874,6 @@ class TestOutputHandler(unittest.TestCase):
                            """.split():
             self.assertIsNoneProperty(widget, propName)
 
-    def test_write_widget_wheel_switch(self):
-        uiname = self.convertAdlFile("wheel_switch.adl")
-        full_uiname = os.path.join(self.tempdir, uiname)
-        self.assertTrue(os.path.exists(full_uiname))
-
-        root = ElementTree.parse(full_uiname).getroot()
-        screen = self.getSubElement(root, "widget")
-        # self.print_xml_children(screen)
-        widgets = screen.findall("widget")
-        self.assertEqual(len(widgets), 1)
-
-        key = "wheel_switch"
-        widget = self.getNamedWidget(screen, key)
-        # self.print_xml_children(widget)
-        self.assertEqualClassName(
-            widget, 
-            "PyDMSpinbox", 
-            key)
-
-        self.assertEqualChannel(widget, "ca://sky:userCalc2.A")
-
     def test_write_widget_valuator_variations(self):
         uiname = self.convertAdlFile("slider.adl")
         full_uiname = os.path.join(self.tempdir, uiname)
@@ -923,6 +902,32 @@ class TestOutputHandler(unittest.TestCase):
         self.assertEqualPropertyDouble(widget, "userMinimum", -10)
         self.assertEqualPropertyBool(widget, "showLimitLabels", True)
         self.assertEqualPropertyBool(widget, "showValueLabel", True)
+
+    def test_write_widget_wheel_switch(self):
+        uiname = self.convertAdlFile("wheel_switch.adl")
+        full_uiname = os.path.join(self.tempdir, uiname)
+        self.assertTrue(os.path.exists(full_uiname))
+
+        root = ElementTree.parse(full_uiname).getroot()
+        screen = self.getSubElement(root, "widget")
+        # self.print_xml_children(screen)
+        widgets = screen.findall("widget")
+        self.assertEqual(len(widgets), 1)
+
+        key = "wheel_switch"
+        widget = self.getNamedWidget(screen, key)
+        # self.print_xml_children(widget)
+        self.assertEqualClassName(
+            widget, 
+            "PyDMSpinbox", 
+            key)
+
+        self.assertEqualChannel(widget, "ca://sky:userCalc2.A")
+        self.assertEqualPropertyDouble(widget, "maximum", 10)
+        self.assertEqualPropertyDouble(widget, "minimum", -10)
+        self.assertEqualPropertyBool(widget, "showLimitLabels", True)
+        self.assertEqualPropertyBool(widget, "showValueLabel", False)
+        self.assertEqualPropertyBool(widget, "userDefinedLimits", True)
 
     def test_write_widget_text_examples(self):
         uiname = self.convertAdlFile("text_examples.adl")
