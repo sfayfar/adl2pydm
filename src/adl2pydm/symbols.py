@@ -78,7 +78,7 @@ adl_widgets = {
     "text" : dict(type="static", pydm_widget="PyDMLabel"),
     "text entry" : dict(type="controller", pydm_widget="PyDMLineEdit"),
     "text update" : dict(type="monitor", pydm_widget="PyDMLabel"),
-    "valuator" : dict(type="controller", pydm_widget="PyDMLineEdit"),
+    "valuator" : dict(type="controller", pydm_widget="PyDMSlider"),
     "wheel switch" : dict(type="controller", pydm_widget="PyDMSpinbox"),
     }
 
