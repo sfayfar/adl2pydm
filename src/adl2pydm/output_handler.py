@@ -215,6 +215,9 @@ class Widget2Pydm(object):
             width = max(1, float(width))   # make sure the outline is seen
         self.writer.writeTaggedString(propty, "double", str(width))
 
+        propty = self.writer.writeOpenProperty(qw, "penCapStyle", stdset="0")
+        self.writer.writeTaggedString(propty, "enum", "Qt::FlatCap")
+
         block.color = None
 
     def write_block(self, parent, block):
@@ -369,7 +372,13 @@ class Widget2Pydm(object):
         self.write_tooltip(qw, pv)
         self.write_channel(qw, pv)
         self.write_colors_style(qw, block)
-        
+    
+    def writePropertyContentsLabel(self, qw, block, label, tag=None):
+        tag = tag or label
+        text = block.contents.get(label)
+        if text is not None:
+            self.writer.writeProperty(qw, tag, text)
+
     def write_block_cartesian_plot(self, parent, block, nm, qw):
         """
         Could be either PyDMWaveformPlot or PyDMScatterPlot
@@ -388,12 +397,8 @@ class Widget2Pydm(object):
             if count is not None:
                 count = int(count)
 
-            text = block.contents.get("xlabel")
-            if text is not None:
-                self.writer.writeProperty(qw, "xLabels", text)
-            text = block.contents.get("ylabel")
-            if text is not None:
-                self.writer.writeProperty(qw, "yLabels", text)
+            self.writePropertyContentsLabel(qw, block, "xlabel", "xLabels")
+            self.writePropertyContentsLabel(qw, block, "ylabel", "yLabels")
 
             for v in block.contents["traces"]:
                 c = v["color"]
@@ -502,9 +507,18 @@ class Widget2Pydm(object):
         self.write_block_indicator(parent, block, nm, qw)
         
     def write_block_polyline(self, parent, block, nm, qw):
-        # TODO: PyDM widget choice needs help here
-        # this gets interesting because of the number points required for each PyDMDrawingMMM widget
         self.write_tooltip(qw, nm)
+        self.write_basic_attribute(qw, block)
+        ba = block.contents.get("basic attribute", {})
+        penWidth = int(ba.get("width", 1))
+
+        prop = self.writer.writeOpenProperty(qw, "points", stdset="0")
+        stringlist = self.writer.writeOpenTag(prop, "stringlist")
+        for pt in block.points:
+            # translate global to local
+            x = pt.x - block.geometry.x - penWidth
+            y = pt.y - block.geometry.y - penWidth
+            self.writeStringText(stringlist, text="%d, %d" % (x, y))
 
     def write_block_rectangle(self, parent, block, nm, qw):
         self.write_basic_attribute(qw, block)
