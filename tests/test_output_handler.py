@@ -91,12 +91,10 @@ class TestOutputHandler(unittest.TestCase):
     def assertEqualClassName(self, parent, cls, nm):
         self.assertExpectedAttrib(parent, **{"class":cls, "name":nm})
 
-    def assertEqualDouble(self, prop, number):
+    def assertEqualDouble(self, prop, expected):
         self.assertIsNotNone(prop)
-        self.assertExpectedAttrib(prop, stdset="0")
-        for item in prop.iter():
-            if item.tag == "double":
-                self.assertEqual(float(item.text), number)
+        child = self.getSubElement(prop, "double")
+        self.assertEqual(float(child.text), float(expected))
 
     def assertEqualGeometry(self, parent, x, y, w, h):
         prop = self.getNamedProperty(parent, "geometry")
@@ -113,9 +111,15 @@ class TestOutputHandler(unittest.TestCase):
             elif item.tag == "height":
                 self.assertEqual(item.text, str(h))
 
-    def assertEqualNumber(self, prop, number):
+    def assertEqualEnum(self, prop, expected):
+        self.assertIsNotNone(prop)
+        child = self.getSubElement(prop, "enum")
+        self.assertEqual(child.text, expected)
+
+    def assertEqualNumber(self, prop, expected):
         child = self.getSubElement(prop, "number")
-        self.assertEqual(float(child.text), float(number))
+        self.assertIsNotNone(prop)
+        self.assertEqual(float(child.text), float(expected))
 
     def assertEqualPenColor(self, parent, r, g, b):
         prop = self.getNamedProperty(parent, "penColor")
@@ -127,13 +131,13 @@ class TestOutputHandler(unittest.TestCase):
         prop = self.getNamedProperty(parent, "penStyle")
         self.assertIsNotNone(prop)
         self.assertExpectedAttrib(prop, stdset="0")
-        for item in prop.iter():
-            if item.tag == "enum":
-                self.assertEqual(item.text, value)
+        self.assertEqualEnum(prop, value)
 
-    def assertEqualPenWidth(self, parent, number):
-        prop = self.getNamedProperty(parent, "penWidth")
-        self.assertEqualDouble(prop, number)
+    def assertEqualPenCapStyle(self, parent, expected):
+        self.assertEqualPropertyEnum(parent, "penCapStyle", expected)
+
+    def assertEqualPenWidth(self, parent, expected):
+        prop = self.assertEqualPropertyDouble(parent, "penWidth", expected)
 
     def assertEqualString(self, parent, text=""):
         child = self.getSubElement(parent, "string")
@@ -156,6 +160,11 @@ class TestOutputHandler(unittest.TestCase):
         prop = self.getNamedProperty(parent, propName)
         self.assertIsNotNone(prop)
         self.assertEqualDouble(prop, expected)
+
+    def assertEqualPropertyEnum(self, parent, propName, expected):
+        prop = self.getNamedProperty(parent, propName)
+        self.assertIsNotNone(prop)
+        self.assertEqualEnum(prop, expected)
 
     def assertEqualPropertyNumber(self, parent, propName, expected):
         prop = self.getNamedProperty(parent, propName)
@@ -528,6 +537,39 @@ class TestOutputHandler(unittest.TestCase):
         self.assertEqualPropertyDouble(widget, "userUpperLimit", 10)
         self.assertEqualPropertyDouble(widget, "userLowerLimit", -10)
 
+    def test_write_widget_polyline(self):
+        uiname = self.convertAdlFile("polyline.adl")
+        full_uiname = os.path.join(self.tempdir, uiname)
+        self.assertTrue(os.path.exists(full_uiname))
+
+        root = ElementTree.parse(full_uiname).getroot()
+        screen = self.getSubElement(root, "widget")
+        # self.print_xml_children(screen)
+        widgets = screen.findall("widget")
+        self.assertEqual(len(widgets), 1)
+
+        key = "polyline"
+        widget = self.getNamedWidget(screen, key)
+        # self.print_xml_children(widget)
+        self.assertEqualClassName(
+            widget, 
+            "PyDMDrawingPolyline", 
+            key)
+
+        prop = self.getNamedProperty(widget, "points")
+        stringlist = self.getSubElement(prop, "stringlist")
+        self.assertEqual(len(stringlist), 6)
+        strings = stringlist.findall("string")
+        self.assertEqual(len(strings), 6)
+        self.assertEqual(strings[0].text, "-2, -2")
+        self.assertEqual(strings[1].text, "55, -2")
+        self.assertEqual(strings[2].text, "-2, 55")
+        self.assertEqual(strings[3].text, "55, 55")
+        self.assertEqual(strings[4].text, "-2, -2")
+        self.assertEqual(strings[5].text, "-2, 6")
+        self.assertEqualPenWidth(widget, 4)
+        self.assertEqualPenCapStyle(widget, "Qt::FlatCap")
+
     def test_write_widget_rectangle(self):
         """
         also test the full file structure
@@ -576,11 +618,12 @@ class TestOutputHandler(unittest.TestCase):
         self.assertEqualGeometry(rect, 10, 53, 113, 35)
         self.assertEqualToolTip(rect, key)
         properties = rect.findall("property")
-        self.assertEqual(len(properties), 6)
+        self.assertEqual(len(properties), 7)
         self.assertEqualBrush(rect, "NoBrush", 253, 0, 0)
         self.assertEqualPenStyle(rect, "Qt::SolidLine")
         self.assertEqualPenColor(rect, 253, 0, 0)
         self.assertEqualPenWidth(rect, 1)
+        self.assertEqualPenCapStyle(rect, "Qt::FlatCap")
 
         key = "rectangle_2"
         rect = children[2]
@@ -588,11 +631,12 @@ class TestOutputHandler(unittest.TestCase):
         self.assertEqualGeometry(rect, 10, 92, 113, 35)
         self.assertEqualToolTip(rect, key)
         properties = rect.findall("property")
-        self.assertEqual(len(properties), 6)
+        self.assertEqual(len(properties), 7)
         self.assertEqualBrush(rect, "NoBrush", 249, 218, 60)
         self.assertEqualPenStyle(rect, "Qt::DashLine")
         self.assertEqualPenColor(rect, 249, 218, 60)
         self.assertEqualPenWidth(rect, 1)
+        self.assertEqualPenCapStyle(rect, "Qt::FlatCap")
 
         key = "rectangle_3"
         rect = children[3]
@@ -600,11 +644,12 @@ class TestOutputHandler(unittest.TestCase):
         self.assertEqualGeometry(rect, 10, 130, 113, 36)
         self.assertEqualToolTip(rect, key)
         properties = rect.findall("property")
-        self.assertEqual(len(properties), 7)
+        self.assertEqual(len(properties), 8)
         self.assertEqualBrush(rect, "NoBrush", 115, 255, 107)
         self.assertEqualPenStyle(rect, "Qt::SolidLine")
         self.assertEqualPenColor(rect, 115, 255, 107)
         self.assertEqualPenWidth(rect, 6)
+        self.assertEqualPenCapStyle(rect, "Qt::FlatCap")
 
         prop = self.getNamedProperty(rect, "rules")
         self.assertExpectedAttrib(prop, stdset="0")
@@ -628,11 +673,12 @@ class TestOutputHandler(unittest.TestCase):
         self.assertEqualGeometry(rect, 20, 138, 93, 20)
         self.assertEqualToolTip(rect, key)
         properties = rect.findall("property")
-        self.assertEqual(len(properties), 7)
+        self.assertEqual(len(properties), 8)
         self.assertEqualBrush(rect, "SolidPattern", 115, 223, 255)
         self.assertEqualPenStyle(rect, "Qt::SolidLine")
         self.assertEqualPenColor(rect, 115, 223, 255)
         self.assertEqualPenWidth(rect, 0)
+        self.assertEqualPenCapStyle(rect, "Qt::FlatCap")
 
         prop = self.getNamedProperty(rect, "rules")
         self.assertExpectedAttrib(prop, stdset="0")
