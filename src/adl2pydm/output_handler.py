@@ -199,26 +199,27 @@ class Widget2Pydm(object):
         brush = self.writer.writeOpenTag(propty, "brush", brushstyle=fill)
         self.write_color_element(brush, block.color, alpha="255")
 
-        propty = self.writer.writeOpenProperty(qw, "penStyle", stdset="0")
-        pen = dict(
-            solid = "Qt::SolidLine",
-            dash = "Qt::DashLine"
-        )[attr.get("style", "solid")]
-        self.writer.writeTaggedString(propty, "enum", pen)
+        if qw.attrib["class"] not in ("PyDMLabel",):
+            propty = self.writer.writeOpenProperty(qw, "penStyle", stdset="0")
+            pen = dict(
+                solid = "Qt::SolidLine",
+                dash = "Qt::DashLine"
+            )[attr.get("style", "solid")]
+            self.writer.writeTaggedString(propty, "enum", pen)
 
-        propty = self.writer.writeOpenProperty(qw, "penColor", stdset="0")
-        self.write_color_element(propty, block.color)
+            propty = self.writer.writeOpenProperty(qw, "penColor", stdset="0")
+            self.write_color_element(propty, block.color)
 
-        propty = self.writer.writeOpenProperty(qw, "penWidth", stdset="0")
-        width = attr.get("width", 0)
-        if fill == "NoBrush":
-            width = max(1, float(width))   # make sure the outline is seen
-        self.writer.writeTaggedString(propty, "double", str(width))
+            propty = self.writer.writeOpenProperty(qw, "penWidth", stdset="0")
+            width = attr.get("width", 0)
+            if fill == "NoBrush":
+                width = max(1, float(width))   # make sure the outline is seen
+            self.writer.writeTaggedString(propty, "double", str(width))
 
-        propty = self.writer.writeOpenProperty(qw, "penCapStyle", stdset="0")
-        self.writer.writeTaggedString(propty, "enum", "Qt::FlatCap")
+            propty = self.writer.writeOpenProperty(qw, "penCapStyle", stdset="0")
+            self.writer.writeTaggedString(propty, "enum", "Qt::FlatCap")
 
-        block.color = None
+            block.color = None
 
     def write_block(self, parent, block):
         nm = self.get_unique_widget_name(block.symbol.replace(" ", "_"))
