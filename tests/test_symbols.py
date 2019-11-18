@@ -40,7 +40,7 @@ class Test_Module(unittest.TestCase):
         self.assertEqual(w["pydm_widget"], "PyDMDrawingPie")
         self.assertEqual(w["type"], "static")
 
-        self.assertEqual(len(symbols.pydm_widgets), 32)
+        self.assertEqual(len(symbols.pydm_widgets), 33)
         self.assertIsInstance(symbols.pydm_widgets, dict)
         for k, w in symbols.pydm_widgets.items():
             self.assertIsInstance(w, symbols.PyDM_CustomWidget)
