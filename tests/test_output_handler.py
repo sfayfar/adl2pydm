@@ -116,10 +116,10 @@ class TestOutputHandler(unittest.TestCase):
         child = self.getSubElement(prop, "enum")
         self.assertEqual(child.text, expected)
 
-    def assertEqualNumber(self, prop, expected):
+    def assertEqualNumber(self, prop, expected, dtype=float):
         child = self.getSubElement(prop, "number")
         self.assertIsNotNone(prop)
-        self.assertEqual(float(child.text), float(expected))
+        self.assertEqual(dtype(child.text), dtype(expected))
 
     def assertEqualPenColor(self, parent, r, g, b):
         prop = self.getNamedProperty(parent, "penColor")
@@ -166,10 +166,10 @@ class TestOutputHandler(unittest.TestCase):
         self.assertIsNotNone(prop)
         self.assertEqualEnum(prop, expected)
 
-    def assertEqualPropertyNumber(self, parent, propName, expected):
+    def assertEqualPropertyNumber(self, parent, propName, expected, dtype=float):
         prop = self.getNamedProperty(parent, propName)
         self.assertIsNotNone(prop)
-        self.assertEqualNumber(prop, expected)
+        self.assertEqualNumber(prop, expected, dtype=dtype)
 
     def assertEqualPropertyString(self, parent, propName, expected):
         prop = self.getNamedProperty(parent, propName)
@@ -942,7 +942,8 @@ class TestOutputHandler(unittest.TestCase):
 
         self.assertEqualChannel(widget, "ca://Xorbit:S1A:H1:CurrentAO")
         self.assertEqualPropertyString(widget, "orientation", "Qt::Horizontal")
-        self.assertEqualPropertyNumber(widget, "precision", 1)
+        self.assertIsNoneProperty(widget, "precision")
+        # this must be an integer for the slider widget
         for propName in """showLimitLabels 
                            showValueLabel 
                            userDefinedLimits
@@ -972,7 +973,7 @@ class TestOutputHandler(unittest.TestCase):
 
         self.assertEqualChannel(widget, "ca://sky:userCalc2.A")
         self.assertEqualPropertyString(widget, "orientation", "Qt::Horizontal")
-        self.assertEqualPropertyNumber(widget, "precision", 0.1)
+        self.assertIsNoneProperty(widget, "precision")
         # self.print_xml_children(widget)
         self.assertEqualPropertyBool(widget, "userDefinedLimits", True)
         self.assertEqualPropertyDouble(widget, "userMaximum", 10)
