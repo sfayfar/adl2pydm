@@ -420,14 +420,14 @@ class Widget2Pydm(object):
                     names.append("y=" + v["ydata"])
                 trace["name"] = ", ".join(names)
 
-                if block.contents["style"] == "point":
-                    trace["symbol"] = 1  # Circle
-                    trace["symbolSize"] = 10
-                elif block.contents["style"] == "line":
+                if block.contents["style"] == "line":
                     trace["lineStyle"] = 1  # Solid
                 elif block.contents["style"] == "fill-under":
                     # TODO: improve?  fill-under not available in PyDM
                     trace["lineStyle"] = 1  # Solid
+                # elif block.contents["style"] == "point":
+                #     trace["symbol"] = 1  # Circle
+                #     trace["symbolSize"] = 10
                 
                 if count is not None:
                     trace["block_size"] = count
@@ -452,18 +452,18 @@ class Widget2Pydm(object):
         filelist = block.contents["composite file"].split(";")
         macros = None
         if len(filelist) != 1:
-            if len(filelist) < 1:
+            if len(filelist) == 2:
+                macros = convertMacros(filelist[1])
+            elif len(filelist) < 1:
                 emsg = "'composite file' list was empty"
                 emsg += " (file: %s, line %d)" % (block.main.given_filename, block.line_offset)
                 logger.error(emsg)
                 return
-            elif len(filelist) == 2:
-                macros = convertMacros(filelist[1])
-            else:
-                emsg = "Rendering only first file from 'composite file'"
-                emsg += "=%s" % block.contents["composite file"]
-                emsg += " (file: %s, line %d)" % (block.main.given_filename, block.line_offset)
-                logger.warning(emsg)
+            # else:
+            #     emsg = "Rendering only first file from 'composite file'"
+            #     emsg += "=%s" % block.contents["composite file"]
+            #     emsg += " (file: %s, line %d)" % (block.main.given_filename, block.line_offset)
+            #     logger.warning(emsg)
         filename = replaceExtension(filelist[0])
         self.writer.writeProperty(qw, "filename", filename, stdset="0")
         if macros is not None:
@@ -673,12 +673,11 @@ class Widget2Pydm(object):
         cw_set = self.writer.writeOpenTag(parent, "customwidgets")
         for widget in self.custom_widgets:
             item = symbols.pydm_widgets.get(widget)
-            if item is None:
-                continue
-            cw = self.writer.writeOpenTag(cw_set, "customwidget")
-            self.writer.writeTaggedString(cw, "class", item.cls)
-            self.writer.writeTaggedString(cw, "extends", item.extends)
-            self.writer.writeTaggedString(cw, "header", item.header)
+            if item is not None:
+                cw = self.writer.writeOpenTag(cw_set, "customwidget")
+                self.writer.writeTaggedString(cw, "class", item.cls)
+                self.writer.writeTaggedString(cw, "extends", item.extends)
+                self.writer.writeTaggedString(cw, "header", item.header)
     
     def write_geometry(self, parent, geom):
         propty = self.writer.writeOpenProperty(parent, "geometry")
@@ -873,8 +872,8 @@ class PYDM_Writer(object):
             element.text = str(value)
         return element
 
-    def writeCloseProperty(self):
-        pass        # nothing to do
+    # def writeCloseProperty(self):
+    #     pass        # nothing to do
 
     # def writeStyleSheet(self, parent, r, g, b):
     #     # TODO: needed by PyDM?
@@ -897,11 +896,11 @@ class PYDM_Writer(object):
             element.attrib[k] = v
         return element
 
-    def writeCloseTag(self, tag):
-        pass        # nothing to do
+    # def writeCloseTag(self, tag):
+    #     pass        # nothing to do
 
-    def writeMessage(self, mess):
-        pass        # nothing to do
+    # def writeMessage(self, mess):
+    #     pass        # nothing to do
 
 
 def findFile(fname):

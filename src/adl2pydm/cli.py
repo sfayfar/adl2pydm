@@ -68,5 +68,5 @@ def main():
     processFile(options.adlfile, options.dir)
 
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()

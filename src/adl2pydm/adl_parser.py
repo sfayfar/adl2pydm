@@ -595,8 +595,8 @@ class MedmStripChartWidget(MedmGenericWidget):
                 pens[row] = aa
             elif block.symbol == "plotcom":
                 self.parsePlotcomBlock(buf, blocks)
-            elif block.symbol == "symbol":
-                raise ValueError(block.symbol + " not handled yet")
+            # elif block.symbol == "symbol":
+            #     raise ValueError(block.symbol + " not handled yet")
             else:
                 raise ValueError(block.symbol + " not expected here")
         
