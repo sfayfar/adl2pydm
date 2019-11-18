@@ -870,6 +870,9 @@ class TestOutputHandler(unittest.TestCase):
 
         self.assertEqualPropertyString(widget, "text", "Test Display")
 
+        for propName in "penStyle penColor penWidth penCapStyle".split():
+            self.assertIsNoneProperty(widget, propName)
+
         prop = self.getNamedProperty(widget, "alignment")
         child = self.getSubElement(prop, "set")
         self.assertIsNotNone(child)
@@ -890,6 +893,9 @@ class TestOutputHandler(unittest.TestCase):
         widget = self.getNamedWidget(screen, key)
         self.assertEqualClassName(widget, "PyDMLineEdit", key)
         # self.print_xml_children(widget)
+
+        for propName in "penStyle penColor penWidth penCapStyle".split():
+            self.assertIsNoneProperty(widget, propName)
 
         self.assertEqualChannel(widget, "ca://Xorbit:S1A:H1:CurrentAO")
 
@@ -913,6 +919,9 @@ class TestOutputHandler(unittest.TestCase):
         self.assertEqualStyleSheet(widget, expected)
 
         self.assertEqualChannel(widget, "ca://Xorbit:S1A:H1:CurrentAO")
+
+        for propName in "penStyle penColor penWidth penCapStyle".split():
+            self.assertIsNoneProperty(widget, propName)
 
         prop = self.getNamedProperty(widget, "textInteractionFlags")
         child = self.getSubElement(prop, "set")
