@@ -570,6 +570,36 @@ class TestOutputHandler(unittest.TestCase):
         self.assertEqualPenWidth(widget, 4)
         self.assertEqualPenCapStyle(widget, "Qt::FlatCap")
 
+    def test_write_widget_polyline_wuth_rules(self):
+        uiname = self.convertAdlFile("polyline-arrow.adl")
+        full_uiname = os.path.join(self.tempdir, uiname)
+        self.assertTrue(os.path.exists(full_uiname))
+
+        root = ElementTree.parse(full_uiname).getroot()
+        screen = self.getSubElement(root, "widget")
+        # self.print_xml_children(screen)
+        widgets = screen.findall("widget")
+        self.assertEqual(len(widgets), 1)
+
+        key = "polyline"
+        widget = self.getNamedWidget(screen, key)
+        # self.print_xml_children(widget)
+        self.assertEqualClassName(
+            widget, 
+            "PyDMDrawingPolyline", 
+            key)
+
+        self.assertEqualChannel(widget, "ca://PYDM:visible")
+        expected = {
+            "name": "rule_0", 
+            "property": "Visible", 
+                "channels": [{
+                "channel": "PYDM:visible", "trigger": True
+                }], 
+            "expression": "ch[0] != 0"
+            }
+        self.assertEqualRules(widget, expected)
+
     def test_write_widget_rectangle(self):
         """
         also test the full file structure
@@ -680,11 +710,6 @@ class TestOutputHandler(unittest.TestCase):
         self.assertEqualPenWidth(rect, 0)
         self.assertEqualPenCapStyle(rect, "Qt::FlatCap")
 
-        prop = self.getNamedProperty(rect, "rules")
-        self.assertExpectedAttrib(prop, stdset="0")
-        child = self.getSubElement(prop, "string")
-        rules = output_handler.jsonDecode(child.text)
-        self.assertEqual(len(rules), 1)
         expected = {
             'name': 'rule_0', 
             'property': 'Visible', 
@@ -696,6 +721,16 @@ class TestOutputHandler(unittest.TestCase):
                 ], 
             'expression': 'ch[0]==ch[1]'
             }
+        self.assertEqualRules(rect, expected)
+
+    def assertEqualRules(self, parent, expected):
+        prop = self.getNamedProperty(parent, "rules")
+        self.assertIsNotNone(prop)
+        self.assertExpectedAttrib(prop, stdset="0")
+        child = self.getSubElement(prop, "string")
+        self.assertIsNotNone(child)
+        rules = output_handler.jsonDecode(child.text)
+        self.assertEqual(len(rules), 1)
         self.assertExpectedDictInRef(rules[0], **expected)
 
     def test_write_widget_related_display(self):
