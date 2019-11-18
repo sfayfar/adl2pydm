@@ -509,8 +509,14 @@ class Widget2Pydm(object):
     def write_block_polyline(self, parent, block, nm, qw):
         self.write_tooltip(qw, nm)
         self.write_basic_attribute(qw, block)
+        self.write_dynamic_attribute(qw, block)
         ba = block.contents.get("basic attribute", {})
         penWidth = int(ba.get("width", 1))
+
+        da = block.contents.get("dynamic attribute", {})
+        pv = self.get_channel(da)
+        if pv is not None:
+            self.write_channel(qw, pv)
 
         prop = self.writer.writeOpenProperty(qw, "points", stdset="0")
         stringlist = self.writer.writeOpenTag(prop, "stringlist")
@@ -578,7 +584,7 @@ class Widget2Pydm(object):
                     lineWidth = 1,
                 )
                 if "chan" in v:
-                    trace["channel"] = "ca://" + v["chan"]
+                    trace["channel"] = "ca://" + convertMacros(v["chan"])
                     trace["name"] = v["chan"]
 
                 self.writeStringText(stringlist, text=jsonEncode(trace))
