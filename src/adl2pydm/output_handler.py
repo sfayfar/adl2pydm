@@ -556,7 +556,6 @@ class Widget2Pydm(object):
     
     def write_block_shell_command(self, parent, block, nm, qw):
         self.write_tooltip(qw, nm)
-        # TODO: block.commands is [{}] with label, name, and args=""
         # BUT, there is no such PyDM widget now.
         # see: https://github.com/slaclab/pydm/issues/581
         if len(block.commands) > 1:
