@@ -556,7 +556,25 @@ class Widget2Pydm(object):
     
     def write_block_shell_command(self, parent, block, nm, qw):
         self.write_tooltip(qw, nm)
-        # TODO: block.commands is a list
+        # TODO: block.commands is [{}] with label, name, and args=""
+        # BUT, there is no such PyDM widget now.
+        # see: https://github.com/slaclab/pydm/issues/581
+        if len(block.commands) > 1:
+            wmsg = "only one command supported in 'shell command' now, received %d"
+            wmsg = wmsg % len(block.commands)
+            wmsg += ", only rendering the first command"
+            logger.warning(wmsg)
+        for spec in block.commands:
+            label = spec.get("label", "")
+            if len(label) > 0:
+                if label[0] == "-":     # MEDM rule, use "-" prefix to hide the icon
+                    self.writePropertyBoolean(qw, "showIcon", False, stdset="0")
+                    label = label[1:]
+                self.writer.writeProperty(qw, "text", spec["label"])
+            command = "%s %s" % (spec["name"], spec.get("args", ""))
+            self.writer.writeProperty(qw, "command", command.strip(), stdset="0")
+
+            return  # TODO: https://github.com/slaclab/pydm/issues/581
         
     def write_block_strip_chart(self, parent, block, nm, qw):
         self.write_tooltip(qw, nm)
