@@ -300,7 +300,13 @@ class Widget2Pydm(object):
     
     def writePropertyBoolean(self, widget, tag, value, **kwargs):
         self.writer.writeProperty(widget, tag, str(value).lower(), tag="bool", **kwargs)
-    
+
+    def writePropertyStringlist(self, widget, title, strings, **kwargs):
+        prop = self.writer.writeOpenProperty(widget, title, **kwargs)
+        stringlist = self.writer.writeOpenTag(prop, "stringlist")
+        for s in strings:
+            self.writeStringText(stringlist, text=s.strip())
+
     def writePropertyTextAlignment(self, widget, attr):
         align =  {
             "horiz. left": "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter",
@@ -390,16 +396,12 @@ class Widget2Pydm(object):
         self.writer.writeProperty(qw, "title", block.title, stdset="0")
 
         if len(block.contents["traces"]) > 0:
-            prop = self.writer.writeOpenProperty(qw, "curves", stdset="0")
-            stringlist = self.writer.writeOpenTag(prop, "stringlist")
+            curves = []
 
             # count: n where plot last n pts or plot n pts & stop
             count = block.contents.get("count")
             if count is not None:
                 count = int(count)
-
-            self.writePropertyContentsLabel(qw, block, "xlabel", "xLabels")
-            self.writePropertyContentsLabel(qw, block, "ylabel", "yLabels")
 
             for v in block.contents["traces"]:
                 c = v["color"]
@@ -437,7 +439,11 @@ class Widget2Pydm(object):
                     if item in block.contents:
                         # TODO:
                         logger.warning("block.contents['%s'] not handled" % item)
-                self.writeStringText(stringlist, text=jsonEncode(trace))
+                curves.append(jsonEncode(trace))
+            
+            self.writePropertyContentsLabel(qw, block, "xlabel", "xLabels")
+            self.writePropertyContentsLabel(qw, block, "ylabel", "yLabels")
+            self.writePropertyStringlist(qw, "curves", curves, stdset="0")
 
     def write_block_composite(self, parent, block, nm, qw):
         # self.write_tooltip(qw, nm)
@@ -519,13 +525,13 @@ class Widget2Pydm(object):
         if pv is not None:
             self.write_channel(qw, pv)
 
-        prop = self.writer.writeOpenProperty(qw, "points", stdset="0")
-        stringlist = self.writer.writeOpenTag(prop, "stringlist")
+        pt_list = []
         for pt in block.points:
             # translate global to local
             x = pt.x - block.geometry.x - penWidth
             y = pt.y - block.geometry.y - penWidth
-            self.writeStringText(stringlist, text="%d, %d" % (x, y))
+            pt_list.append("%d, %d" % (x, y))
+        self.writePropertyStringlist(qw, "points", pt_list, stdset="0")
 
     def write_block_rectangle(self, parent, block, nm, qw):
         self.write_basic_attribute(qw, block)
@@ -546,10 +552,7 @@ class Widget2Pydm(object):
                 "macros" : [convertMacros(d.get("args", "")) for d in block.displays]
             }
             for tag, items in displays.items():
-                prop = self.writer.writeOpenProperty(qw, tag, stdset="0")
-                stringlist = self.writer.writeOpenTag(prop, "stringlist")
-                for v in items:
-                    self.writeStringText(stringlist, text=v)
+                self.writePropertyStringlist(qw, tag, items, stdset="0")
 
         # # TODO: conditional
         # self.writePropertyBoolean(qw, "openInNewWindow", True)
@@ -565,26 +568,13 @@ class Widget2Pydm(object):
             command_list.append("%s %s" % (spec["name"], spec.get("args", "")))
 
         if len(command_list) > 0:
-
-            def write_stringlist_property(parent, title, items):
-                prop = self.writer.writeOpenProperty(parent, title, stdset="0")
-                stringlist = self.writer.writeOpenTag(prop, "stringlist")
-                for text in items:
-                    self.writeStringText(stringlist, text=text.strip())
-
             # second: assemble XML structures
-            write_stringlist_property(qw, "titles", title_list)
-            write_stringlist_property(qw, "commands", command_list)
+            self.writePropertyStringlist(qw, "titles", title_list, stdset="0")
+            self.writePropertyStringlist(qw, "commands", command_list, stdset="0")
 
-        # <property name="text">
-        #     <string>button title</string>
-        # </property>
-        # <property name="showIcon" stdset="0">
-        #     <bool>false</bool>
-        # </property>
         title = block.title or ""
         if len(title) > 0:
-            if title[0] == "-":     # MEDM rule, use "-" prefix to hide the icon
+            if title.startswith("-"):     # MEDM rule, use "-" prefix to hide the icon
                 self.writePropertyBoolean(qw, "showIcon", False, stdset="0")
                 title = title[1:]
             self.writer.writeProperty(qw, "text", title)
@@ -605,8 +595,7 @@ class Widget2Pydm(object):
             if text is not None:
                 self.writer.writeProperty(qw, "yLabels", text)
 
-            prop = self.writer.writeOpenProperty(qw, "curves", stdset="0")
-            stringlist = self.writer.writeOpenTag(prop, "stringlist")
+            curves = []
             for v in block.contents["pens"]:
                 c = v["color"]
                 trace = dict(
@@ -619,7 +608,9 @@ class Widget2Pydm(object):
                     trace["channel"] = "ca://" + convertMacros(v["chan"])
                     trace["name"] = v["chan"]
 
-                self.writeStringText(stringlist, text=jsonEncode(trace))
+                curves.append(jsonEncode(trace))
+
+            self.writePropertyStringlist(qw, "curves", curves, stdset="0")
 
     def write_block_text(self, parent, block, nm, qw):
         text = block.title
