@@ -802,6 +802,52 @@ class TestOutputHandler(unittest.TestCase):
         self.assertEqualPropertyString(widget, "xLabels", "x axis text")
         self.assertEqualPropertyString(widget, "yLabels", "y axis text")
 
+    def test_write_widget_shell_command(self):
+        uiname = self.convertAdlFile("test_shell_command.adl")
+        full_uiname = os.path.join(self.tempdir, uiname)
+        self.assertTrue(os.path.exists(full_uiname))
+
+        root = ElementTree.parse(full_uiname).getroot()
+        screen = self.getSubElement(root, "widget")
+        # self.print_xml_children(screen)
+        widgets = screen.findall("widget")
+        self.assertEqual(len(widgets), 1)
+
+        key = "shell_command"
+        widget = self.getNamedWidget(screen, key)
+        # self.print_xml_children(widget)
+        self.assertEqualClassName(
+            widget, 
+            "PyDMShellCommand", 
+            key)
+
+        self.assertEqualPropertyString(widget, "text", "shell commands")
+        self.assertEqualPropertyBool(widget, "showIcon", False)
+
+        prop = self.getNamedProperty(widget, "titles")
+        stringlist = self.getSubElement(prop, "stringlist")
+        self.assertEqual(len(stringlist), 4)
+        titles = [t.text for t in stringlist]
+        expected = [
+            "Eyes", 
+            "System Load", 
+            "Command with Arguments",
+            "Command with Arguments",
+            ]
+        self.assertEqual(titles, expected)
+
+        prop = self.getNamedProperty(widget, "commands")
+        stringlist = self.getSubElement(prop, "stringlist")
+        self.assertEqual(len(stringlist), 4)
+        commands = [t.text for t in stringlist]
+        expected = [
+            "xeyes", 
+            "xload", 
+            "pvview sky:UPTIME",
+            "pvview sky:datetime",
+            ]
+        self.assertEqual(commands, expected)
+
     def test_write_widget_strip_chart(self):
         uiname = self.convertAdlFile("testDisplay.adl")
         full_uiname = os.path.join(self.tempdir, uiname)
