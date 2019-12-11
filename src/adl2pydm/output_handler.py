@@ -556,24 +556,38 @@ class Widget2Pydm(object):
     
     def write_block_shell_command(self, parent, block, nm, qw):
         self.write_tooltip(qw, nm)
-        # BUT, there is no such PyDM widget now.
-        # see: https://github.com/slaclab/pydm/issues/581
-        if len(block.commands) > 1:
-            wmsg = "only one command supported in 'shell command' now, received %d"
-            wmsg = wmsg % len(block.commands)
-            wmsg += ", only rendering the first command"
-            logger.warning(wmsg)
-        for spec in block.commands:
-            label = spec.get("label", "")
-            if len(label) > 0:
-                if label[0] == "-":     # MEDM rule, use "-" prefix to hide the icon
-                    self.writePropertyBoolean(qw, "showIcon", False, stdset="0")
-                    label = label[1:]
-                self.writer.writeProperty(qw, "text", spec["label"])
-            command = "%s %s" % (spec["name"], spec.get("args", ""))
-            self.writer.writeProperty(qw, "command", command.strip(), stdset="0")
 
-            return  # TODO: https://github.com/slaclab/pydm/issues/581
+        # first: gather shell command contents
+        title_list = []
+        command_list = []
+        for spec in block.commands:
+            title_list.append(spec.get("label", ""))
+            command_list.append("%s %s" % (spec["name"], spec.get("args", "")))
+
+        if len(command_list) > 0:
+
+            def write_stringlist_property(parent, title, items):
+                prop = self.writer.writeOpenProperty(parent, title, stdset="0")
+                stringlist = self.writer.writeOpenTag(prop, "stringlist")
+                for text in items:
+                    self.writeStringText(stringlist, text=text.strip())
+
+            # second: assemble XML structures
+            write_stringlist_property(qw, "titles", title_list)
+            write_stringlist_property(qw, "commands", command_list)
+
+        # <property name="text">
+        #     <string>button title</string>
+        # </property>
+        # <property name="showIcon" stdset="0">
+        #     <bool>false</bool>
+        # </property>
+        title = block.title or ""
+        if len(title) > 0:
+            if title[0] == "-":     # MEDM rule, use "-" prefix to hide the icon
+                self.writePropertyBoolean(qw, "showIcon", False, stdset="0")
+                title = title[1:]
+            self.writer.writeProperty(qw, "text", title)
         
     def write_block_strip_chart(self, parent, block, nm, qw):
         self.write_tooltip(qw, nm)
