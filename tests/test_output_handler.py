@@ -823,6 +823,7 @@ class TestOutputHandler(unittest.TestCase):
 
         self.assertEqualPropertyString(widget, "text", "shell commands")
         self.assertEqualPropertyBool(widget, "showIcon", False)
+        self.assertEqualPropertyBool(widget, "allowMultipleExecutions", True)
 
         prop = self.getNamedProperty(widget, "titles")
         stringlist = self.getSubElement(prop, "stringlist")

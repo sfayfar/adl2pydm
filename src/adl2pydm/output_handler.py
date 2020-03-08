@@ -579,6 +579,9 @@ class Widget2Pydm(object):
                 title = title[1:]
             self.writer.writeProperty(qw, "text", title)
         
+        # impose MEDM behavior
+        self.writePropertyBoolean(qw, "allowMultipleExecutions", True, stdset="0")
+        
     def write_block_strip_chart(self, parent, block, nm, qw):
         self.write_tooltip(qw, nm)
         self.writer.writeProperty(qw, "title", block.title, stdset="0")
