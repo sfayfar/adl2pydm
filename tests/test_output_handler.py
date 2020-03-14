@@ -382,7 +382,7 @@ class TestOutputHandler(unittest.TestCase):
             "PyDMEnumButton", 
             key)
 
-        self.assertEqualChannel(widget, "ca://Xorbit:S1A:H1:CurrentAO.SCAN")
+        self.assertEqualChannel(widget, "ca://sky:m1.SCAN")
 
     def test_write_widget_composite(self):
         uiname = self.convertAdlFile("testDisplay.adl")
@@ -460,7 +460,7 @@ class TestOutputHandler(unittest.TestCase):
             "PyDMScaleIndicator", 
             key)
         
-        self.assertEqualChannel(widget, "ca://Xorbit:S1A:H1:CurrentAO")
+        self.assertEqualChannel(widget, "ca://sky:m1.RBV")
 
         key = "meter"
         widget = self.getNamedWidget(screen, key)
@@ -470,7 +470,7 @@ class TestOutputHandler(unittest.TestCase):
             "PyDMScaleIndicator", 
             key)
         
-        self.assertEqualChannel(widget, "ca://Xorbit:S1A:H1:CurrentAO")
+        self.assertEqualChannel(widget, "ca://sky:m1.RBV")
 
         # meter widget has no title
         self.assertEqualTitle(widget, None)
@@ -495,11 +495,11 @@ class TestOutputHandler(unittest.TestCase):
         widget = self.getNamedWidget(screen, key)
         self.assertEqualClassName(
             widget, 
-            "PyDMEnumButton", 
+            "PyDMEnumComboBox", 
             key)
         # self.print_xml_children(widget)
 
-        self.assertEqualChannel(widget, "ca://Xorbit:S1A:H1:CurrentAO.SCAN")
+        self.assertEqualChannel(widget, "ca://sky:m1.SPMG")
 
     def test_write_widget_message_button(self):
         uiname = self.convertAdlFile("testDisplay.adl")
@@ -514,9 +514,9 @@ class TestOutputHandler(unittest.TestCase):
         key = "message_button"
         widget = self.getNamedWidget(screen, key)
         self.assertEqualClassName(widget, "PyDMPushButton", "message_button")
-        self.assertEqualPropertyString(widget, "text", "S1A:H1 Reset")
-        self.assertEqualPropertyString(widget, "toolTip", "Xorbit:S1A:H1:CurrentAO")
-        self.assertEqualChannel(widget, "ca://Xorbit:S1A:H1:CurrentAO")
+        self.assertEqualPropertyString(widget, "text", "sky:m1 to zero")
+        self.assertEqualPropertyString(widget, "toolTip", "sky:m1")
+        self.assertEqualChannel(widget, "ca://sky:m1")
         self.assertEqualPropertyString(widget, "pressValue", "0.00")
 
     def test_write_widget_meter(self):
@@ -877,8 +877,8 @@ class TestOutputHandler(unittest.TestCase):
             "color": "#cd6100",
             "lineStyle": 1,
             "lineWidth": 1,
-            "channel": "ca://Xorbit:S1A:H1:CurrentAO",
-            "name": "Xorbit:S1A:H1:CurrentAO"
+            "channel": "ca://sky:m1",
+            "name": "sky:m1"
             }
         self.assertDictEqual(trace, expected)
         trace = output_handler.jsonDecode(stringlist[1].text)
@@ -943,7 +943,7 @@ class TestOutputHandler(unittest.TestCase):
         for propName in "penStyle penColor penWidth penCapStyle".split():
             self.assertIsNoneProperty(widget, propName)
 
-        self.assertEqualChannel(widget, "ca://Xorbit:S1A:H1:CurrentAO")
+        self.assertEqualChannel(widget, "ca://sky:m1")
 
     def test_write_widget_text_update(self):
         uiname = self.convertAdlFile("testDisplay.adl")
@@ -964,7 +964,7 @@ class TestOutputHandler(unittest.TestCase):
   }""" % key
         self.assertEqualStyleSheet(widget, expected)
 
-        self.assertEqualChannel(widget, "ca://Xorbit:S1A:H1:CurrentAO")
+        self.assertEqualChannel(widget, "ca://sky:m1.RBV")
 
         for propName in "penStyle penColor penWidth penCapStyle".split():
             self.assertIsNoneProperty(widget, propName)
@@ -995,7 +995,7 @@ class TestOutputHandler(unittest.TestCase):
             "PyDMSlider", 
             key)
 
-        self.assertEqualChannel(widget, "ca://Xorbit:S1A:H1:CurrentAO")
+        self.assertEqualChannel(widget, "ca://sky:m1")
         self.assertEqualPropertyString(widget, "orientation", "Qt::Horizontal")
         self.assertIsNoneProperty(widget, "precision")
         # this must be an integer for the slider widget
