@@ -270,6 +270,8 @@ class Widget2Pydm(object):
     
     def write_ui(self, screen, output_path):
         """main entry point to write the .ui file"""
+        window_class = "QWidget"
+        # window_class = "QMainWindow"
         title = screen.title or os.path.split(os.path.splitext(screen.given_filename)[0])[-1]
         ui_filename = os.path.join(output_path, title + SCREEN_FILE_EXTENSION)
         self.writer = PYDM_Writer(None)
@@ -277,7 +279,7 @@ class Widget2Pydm(object):
         root = self.writer.openFile(ui_filename)
         logging.info("writing screen file: " + ui_filename)
         self.writer.writeTaggedString(root, "class", title)
-        form = self.writer.writeOpenTag(root, "widget", cls="QWidget", name="screen")
+        form = self.writer.writeOpenTag(root, "widget", cls=window_class, name="screen")
         
         self.write_geometry(form, screen.geometry)
         self.write_colors_style(form, screen)
@@ -540,22 +542,34 @@ class Widget2Pydm(object):
 
     def write_block_related_display(self, parent, block, nm, qw):
         text = block.title or nm
-        text = text.lstrip("-")
+        showIcon = not text.startswith("-")
+        text = convertMacros(text.lstrip("-"))
         self.write_tooltip(qw, text)
         self.writer.writeProperty(qw, "text", text, tag="string")
-        self.writePropertyBoolean(qw, "showIcon", not text.startswith("-"), stdset="0")
+        logger.debug(f"relatedDisplay showIcon={showIcon}  text='{text}''")
+        self.writePropertyBoolean(qw, "showIcon", showIcon, stdset="0")
         self.write_colors_style(qw, block)
+        replaceDisplay = True
         if hasattr(block, "displays"):
             displays = {
                 "titles" : [d.get("label", "") for d in block.displays],
                 "filenames" : [replaceExtension(d.get("name", "")) for d in block.displays],
-                "macros" : [convertMacros(d.get("args", "")) for d in block.displays]
+                "macros" : [convertMacros(d.get("args", "")) for d in block.displays],
             }
             for tag, items in displays.items():
                 self.writePropertyStringlist(qw, tag, items, stdset="0")
+            policies = [
+                d.get("policy", "") == "replace display" 
+                for d in block.displays]
+            replaceDisplay = True not in policies
 
-        # # TODO: conditional
-        # self.writePropertyBoolean(qw, "openInNewWindow", True)
+        self.writePropertyBoolean(qw, "openInNewWindow", replaceDisplay, stdset="0")
+        """
+        <property name="openInNewWindow" stdset="0">
+            <bool>true</bool>
+        </property>
+        inside the widget
+        """
     
     def write_block_shell_command(self, parent, block, nm, qw):
         self.write_tooltip(qw, nm)
@@ -574,6 +588,7 @@ class Widget2Pydm(object):
 
         title = block.title or ""
         if len(title) > 0:
+            logger.debug(f"title={title}")
             if title.startswith("-"):     # MEDM rule, use "-" prefix to hide the icon
                 self.writePropertyBoolean(qw, "showIcon", False, stdset="0")
                 title = title[1:]
