@@ -379,7 +379,7 @@ class TestOutputHandler(unittest.TestCase):
         widget = self.getNamedWidget(screen, key)
         self.assertEqualClassName(
             widget, 
-            "PyDMEnumComboBox", 
+            "PyDMEnumButton", 
             key)
 
         self.assertEqualChannel(widget, "ca://Xorbit:S1A:H1:CurrentAO.SCAN")
