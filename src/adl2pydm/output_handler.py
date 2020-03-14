@@ -564,7 +564,7 @@ class Widget2Pydm(object):
         replaceDisplay = True
         if hasattr(block, "displays"):
             displays = {
-                "titles" : [d.get("label", "") for d in block.displays],
+                "titles" : [convertMacros(d.get("label", "")) for d in block.displays],
                 "filenames" : [replaceExtension(d.get("name", "")) for d in block.displays],
                 "macros" : [convertMacros(d.get("args", "")) for d in block.displays],
             }
