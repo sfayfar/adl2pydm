@@ -15,9 +15,7 @@ from . import adl_parser
 from . import output_handler
 
 
-logging.basicConfig(level=logging.DEBUG)        # development
-# logging.basicConfig(level=logging.WARNING)      # production
-logger = logging.getLogger(__name__)
+logger = None
 
 
 def processFile(adl_filename, output_path=None):
@@ -43,7 +41,7 @@ def get_user_parameters():
     parser.add_argument(
         'adlfiles', 
         action='store', 
-        nargs='+',
+        nargs=argparse.ONE_OR_MORE,
         help=msg,
         )
 
@@ -63,13 +61,35 @@ def get_user_parameters():
         action='version', 
         version=adl2pydm.__version__)
 
-    # TODO: control logging level
-    # see: https://www.fun4jimmy.com/2015/09/15/configuring-pythons-logging-module-with-argparse.html
+    parser.add_argument(
+        "-log", 
+        "--log", 
+        default="warning",
+        help=(
+            "Provide logging level. "
+            "Example --log debug', default='warning'"),
+        )
 
     return parser.parse_args()
 
 def main():
+    global logger
     options = get_user_parameters()
+    levels = {
+        'critical': logging.CRITICAL,
+        'error': logging.ERROR,
+        'warn': logging.WARNING,
+        'warning': logging.WARNING,
+        'info': logging.INFO,
+        'debug': logging.DEBUG
+    }
+    level = levels.get(options.log.lower())
+    if level is None:
+        raise ValueError(
+            f"log level given: {options.log}"
+            f" -- must be one of: {' | '.join(levels.keys())}")
+    logging.basicConfig(level=level)
+    logger = logging.getLogger(__name__)
     for adlfile in options.adlfiles:
         processFile(adlfile, options.dir)
 
