@@ -72,9 +72,9 @@ def get_user_parameters():
 
     return parser.parse_args()
 
-def main():
+
+def configure_logging(options):
     global logger
-    options = get_user_parameters()
     levels = {
         'critical': logging.CRITICAL,
         'error': logging.ERROR,
@@ -90,6 +90,11 @@ def main():
             f" -- must be one of: {' | '.join(levels.keys())}")
     logging.basicConfig(level=level)
     logger = logging.getLogger(__name__)
+
+
+def main():
+    options = get_user_parameters()
+    configure_logging(options)
     for adlfile in options.adlfiles:
         processFile(adlfile, options.dir)
 
