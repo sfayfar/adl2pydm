@@ -761,8 +761,7 @@ class TestOutputHandler(unittest.TestCase):
   }""" % key
         self.assertEqualStyleSheet(widget, expected)
 
-        self.assertIsNoneProperty(widget, "openInNewWindow")
-        # self.assertEqualPropertyBool(widget, "openInNewWindow", True)
+        self.assertEqualPropertyBool(widget, "openInNewWindow", True)
         self.assertEqualPropertyBool(widget, "showIcon", True)
 
         prop = self.getNamedProperty(widget, "filenames")
