@@ -39,8 +39,13 @@ def get_user_parameters():
     parser = argparse.ArgumentParser(
         prog=adl2pydm.__package__, description=doc)
 
-    msg = "MEDM '.adl' file to convert"
-    parser.add_argument('adlfile', action='store', help=msg)
+    msg = "MEDM '.adl' file(s) to convert"
+    parser.add_argument(
+        'adlfiles', 
+        action='store', 
+        nargs='+',
+        help=msg,
+        )
 
     msg =  "output directory"
     msg += ", default: same directory as input file"
@@ -65,7 +70,8 @@ def get_user_parameters():
 
 def main():
     options = get_user_parameters()
-    processFile(options.adlfile, options.dir)
+    for adlfile in options.adlfiles:
+        processFile(adlfile, options.dir)
 
 
 # if __name__ == "__main__":
