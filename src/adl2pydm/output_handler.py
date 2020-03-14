@@ -699,9 +699,13 @@ class Widget2Pydm(object):
         if format is not None:
             wmsg = "wheel switch format is unsupported now: " + format
             logger.warning(wmsg)
-            # TODO: format - maybe not supported in Qt QDoubleSpinBox
+            # TODO: format - 
+            # maybe not be supported in Qt QDoubleSpinBox
             # https://doc.qt.io/qt-5/qdoublespinbox.html#details
-            # If the Format is not specified, then the WheelSwitch calculates it based on the low and high limits and the precision.
+            # If the Format is not specified, 
+            #   then the WheelSwitch calculates it 
+            #   based on the low and high limits and 
+            #   the precision.
             # https://epics.anl.gov/EpicsDocumentation/ExtensionsManuals/MEDM/MEDM.html#Label
 
     # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -716,22 +720,23 @@ class Widget2Pydm(object):
     
     def write_colors_style(self, parent, block):
         fmt = "  %s: rgb(%d, %d, %d);\n"
+
+        style = "%s#%s {\n" % (
+            parent.attrib["class"], 
+            parent.attrib["name"])
+
         clr = block.color
+        if clr is not None:
+            style += fmt % ("color", clr.r, clr.g, clr.b)
+
         bclr = block.background_color
+        if bclr is not None:
+            style += fmt % ("background-color", bclr.r, bclr.g, bclr.b)
+
         if hasattr(block, "border"):
             border = block.border
         else:
             border = None
-
-        style = ""
-        style += "%s#%s {\n" % (parent.attrib["class"], parent.attrib["name"])
-
-        if clr is not None:
-            style += fmt % ("color", clr.r, clr.g, clr.b)
-
-        if bclr is not None:
-            style += fmt % ("background-color", bclr.r, bclr.g, bclr.b)
-
         if border is not None:
             style += f"  border: {border['size']} {border['style']} {border['color']};\n"
         style += "  }"
