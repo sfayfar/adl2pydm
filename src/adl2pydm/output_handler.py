@@ -245,7 +245,7 @@ class Widget2Pydm(object):
         # TODO: PyDMDrawingMMM (Line, Polygon, Oval, ...) need more decisions here 
         qw = self.writer.writeOpenTag(parent, "widget", cls=cls, name=nm)
         self.write_geometry(qw, block.geometry)
-        # self.write_colors_style(qw, block)
+        # self.write_stylesheet(qw, block)
         handler(parent, block, nm, qw)
         msg = "(#%d) %s -> %s: %s" % (block.line_offset, block.symbol, cls, nm)
         logger.debug(msg)
@@ -283,7 +283,7 @@ class Widget2Pydm(object):
         form = self.writer.writeOpenTag(root, "widget", cls=window_class, name="screen")
         
         self.write_geometry(form, screen.geometry)
-        self.write_colors_style(form, screen)
+        self.write_stylesheet(form, screen)
     
         propty = self.writer.writeOpenProperty(form, "windowTitle")
         self.writer.writeTaggedString(propty, value=title)
@@ -396,7 +396,7 @@ class Widget2Pydm(object):
         orientation = stacking_choices[stacking]
         self.writer.writeProperty(qw, "orientation", orientation, stdset="0")
 
-        self.write_colors_style(
+        self.write_stylesheet(
             qw, 
             block,
             margin = "0px",
@@ -532,7 +532,7 @@ class Widget2Pydm(object):
         pv = self.get_channel(block.contents["control"])
         self.write_tooltip(qw, pv)
         self.write_channel(qw, pv)
-        self.write_colors_style(qw, block)
+        self.write_stylesheet(qw, block)
 
     def write_block_message_button(self, parent, block, nm, qw):
         pv = self.get_channel(block.contents["control"])
@@ -542,7 +542,7 @@ class Widget2Pydm(object):
         msg = block.contents.get("press_msg")
         if msg is not None:
             self.writer.writeProperty(qw, "pressValue", msg, stdset="0")
-        self.write_colors_style(qw, block)
+        self.write_stylesheet(qw, block)
         
     def write_block_meter(self, parent, block, nm, qw):
         # handle same as indicator since PyDM does not have a meter widget
@@ -581,7 +581,7 @@ class Widget2Pydm(object):
         self.writer.writeProperty(qw, "text", text, tag="string")
         logger.debug(f"relatedDisplay showIcon={showIcon}  text='{text}''")
         self.writePropertyBoolean(qw, "showIcon", showIcon, stdset="0")
-        self.write_colors_style(qw, block)
+        self.write_stylesheet(qw, block)
         replaceDisplay = True
         if hasattr(block, "displays"):
             displays = {
@@ -682,7 +682,7 @@ class Widget2Pydm(object):
         pv = self.get_channel(block.contents["control"])    # TODO: format = string | compact
         self.write_channel(qw, pv)
         self.write_tooltip(qw, pv)
-        self.write_colors_style(
+        self.write_stylesheet(
             qw, 
             block, 
             border="1px solid black",   # alternative to QFrame
@@ -698,7 +698,7 @@ class Widget2Pydm(object):
         flags = "Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse"
         self.writer.writeProperty(qw, "textInteractionFlags", flags, tag="set")
         self.write_channel(qw, pv)
-        self.write_colors_style(qw, block)
+        self.write_stylesheet(qw, block)
         
     def write_block_valuator(self, parent, block, nm, qw):
         pv = self.get_channel(block.contents["control"])
@@ -741,7 +741,12 @@ class Widget2Pydm(object):
             propty, 
             value="ca://" + convertMacros(channel))
     
-    def write_colors_style(self, parent, block, **kwargs):
+    def write_stylesheet(self, parent, block, **kwargs):
+        """
+        write the style sheet, principally, the colors
+
+        other style settings are provided in the kwargs dict
+        """
         fmt = "  %s: rgb(%d, %d, %d);\n"
 
         style = "%s#%s {\n" % (
