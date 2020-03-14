@@ -96,7 +96,13 @@ def main():
     options = get_user_parameters()
     configure_logging(options)
     for adlfile in options.adlfiles:
-        processFile(adlfile, options.dir)
+        try:
+            processFile(adlfile, options.dir)
+        except Exception as exc:
+            logger.error(
+                f"error processing {adlfile}:"
+                f" {exc}"
+            )
 
 
 # if __name__ == "__main__":
