@@ -125,7 +125,7 @@ oval {
 		clr=50
 	}
 	"dynamic attribute" {
-		chan="Xorbit:S1A:H1:CurrentAO"
+		chan="sky:m1"
 	}
 }
 text {
@@ -149,7 +149,7 @@ meter {
 		height=161
 	}
 	monitor {
-		chan="Xorbit:S1A:H1:CurrentAO"
+		chan="sky:m1.RBV"
 		clr=25
 		bclr=2
 	}
@@ -165,7 +165,7 @@ meter {
 		height=25
 	}
 	monitor {
-		chan="Xorbit:S1A:H1:CurrentAO"
+		chan="sky:m1.RBV"
 		clr=25
 		bclr=1
 	}
@@ -181,7 +181,7 @@ bar {
 		height=81
 	}
 	monitor {
-		chan="Xorbit:S1A:H1:CurrentAO"
+		chan="sky:m1.RBV"
 		clr=25
 		bclr=2
 	}
@@ -202,7 +202,7 @@ bar {
 		bclr=2
 	}
 	pen[0] {
-		chan="Xorbit:S1A:H1:CurrentAO"
+		chan="sky:m1"
 		clr=34
 		limits {
 		}
@@ -251,7 +251,7 @@ bar {
 		height=22
 	}
 	control {
-		chan="Xorbit:S1A:H1:CurrentAO"
+		chan="sky:m1"
 		clr=14
 		bclr=0
 	}
@@ -304,7 +304,7 @@ oval {
 		clr=50
 	}
 	"dynamic attribute" {
-		chan="Xorbit:S1A:H1:CurrentAO"
+		chan="sky:m1"
 	}
 }
 menu {
@@ -315,7 +315,7 @@ menu {
 		height=19
 	}
 	control {
-		chan="Xorbit:S1A:H1:CurrentAO.SCAN"
+		chan="sky:m1.SPMG"
 		clr=14
 		bclr=51
 	}
@@ -406,7 +406,7 @@ indicator {
 		height=128
 	}
 	monitor {
-		chan="Xorbit:S1A:H1:CurrentAO"
+		chan="sky:m1.RBV"
 		clr=25
 		bclr=2
 	}
@@ -533,7 +533,7 @@ arc {
 	}
 	"dynamic attribute" {
 		vis="if not zero"
-		chan="Xorbit:S1A:H1:CurrentAO"
+		chan="sky:m1"
 	}
 	begin=0
 	path=20480
@@ -550,7 +550,7 @@ arc {
 	}
 	"dynamic attribute" {
 		vis="if not zero"
-		chan="Xorbit:S1A:H1:CurrentAO"
+		chan="sky:m1"
 	}
 	begin=0
 	path=20480
@@ -563,7 +563,7 @@ arc {
 		height=180
 	}
 	control {
-		chan="Xorbit:S1A:H1:CurrentAO.SCAN"
+		chan="sky:m1.SCAN"
 		clr=25
 		bclr=2
 	}
@@ -576,11 +576,11 @@ arc {
 		height=20
 	}
 	control {
-		chan="Xorbit:S1A:H1:CurrentAO"
+		chan="sky:m1"
 		clr=25
 		bclr=2
 	}
-	label="S1A:H1 Reset"
+	label="sky:m1 to zero"
 	press_msg="0.00"
 }
 valuator {
@@ -591,7 +591,7 @@ valuator {
 		height=54
 	}
 	control {
-		chan="Xorbit:S1A:H1:CurrentAO"
+		chan="sky:m1"
 		clr=25
 		bclr=2
 	}
@@ -624,7 +624,7 @@ text {
 		clr=14
 	}
 	"dynamic attribute" {
-		chan="Xorbit:S1A:H1:CurrentAO"
+		chan="sky:m1"
 	}
 	textix="Text Monitor (Text Update)"
 	align="horiz. centered"
@@ -766,7 +766,7 @@ byte {
 		height=13
 	}
 	monitor {
-		chan="evans:test:MBBOD"
+		chan="sky:m1.MSTA"
 		clr=25
 		bclr=1
 	}
@@ -792,7 +792,7 @@ byte {
 		height=13
 	}
 	monitor {
-		chan="evans:test:MBBID"
+		chan="sky:m1.MSTA"
 		clr=25
 		bclr=1
 	}
@@ -988,7 +988,7 @@ composite {
 				clr=14
 			}
 			"dynamic attribute" {
-				chan="Xorbit:S1A:H1:CurrentAO"
+				chan="sky:m1"
 			}
 			textix="Rectangle"
 			align="horiz. centered"
@@ -1004,7 +1004,7 @@ composite {
 				clr=14
 			}
 			"dynamic attribute" {
-				chan="Xorbit:S1A:H1:CurrentAO"
+				chan="sky:m1"
 			}
 			points {
 				(36,395)
@@ -1024,7 +1024,7 @@ composite {
 				clr=14
 			}
 			"dynamic attribute" {
-				chan="Xorbit:S1A:H1:CurrentAO"
+				chan="sky:m1"
 			}
 			points {
 				(57,368)
@@ -1042,7 +1042,7 @@ composite {
 				clr=38
 			}
 			"dynamic attribute" {
-				chan="Xorbit:S1A:H1:CurrentAO"
+				chan="sky:m1"
 			}
 		}
 		rectangle {
@@ -1056,7 +1056,7 @@ composite {
 				clr=38
 			}
 			"dynamic attribute" {
-				chan="Xorbit:S1A:H1:CurrentAO"
+				chan="sky:m1"
 			}
 		}
 	}
@@ -1073,7 +1073,7 @@ arc {
 	}
 	"dynamic attribute" {
 		vis="if zero"
-		chan="Xorbit:S1A:H1:CurrentAO"
+		chan="sky:m1"
 	}
 	begin=0
 	path=20480
@@ -1090,7 +1090,7 @@ arc {
 	}
 	"dynamic attribute" {
 		vis="if zero"
-		chan="Xorbit:S1A:H1:CurrentAO"
+		chan="sky:m1"
 	}
 	begin=0
 	path=20480
@@ -1107,7 +1107,7 @@ arc {
 	}
 	"dynamic attribute" {
 		vis="if zero"
-		chan="Xorbit:S1A:H1:CurrentAO"
+		chan="sky:m1"
 	}
 	begin=0
 	path=20480
