@@ -381,7 +381,28 @@ class Widget2Pydm(object):
         pv = self.get_channel(block.contents["control"])
         self.write_tooltip(qw, pv)
         self.write_channel(qw, pv)
-        self.write_colors_style(qw, block)
+
+        # MEDM stacking: row | column | row column
+        stacking_choices = {
+            # seems backwards 
+            # but MEDM shows a row with stacking = column
+            "row": "Qt::Vertical", 
+            "column": "Qt::Horizontal",
+            }
+        stacking = block.contents.get("stacking", "row")
+        if stacking not in stacking_choices:
+            logger.warning(f"stacking '{stacking}' not supported, using 'row'")
+            stacking = "row"
+        orientation = stacking_choices[stacking]
+        self.writer.writeProperty(qw, "orientation", orientation, stdset="0")
+
+        self.write_colors_style(
+            qw, 
+            block,
+            margin = "0px",
+            padding = "0px",
+            spacing = "0px",
+            )
     
     def writePropertyContentsLabel(self, qw, block, label, tag=None):
         tag = tag or label
@@ -658,15 +679,17 @@ class Widget2Pydm(object):
         # line width = 2    # makes the text entry smaller
         # frame shape = Panel
         # frame shadow = Sunken
-        block.border = { # alternative, set stylesheet
-            "size": "1px",
-            "style": "solid",
-            "color": "black",
-        }
         pv = self.get_channel(block.contents["control"])    # TODO: format = string | compact
         self.write_channel(qw, pv)
         self.write_tooltip(qw, pv)
-        self.write_colors_style(qw, block)
+        self.write_colors_style(
+            qw, 
+            block, 
+            border="1px solid black",   # alternative to QFrame
+            margin="0px",
+            padding="0px",
+            spacing="0px",
+            )
     
     def write_block_text_update(self, parent, block, nm, qw):
         pv = self.get_channel(block.contents["monitor"])
@@ -718,7 +741,7 @@ class Widget2Pydm(object):
             propty, 
             value="ca://" + convertMacros(channel))
     
-    def write_colors_style(self, parent, block):
+    def write_colors_style(self, parent, block, **kwargs):
         fmt = "  %s: rgb(%d, %d, %d);\n"
 
         style = "%s#%s {\n" % (
@@ -733,12 +756,9 @@ class Widget2Pydm(object):
         if bclr is not None:
             style += fmt % ("background-color", bclr.r, bclr.g, bclr.b)
 
-        if hasattr(block, "border"):
-            border = block.border
-        else:
-            border = None
-        if border is not None:
-            style += f"  border: {border['size']} {border['style']} {border['color']};\n"
+        for k, v in kwargs.items():
+            style += f"  {k}: {v};\n"
+
         style += "  }"
     
         if clr is not None or bclr is not None:
