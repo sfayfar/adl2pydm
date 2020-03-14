@@ -225,6 +225,7 @@ class MedmBaseWidget(object):
         label = assignments.get("label")
         if label is not None and label not in reservedLabels:
             self.title = label
+            logger.debug(f"label={label}")
 
         # stash remaining contents
         contents = dict(**assignments)
