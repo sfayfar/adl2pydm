@@ -93,6 +93,9 @@ def convertDynamicAttribute_to_Rules(attr):
     for k, v in exchanges.items():
         calc = calc.replace(k, v)
 
+    if calc == "a=0":
+        logger.info(f"{calc} : PyDM Error while evaluating Rule.")
+
     rule["expression"] = calc
 
     return [rule]
@@ -402,6 +405,8 @@ class Widget2Pydm(object):
             margin = "0px",
             padding = "0px",
             spacing = "0px",
+            # PyDMEnumButton: add color styles for the buttons
+            extra_classes = "QPushButton QRadioButton".split(),
             )
     
     def writePropertyContentsLabel(self, qw, block, label, tag=None):
@@ -747,23 +752,41 @@ class Widget2Pydm(object):
 
         other style settings are provided in the kwargs dict
         """
-        settings = []
+        others = []
+        if "extra_classes" in kwargs:
+            others = kwargs.pop("extra_classes")
 
+        parts = []
         fmt = "  %s: rgb(%d, %d, %d);"
         if block.color is not None:
-            settings.append(fmt % ("color", *block.color))
+            parts.append(fmt % ("color", *block.color))
 
         if block.background_color is not None:
-            settings.append(fmt % ("background-color", *block.background_color))
+            parts.append(fmt % ("background-color", *block.background_color))
 
         for k, v in kwargs.items():
-            settings.append(f"  {k}: {v};")
+            parts.append(f"  {k}: {v};")
     
-        if len(settings) > 0:
+        if len(parts) > 0:
             pa = parent.attrib
-            settings.insert(0, f"{pa['class']}#{pa['name']}" + " {")
+            settings = [f"{pa['class']}#{pa['name']}" + " {",]
+            settings += parts
             settings.append("  }")
+            for cls in others:
+                # special case
+                # copy color styles to interior widgets
+                settings.append(f"{cls}" + " {")
+                settings += [
+                    v
+                    for v in parts
+                    if v.strip().split()[0] in (
+                        "color:",
+                        "background-color:"
+                    )
+                ]
+                settings.append("  }")
             style = "\n".join(settings)
+
             propty = self.writer.writeOpenProperty(parent, "styleSheet")
             ss = self.writer.writeOpenTag(propty, "string", notr="true")
             ss.text = style
