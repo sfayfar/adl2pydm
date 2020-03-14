@@ -747,26 +747,23 @@ class Widget2Pydm(object):
 
         other style settings are provided in the kwargs dict
         """
-        fmt = "  %s: rgb(%d, %d, %d);\n"
+        settings = []
 
-        style = "%s#%s {\n" % (
-            parent.attrib["class"], 
-            parent.attrib["name"])
+        fmt = "  %s: rgb(%d, %d, %d);"
+        if block.color is not None:
+            settings.append(fmt % ("color", *block.color))
 
-        clr = block.color
-        if clr is not None:
-            style += fmt % ("color", clr.r, clr.g, clr.b)
-
-        bclr = block.background_color
-        if bclr is not None:
-            style += fmt % ("background-color", bclr.r, bclr.g, bclr.b)
+        if block.background_color is not None:
+            settings.append(fmt % ("background-color", *block.background_color))
 
         for k, v in kwargs.items():
-            style += f"  {k}: {v};\n"
-
-        style += "  }"
+            settings.append(f"  {k}: {v};")
     
-        if clr is not None or bclr is not None:
+        if len(settings) > 0:
+            pa = parent.attrib
+            settings.insert(0, f"{pa['class']}#{pa['name']}" + " {")
+            settings.append("  }")
+            style = "\n".join(settings)
             propty = self.writer.writeOpenProperty(parent, "styleSheet")
             ss = self.writer.writeOpenTag(propty, "string", notr="true")
             ss.text = style
