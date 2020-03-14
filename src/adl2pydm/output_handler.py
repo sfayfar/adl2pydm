@@ -13,6 +13,7 @@ from xml.dom import minidom
 from xml.etree import ElementTree
 
 from . import symbols
+from .adl_parser import Geometry
 
 
 QT_STYLESHEET_FILE = "stylesheet.qss"
@@ -450,7 +451,18 @@ class Widget2Pydm(object):
     def write_block_composite(self, parent, block, nm, qw):
         # self.write_tooltip(qw, nm)
         self.write_dynamic_attribute(qw, block)
+        x0 = block.geometry.x
+        y0 = block.geometry.y
         for widget in block.widgets:
+            # in MEDM, composites use absolute positioning
+            # in PyDM, composites use relative positioning
+            # subtract x,y of the composite from each widget
+            widget.geometry = Geometry(
+                widget.geometry.x - x0,
+                widget.geometry.y - y0,
+                widget.geometry.width,
+                widget.geometry.height,
+            )
             self.write_block(qw, widget)
 
     def write_block_embedded_display(self, parent, block, nm, qw):
@@ -641,6 +653,16 @@ class Widget2Pydm(object):
         self.writePropertyTextAlignment(qw, block.contents)
     
     def write_block_text_entry(self, parent, block, nm, qw):
+        # must wrap in a QFrame to get sunken border look 
+        #   and a layout to fill the space
+        # line width = 2    # makes the text entry smaller
+        # frame shape = Panel
+        # frame shadow = Sunken
+        block.border = { # alternative, set stylesheet
+            "size": "1px",
+            "style": "solid",
+            "color": "black",
+        }
         pv = self.get_channel(block.contents["control"])    # TODO: format = string | compact
         self.write_channel(qw, pv)
         self.write_tooltip(qw, pv)
@@ -693,15 +715,25 @@ class Widget2Pydm(object):
             value="ca://" + convertMacros(channel))
     
     def write_colors_style(self, parent, block):
+        fmt = "  %s: rgb(%d, %d, %d);\n"
         clr = block.color
         bclr = block.background_color
+        if hasattr(block, "border"):
+            border = block.border
+        else:
+            border = None
+
         style = ""
         style += "%s#%s {\n" % (parent.attrib["class"], parent.attrib["name"])
-        fmt = "  %s: rgb(%d, %d, %d);\n"
+
         if clr is not None:
             style += fmt % ("color", clr.r, clr.g, clr.b)
+
         if bclr is not None:
             style += fmt % ("background-color", bclr.r, bclr.g, bclr.b)
+
+        if border is not None:
+            style += f"  border: {border['size']} {border['style']} {border['color']};\n"
         style += "  }"
     
         if clr is not None or bclr is not None:
