@@ -66,7 +66,7 @@ adl_widgets = {
     "embedded display" : dict(type="static", pydm_widget="PyDMEmbeddedDisplay"),
     "image" : dict(type="monitor", pydm_widget="PyDMDrawingImage"),
     "indicator" : dict(type="monitor", pydm_widget="PyDMScaleIndicator"),
-    "menu" : dict(type="controller", pydm_widget="PyDMEnumButton"),
+    "menu" : dict(type="controller", pydm_widget="PyDMEnumComboBox"),
     "message button" : dict(type="controller", pydm_widget="PyDMPushButton"),
     "meter" : dict(type="monitor", pydm_widget="PyDMScaleIndicator"),
     "oval" : dict(type="static", pydm_widget="PyDMDrawingEllipse"),
