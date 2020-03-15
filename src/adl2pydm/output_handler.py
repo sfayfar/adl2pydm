@@ -62,6 +62,7 @@ def convertDynamicAttribute_to_Rules(attr):
     PyDM  `${P}`
     ====  ======
     """
+    # TODO: refactor?
     rule = dict(name="rule_0", property="Visible")
     channels = []
     for nm in "chan chanB chanC chanD".split():
@@ -81,7 +82,7 @@ def convertDynamicAttribute_to_Rules(attr):
     if len(channels) > 0:
         rule["channels"] = channels
         if calc is None:
-            calc = "ch[0]" + visibility_calc
+            calc = "a" + visibility_calc
 
     rule["expression"] = convertCalcToRuleExpression(calc)
 
