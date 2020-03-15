@@ -41,10 +41,10 @@ def convertCalcToRuleExpression(medm_calc):
             if tok.type == tokenize.NAME:
                 idx = "ABCDEFGHIJKL".index(tok.string.upper())
                 if idx > 3:
+                    # TODO: consider handling these less common cases
                     raise ValueError(
-                        f"MEDM calc {medm_calc}"
+                        f"unhandled complexity in MEDM calc '{medm_calc}''"
                         f" uses special variable {tok.string}"
-                        " -- adl2pydm does not yet handle this calculation"
                         )
                 calc += f"ch[{idx}]"
             elif tok.type == tokenize.ERRORTOKEN:
