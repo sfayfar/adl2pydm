@@ -66,37 +66,3 @@ def convertCalcToRuleExpression(medm_calc):
 
     pydm_rule = " ".join(calc.strip().split())
     return pydm_rule
-
-
-def tester():
-    import json
-    import os
-    import pyRestTable
-
-    path = os.path.abspath(
-        os.path.join(
-            os.path.dirname(__file__),
-            "..",
-            "..",
-            "tests",
-            "test_calcs.json",
-        )
-    )
-
-    with open(path, "r") as f:
-        buf = f.read()
-    
-    test_calcs = json.loads(buf)
-    
-    tbl = pyRestTable.Table()
-    tbl.labels = "MEDM PyDM convertCalcToRule equal".split()
-    for testcase in test_calcs:
-        rule = convertCalcToRuleExpression(testcase[0])
-        equal = rule == testcase[-1]
-        testcase+= [rule, equal]
-        tbl.addRow(testcase)
-    print(tbl)
-
-
-if __name__ == "__main__":
-    tester()
