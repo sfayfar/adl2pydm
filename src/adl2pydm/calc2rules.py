@@ -7,6 +7,13 @@ see: https://epics.anl.gov/EpicsDocumentation/ExtensionsManuals/MEDM/MEDM.html#C
 see: https://slaclab.github.io/pydm/widgets/widget_rules/index.html
 """
 
+import io
+import logging
+import tokenize
+
+logger = logging.getLogger(__file__)
+
+
 def convertCalcToRuleExpression(medm_calc):
     """
     convert MEDM calc expression to PyDM rules
@@ -21,36 +28,43 @@ def convertCalcToRuleExpression(medm_calc):
     str
         The converted PyDM rule expression.
     """
-    calc = medm_calc
+    logger.debug(f"MEDM: {medm_calc}")
 
-    # TODO: consider using tokenizer
+    medm_calc = medm_calc.replace("#", "!=")
+    medm_calc = medm_calc.replace("&&", "&")
+    medm_calc = medm_calc.replace("||", "|")
 
-    # if calc is not None and len(calc) > 0:
-    #     logger.info(f"CALC: {calc}")
-    # visibility_calc = {
-    #     "if zero": " == 0",
-    #     "if not zero": " != 0",
-    #     "calc": calc
-    # }[attr.get("vis", "if not zero")]
-    # if len(channels) > 0:
-    #     rule["channels"] = channels
-    #     if calc is None:
-    #         calc = "ch[0]" + visibility_calc
-    
-    # edit the calc expression for known changes
-    # FIXME: misses calc="a==0", algorithm needs improvement
-    exchanges = {
-        "A": "ch[0]",
-        "B": "ch[1]",
-        "C": "ch[2]",
-        "D": "ch[3]",
-        "#": "!=",
-        "||": " or "
-        }
-    for k, v in exchanges.items():
-        calc = calc.replace(k, v)
+    calc = ""
+    with io.StringIO(medm_calc) as f:
+        for tok in tokenize.generate_tokens(f.read):
+            logger.debug(tok)
+            if tok.type == tokenize.NAME:
+                idx = "ABCDEFGHIJKL".index(tok.string.upper())
+                if idx > 3:
+                    raise ValueError(
+                        f"MEDM calc {medm_calc}"
+                        f" uses special variable {tok.string}"
+                        " -- adl2pydm does not yet handle this calculation"
+                        )
+                calc += f"ch[{idx}]"
+            elif tok.type == tokenize.ERRORTOKEN:
+                op = tok.string
+                if op == "!":
+                    op = " not "
+                calc += op
+            elif tok.type == tokenize.OP:
+                op = tok.string
+                if op == "=":
+                    op = "=="
+                elif op == "|":
+                    op = " or "
+                elif op == "&":
+                    op = " and "
+                calc += op
+            elif tok.type not in (tokenize.NEWLINE, tokenize.ENDMARKER):
+                calc += tok.string
 
-    pydm_rule = calc
+    pydm_rule = " ".join(calc.strip().split())
     return pydm_rule
 
 
@@ -75,10 +89,11 @@ def tester():
     test_calcs = json.loads(buf)
     
     tbl = pyRestTable.Table()
-    tbl.labels = "MEDM PyDM convertCalcToRule".split()
+    tbl.labels = "MEDM PyDM convertCalcToRule equal".split()
     for testcase in test_calcs:
         rule = convertCalcToRuleExpression(testcase[0])
-        testcase.append(rule)
+        equal = rule == testcase[-1]
+        testcase+= [rule, equal]
         tbl.addRow(testcase)
     print(tbl)
 
