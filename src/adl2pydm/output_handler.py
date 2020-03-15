@@ -14,6 +14,7 @@ from xml.etree import ElementTree
 
 from . import symbols
 from .adl_parser import Geometry
+from .calc2rules import convertCalcToRuleExpression
 
 
 QT_STYLESHEET_FILE = "stylesheet.qss"
@@ -81,24 +82,8 @@ def convertDynamicAttribute_to_Rules(attr):
         rule["channels"] = channels
         if calc is None:
             calc = "ch[0]" + visibility_calc
-    
-    # edit the calc expression for known changes
-    # FIXME: misses calc="a==0", algorithm needs improvement
-    exchanges = {
-        "A": "ch[0]",
-        "B": "ch[1]",
-        "C": "ch[2]",
-        "D": "ch[3]",
-        "#": "!=",
-        "||": "|"
-        }
-    for k, v in exchanges.items():
-        calc = calc.replace(k, v)
 
-    if calc == "a=0":
-        logger.info(f"{calc} : PyDM Error while evaluating Rule.")
-
-    rule["expression"] = calc
+    rule["expression"] = convertCalcToRuleExpression(calc)
 
     return [rule]
 
