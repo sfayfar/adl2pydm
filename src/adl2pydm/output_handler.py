@@ -259,7 +259,24 @@ class Widget2Pydm(object):
         if attr is None:
             return
         self.processDynamicAttributeAsRules(qw, block)
-    
+
+    def write_font_size(self, qw, block, **kwargs):
+        """
+        <property name="font">
+            <font>
+            <pointsize>7</pointsize>
+            </font>
+        </property>
+        """
+        smallest = 4
+        largest = 10
+        margin = 3
+        # constrain within geometry (height)
+        pointsize = int(max(smallest, min(largest, block.geometry.height - 2*margin)))
+        propty = self.writer.writeOpenProperty(qw, "font", stdset="0")
+        font = self.writer.writeOpenTag(propty, "font")
+        self.writer.writeTaggedString(font, "pointsize", str(pointsize))
+
     def write_ui(self, screen, output_path):
         """main entry point to write the .ui file"""
         window_class = "QWidget"
@@ -667,6 +684,7 @@ class Widget2Pydm(object):
         if block.title is not None:
             text = convertMacros(block.title)
         self.writer.writeProperty(qw, "text", text, tag="string")
+        self.write_font_size(qw, block)
         self.write_basic_attribute(qw, block)
         self.write_dynamic_attribute(qw, block)
         self.write_tooltip(qw, nm)
@@ -680,6 +698,7 @@ class Widget2Pydm(object):
         # frame shadow = Sunken
         pv = self.get_channel(block.contents["control"])    # TODO: format = string | compact
         self.write_channel(qw, pv)
+        self.write_font_size(qw, block)
         self.write_tooltip(qw, pv)
         self.write_stylesheet(
             qw, 
@@ -692,6 +711,7 @@ class Widget2Pydm(object):
     
     def write_block_text_update(self, parent, block, nm, qw):
         pv = self.get_channel(block.contents["monitor"])
+        self.write_font_size(qw, block)
         self.write_tooltip(qw, "PV: " + pv)
         self.writePropertyTextAlignment(qw, block.contents)
         flags = "Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse"
@@ -988,16 +1008,7 @@ class PYDM_Writer(object):
             element.text = str(value)
         return element
 
-    # def writeCloseProperty(self):
-    #     pass        # nothing to do
-
-    # def writeStyleSheet(self, parent, r, g, b):
-    #     # TODO: needed by PyDM?
-    #     prop = self.writeOpenProperty(parent, name="styleSheet")
-    #     
-    #     fmt = "\n\nQWidget#centralWidget {background: rgba(%d, %d, %d, %d;}\n\n"
-    #     color = fmt % (r, g, b, 255)
-    #     self.writeTaggedString(prop, value=color)
+    # def writeCloseProperty(self): ...        # nothing to do
 
     def writeOpenTag(self, parent, tag, cls="", name="", **kwargs):
         if parent is None:
@@ -1012,11 +1023,8 @@ class PYDM_Writer(object):
             element.attrib[k] = v
         return element
 
-    # def writeCloseTag(self, tag):
-    #     pass        # nothing to do
-
-    # def writeMessage(self, mess):
-    #     pass        # nothing to do
+    # def writeCloseTag(self, tag): ...        # nothing to do
+    # def writeMessage(self, mess): ...        # nothing to do
 
 
 def findFile(fname):
