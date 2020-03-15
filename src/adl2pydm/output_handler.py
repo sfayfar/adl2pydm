@@ -262,17 +262,13 @@ class Widget2Pydm(object):
 
     def write_font_size(self, qw, block, **kwargs):
         """
-        <property name="font">
-            <font>
-            <pointsize>7</pointsize>
-            </font>
-        </property>
+        constrain font size within geometry (height)
         """
         smallest = 4
         largest = 10
         margin = 3
-        # constrain within geometry (height)
         pointsize = int(max(smallest, min(largest, block.geometry.height - 2*margin)))
+        
         propty = self.writer.writeOpenProperty(qw, "font", stdset="0")
         font = self.writer.writeOpenTag(propty, "font")
         self.writer.writeTaggedString(font, "pointsize", str(pointsize))
@@ -333,11 +329,6 @@ class Widget2Pydm(object):
         self.write_tooltip(qw, "TBA widget: " + nm)
         self.write_basic_attribute(qw, block)
         self.write_dynamic_attribute(qw, block)
-        # what styling is effective?
-        #self.writer.writeProperty(qw, "frameShape", "QFrame::StyledPanel", tag="enum")
-        #self.writer.writeProperty(qw, "frameShadow", "QFrame::Raised", tag="enum")
-        #self.writer.writeProperty(qw, "lineWidth", "2", tag="number")
-        #self.writer.writeProperty(qw, "midLineWidth", "2", tag="number")
 
     def write_block_arc(self, parent, block, nm, qw):
         self.write_basic_attribute(qw, block)
@@ -389,6 +380,7 @@ class Widget2Pydm(object):
         pv = self.get_channel(block.contents["control"])
         self.write_tooltip(qw, pv)
         self.write_channel(qw, pv)
+        self.write_font_size(qw, block)
 
         # MEDM stacking: row | column | row column
         stacking_choices = {
@@ -548,11 +540,13 @@ class Widget2Pydm(object):
         pv = self.get_channel(block.contents["control"])
         self.write_tooltip(qw, pv)
         self.write_channel(qw, pv)
+        self.write_font_size(qw, block)
         self.write_stylesheet(qw, block)
 
     def write_block_message_button(self, parent, block, nm, qw):
         pv = self.get_channel(block.contents["control"])
         self.writer.writeProperty(qw, "text", block.title, tag="string")
+        self.write_font_size(qw, block)
         self.write_tooltip(qw, pv)
         self.write_channel(qw, pv)  
         msg = block.contents.get("press_msg")
@@ -595,6 +589,7 @@ class Widget2Pydm(object):
         text = convertMacros(text.lstrip("-"))
         self.write_tooltip(qw, text)
         self.writer.writeProperty(qw, "text", text, tag="string")
+        self.write_font_size(qw, block)
         logger.debug(f"relatedDisplay showIcon={showIcon}  text='{text}''")
         self.writePropertyBoolean(qw, "showIcon", showIcon, stdset="0")
         self.write_stylesheet(qw, block)
@@ -689,7 +684,8 @@ class Widget2Pydm(object):
         self.write_dynamic_attribute(qw, block)
         self.write_tooltip(qw, nm)
         self.writePropertyTextAlignment(qw, block.contents)
-    
+        self.write_stylesheet(qw, block)
+
     def write_block_text_entry(self, parent, block, nm, qw):
         # must wrap in a QFrame to get sunken border look 
         #   and a layout to fill the space
