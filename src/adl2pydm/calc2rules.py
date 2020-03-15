@@ -53,14 +53,11 @@ def convertCalcToRuleExpression(medm_calc):
                     op = " not "
                 calc += op
             elif tok.type == tokenize.OP:
-                op = tok.string
-                if op == "=":
-                    op = "=="
-                elif op == "|":
-                    op = " or "
-                elif op == "&":
-                    op = " and "
-                calc += op
+                calc += {
+                    "=": "==",
+                    "|": " or ",
+                    "&": " and ",
+                }.get(tok.string, tok.string)
             elif tok.type not in (tokenize.NEWLINE, tokenize.ENDMARKER):
                 calc += tok.string
 
