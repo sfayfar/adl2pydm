@@ -14,6 +14,7 @@ if _path not in sys.path:
 def suite(*args, **kw):
 
     from tests import test_adl_parser
+    from tests import test_calc2rules
     from tests import test_cli
     from tests import test_output_handler
     from tests import test_simple
@@ -25,6 +26,7 @@ def suite(*args, **kw):
         test_symbols,
         test_adl_parser,
         test_cli,
+        test_calc2rules,
         test_output_handler,
         test_testDisplay,
         ]
