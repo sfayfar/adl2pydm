@@ -64,5 +64,5 @@ def convertCalcToRuleExpression(medm_calc):
             elif tok.type not in (tokenize.NEWLINE, tokenize.ENDMARKER):
                 calc += tok.string
 
-    pydm_rule = " ".join(calc.strip().split())
+    pydm_rule = " ".join(calc.strip().split())  # remove interior extra spaces
     return pydm_rule
