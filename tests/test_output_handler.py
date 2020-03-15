@@ -596,7 +596,7 @@ class TestOutputHandler(unittest.TestCase):
                 "channels": [{
                 "channel": "PYDM:visible", "trigger": True
                 }], 
-            "expression": "ch[0] != 0"
+            "expression": "ch[0]!=0"
             }
         self.assertEqualRules(widget, expected)
 
@@ -693,7 +693,7 @@ class TestOutputHandler(unittest.TestCase):
                 {'channel': '${P}alldone', 
                  'trigger': True}
                 ], 
-            'expression': 'ch[0] == 0'
+            'expression': 'ch[0]==0'
             }
         self.assertExpectedDictInRef(rules[0], **expected)
 
