@@ -398,6 +398,12 @@ class Widget2Pydm(object):
             stacking = "row"
         orientation = stacking_choices[stacking]
         self.writer.writeProperty(qw, "orientation", orientation, stdset="0")
+        for k in """
+                horizontalSpacing   verticalSpacing 
+                margin_top          margin_bottom 
+                margin_left         margin_right
+                """.split():
+            self.writer.writeProperty(qw, k, 0, tag="number", stdset="0")
 
         self.write_stylesheet(
             qw, 
