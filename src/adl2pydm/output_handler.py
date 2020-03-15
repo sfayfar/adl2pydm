@@ -70,6 +70,8 @@ def convertDynamicAttribute_to_Rules(attr):
         channels.append(dict(channel=pv, trigger=len(pv)>0))
 
     calc = attr.get("calc")
+    if calc is not None and len(calc) > 0:
+        logger.info(f"CALC: {calc}")
     visibility_calc = {
         "if zero": " == 0",
         "if not zero": " != 0",
