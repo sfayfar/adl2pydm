@@ -292,8 +292,14 @@ class Widget2Pydm(object):
         propty = self.writer.writeOpenProperty(form, "windowTitle")
         self.writer.writeTaggedString(propty, value=title)
     
-        for widget in screen.widgets:
+        for i, widget in enumerate(screen.widgets):
             # handle "widget" if it is a known screen component
+            logger.debug(
+                f"WIDGET {screen.given_filename}"
+                f" {widget.line_offset}"
+                f" {i+1}/{len(screen.widgets)}"
+                f" {widget.symbol}"
+            )
             self.write_block(form, widget)
         
         # TODO: self.write widget <zorder/> elements here (#7)
@@ -353,8 +359,8 @@ class Widget2Pydm(object):
                 stdset="0")
 
     def write_block_byte_indicator(self, parent, block, nm, qw):
-        ebit = int(block.contents.get("ebit", 0))
-        sbit = int(block.contents.get("sbit", 0))
+        ebit = int(block.contents.get("ebit", 0))   # TODO: handle if not number
+        sbit = int(block.contents.get("sbit", 0))   # TODO: handle if not number
         numBits = 1 + max(ebit, sbit) - min(ebit, sbit)
         if numBits < 1:
             wmsg = "number of bits = %d" % numBits
@@ -433,7 +439,10 @@ class Widget2Pydm(object):
             # count: n where plot last n pts or plot n pts & stop
             count = block.contents.get("count")
             if count is not None:
-                count = int(count)
+                try:
+                    count = int(count)
+                except ValueError as exc:
+                    logger.error(f"{exc}")
 
             for v in block.contents["traces"]:
                 c = v["color"]
@@ -454,12 +463,13 @@ class Widget2Pydm(object):
                     names.append("y=" + v["ydata"])
                 trace["name"] = ", ".join(names)
 
-                if block.contents["style"] == "line":
+                style = block.contents.get("style", "line")
+                if style == "line":
                     trace["lineStyle"] = 1  # Solid
-                elif block.contents["style"] == "fill-under":
+                elif style == "fill-under":
                     # TODO: improve?  fill-under not available in PyDM
                     trace["lineStyle"] = 1  # Solid
-                # elif block.contents["style"] == "point":
+                # elif style == "point":
                 #     trace["symbol"] = 1  # Circle
                 #     trace["symbolSize"] = 10
                 
@@ -467,14 +477,11 @@ class Widget2Pydm(object):
                     trace["block_size"] = count
                 curves.append(jsonEncode(trace))
 
-                scales = dict(autoRangeX=False, autoRangeY=False)
+                scales = dict(autoRangeX=True, autoRangeY=True)
                 for axis in "x_axis y1_axis y2_axis".split():
                     rangeStyle = block.contents.get(axis, {}).get("rangeStyle")
                     option = rangeStyle == "auto-scale"
-                    if axis.startswith("x"):
-                        scales["autoRangeX"] = option
-                    else:
-                        scales["autoRangeY"] = option
+                    scales["autoRange"+axis[0].upper()] = option
                 for k, v in scales.items():
                     self.writePropertyBoolean(qw, k, v, stdset="0")
             
@@ -568,7 +575,7 @@ class Widget2Pydm(object):
         self.write_basic_attribute(qw, block)
         self.write_dynamic_attribute(qw, block)
         ba = block.contents.get("basic attribute", {})
-        penWidth = int(ba.get("width", 1))
+        penWidth = int(ba.get("width", 1))  # TODO: handle if not number
 
         da = block.contents.get("dynamic attribute", {})
         pv = self.get_channel(da)
@@ -717,11 +724,12 @@ class Widget2Pydm(object):
     def write_block_text_update(self, parent, block, nm, qw):
         pv = self.get_channel(block.contents["monitor"])
         self.write_font_size(qw, block)
-        self.write_tooltip(qw, "PV: " + pv)
+        if pv is not None:
+            self.write_tooltip(qw, "PV: " + pv)
+            self.write_channel(qw, pv)
         self.writePropertyTextAlignment(qw, block.contents)
         flags = "Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse"
         self.writer.writeProperty(qw, "textInteractionFlags", flags, tag="set")
-        self.write_channel(qw, pv)
         self.write_stylesheet(qw, block)
         
     def write_block_valuator(self, parent, block, nm, qw):
