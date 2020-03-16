@@ -1107,6 +1107,24 @@ class TestOutputHandler(unittest.TestCase):
                     height = item.text
             self.assertEqualPropertyString(widget, "text", "height: " + height)
 
+    def test_recordPV(self):
+        """
+        invalid literal for int() with base 10: '$(P)$(Q)$(R).NSAM'
+        """
+        uiname = self.convertAdlFile("recordPV.adl")
+        full_uiname = os.path.join(self.tempdir, uiname)
+        self.assertTrue(os.path.exists(full_uiname))
+        # TODO:
+
+    def test_table_help(self):
+        """
+        can only concatenate str (not "NoneType") to str
+        """
+        uiname = self.convertAdlFile("table_help.adl")
+        full_uiname = os.path.join(self.tempdir, uiname)
+        self.assertTrue(os.path.exists(full_uiname))
+        # TODO:
+
 
 class Test_PYDM_Writer_Support(unittest.TestCase):
 
