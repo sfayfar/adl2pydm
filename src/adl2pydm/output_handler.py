@@ -359,8 +359,11 @@ class Widget2Pydm(object):
                 stdset="0")
 
     def write_block_byte_indicator(self, parent, block, nm, qw):
-        ebit = int(block.contents.get("ebit", 0))   # TODO: handle if not number
-        sbit = int(block.contents.get("sbit", 0))   # TODO: handle if not number
+        try:
+            ebit = int(block.contents.get("ebit", 0))   # TODO: handle if not number
+            sbit = int(block.contents.get("sbit", 0))   # TODO: handle if not number
+        except Exception as exc:
+            logger.critical(f"sbit/ebit: {exc}")
         numBits = 1 + max(ebit, sbit) - min(ebit, sbit)
         if numBits < 1:
             wmsg = "number of bits = %d" % numBits
@@ -442,7 +445,9 @@ class Widget2Pydm(object):
                 try:
                     count = int(count)
                 except ValueError as exc:
-                    logger.error(f"{exc}")
+                    logger.warning(f"{exc}")
+            if count in (None, ""):
+                count = 1200    # default for PyDMScatterPlot widget
 
             for v in block.contents["traces"]:
                 c = v["color"]
@@ -575,7 +580,10 @@ class Widget2Pydm(object):
         self.write_basic_attribute(qw, block)
         self.write_dynamic_attribute(qw, block)
         ba = block.contents.get("basic attribute", {})
-        penWidth = int(ba.get("width", 1))  # TODO: handle if not number
+        try:
+            penWidth = int(ba.get("width", 1))  # TODO: handle if not number
+        except Exception as exc:
+            logger.critical(f"penWidth: {exc}")
 
         da = block.contents.get("dynamic attribute", {})
         pv = self.get_channel(da)
@@ -709,9 +717,10 @@ class Widget2Pydm(object):
         # frame shape = Panel
         # frame shadow = Sunken
         pv = self.get_channel(block.contents["control"])    # TODO: format = string | compact
-        self.write_channel(qw, pv)
+        if pv is not None:
+            self.write_channel(qw, pv)
+            self.write_tooltip(qw, pv)
         self.write_font_size(qw, block)
-        self.write_tooltip(qw, pv)
         self.write_stylesheet(
             qw, 
             block, 
@@ -795,8 +804,8 @@ class Widget2Pydm(object):
             parts.append(f"  {k}: {v};")
     
         if len(parts) > 0:
-            pa = parent.attrib
-            settings = [f"{pa['class']}#{pa['name']}" + " {",]
+            #
+            settings = [f"{parent.attrib['class']}#{parent.attrib['name']}" + " {",]
             settings += parts
             settings.append("  }")
             for cls in others:
