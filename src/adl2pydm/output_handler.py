@@ -649,10 +649,14 @@ class Widget2Pydm(object):
     def write_block_strip_chart(self, parent, block, nm, qw):
         self.write_tooltip(qw, nm)
         self.writer.writeProperty(qw, "title", block.title, stdset="0")
-        if "period" in block.contents:
-            logger.warning("block.contents['period'] not handled")
-            # TODO: block.contents["period"]
+        period = block.contents.get("period")
+        if period is not None:
             # The period is the time between updates (s)
+            self.writer.writeProperty(
+                qw, "updateInterval", 
+                str(period), 
+                tag="double", 
+                stdset="0")
 
         if len(block.contents["pens"]) > 0:
             text = block.contents.get("xlabel")
