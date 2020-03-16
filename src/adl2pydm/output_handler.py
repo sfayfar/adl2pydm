@@ -360,8 +360,8 @@ class Widget2Pydm(object):
 
     def write_block_byte_indicator(self, parent, block, nm, qw):
         try:
-            ebit = int(block.contents.get("ebit", 0))   # TODO: handle if not number
-            sbit = int(block.contents.get("sbit", 0))   # TODO: handle if not number
+            ebit = int(block.contents.get("ebit", 0))
+            sbit = int(block.contents.get("sbit", 0))
         except Exception as exc:
             logger.critical(f"sbit/ebit: {exc}")
         numBits = 1 + max(ebit, sbit) - min(ebit, sbit)
@@ -581,9 +581,10 @@ class Widget2Pydm(object):
         self.write_dynamic_attribute(qw, block)
         ba = block.contents.get("basic attribute", {})
         try:
-            penWidth = int(ba.get("width", 1))  # TODO: handle if not number
+            penWidth = int(ba.get("width", 1))
         except Exception as exc:
             logger.critical(f"penWidth: {exc}")
+            penWidth = 1
 
         da = block.contents.get("dynamic attribute", {})
         pv = self.get_channel(da)
