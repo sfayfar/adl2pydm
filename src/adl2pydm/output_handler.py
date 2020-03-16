@@ -465,13 +465,18 @@ class Widget2Pydm(object):
                 
                 if count is not None:
                     trace["block_size"] = count
-
-                # x_axis y1_axis y2_axis: might have rangeStyle="auto-scale"
-                for item in "x_axis y1_axis y2_axis".split():
-                    if item in block.contents:
-                        # TODO:
-                        logger.warning("block.contents['%s'] not handled" % item)
                 curves.append(jsonEncode(trace))
+
+                scales = dict(autoRangeX=False, autoRangeY=False)
+                for axis in "x_axis y1_axis y2_axis".split():
+                    rangeStyle = block.contents.get(axis, {}).get("rangeStyle")
+                    option = rangeStyle == "auto-scale"
+                    if axis.startswith("x"):
+                        scales["autoRangeX"] = option
+                    else:
+                        scales["autoRangeY"] = option
+                for k, v in scales.items():
+                    self.writePropertyBoolean(qw, k, v, stdset="0")
             
             self.writePropertyContentsLabel(qw, block, "xlabel", "xLabels")
             self.writePropertyContentsLabel(qw, block, "ylabel", "yLabels")
@@ -645,7 +650,7 @@ class Widget2Pydm(object):
         self.write_tooltip(qw, nm)
         self.writer.writeProperty(qw, "title", block.title, stdset="0")
         if "period" in block.contents:
-            logger.warning("block.contents['%s'] not handled" % "period")
+            logger.warning("block.contents['period'] not handled")
             # TODO: block.contents["period"]
             # The period is the time between updates (s)
 
@@ -858,8 +863,9 @@ class Widget2Pydm(object):
                 hiLimitName = "maximum"
                 loLimitName = "minimum"
             else:
-                emsg = "limits for %s widget not handled" % qw.attrib["class"]
-                raise NotImplementedError(emsg)
+                raise NotImplementedError(
+                    f"limits for {qw.attrib['class']} widget not handled"
+                    )
 
             self.writePropertyBoolean(qw, "userDefinedLimits", True, stdset="0")
             self.writer.writeProperty(
