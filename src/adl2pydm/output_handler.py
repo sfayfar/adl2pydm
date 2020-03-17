@@ -461,10 +461,10 @@ class Widget2Pydm(object):
                 )
                 names = []
                 if "xdata" in v:
-                    trace["x_channel"] = "ca://" + v["xdata"].rstrip("$")
+                    trace["x_channel"] = "ca://" + v["xdata"]
                     names.append("x=" + v["xdata"])
                 if "ydata" in v:
-                    trace["y_channel"] = "ca://" + v["ydata"].rstrip("$")
+                    trace["y_channel"] = "ca://" + v["ydata"]
                     names.append("y=" + v["ydata"])
                 trace["name"] = ", ".join(names)
 
@@ -692,7 +692,7 @@ class Widget2Pydm(object):
                     lineWidth = 1,
                 )
                 if "chan" in v:
-                    trace["channel"] = "ca://" + convertMacros(v["chan"]).rstrip("$")
+                    trace["channel"] = "ca://" + convertMacros(v["chan"])
                     trace["name"] = v["chan"]
 
                 curves.append(jsonEncode(trace))
@@ -717,10 +717,12 @@ class Widget2Pydm(object):
         # line width = 2    # makes the text entry smaller
         # frame shape = Panel
         # frame shadow = Sunken
-        pv = self.get_channel(block.contents["control"])    # TODO: format = string | compact
+        pv = self.get_channel(block.contents["control"])
         if pv is not None:
             self.write_channel(qw, pv)
             self.write_tooltip(qw, pv)
+            self.write_display_format(qw, pv, block)
+
         self.write_font_size(qw, block)
         self.write_stylesheet(
             qw, 
@@ -733,10 +735,12 @@ class Widget2Pydm(object):
     
     def write_block_text_update(self, parent, block, nm, qw):
         pv = self.get_channel(block.contents["monitor"])
-        self.write_font_size(qw, block)
         if pv is not None:
             self.write_tooltip(qw, "PV: " + pv)
             self.write_channel(qw, pv)
+            self.write_display_format(qw, pv, block)
+
+        self.write_font_size(qw, block)
         self.writePropertyTextAlignment(qw, block.contents)
         flags = "Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse"
         self.writer.writeProperty(qw, "textInteractionFlags", flags, tag="set")
@@ -781,9 +785,26 @@ class Widget2Pydm(object):
         # stdset=0 signals this attribute is from PyDM, not Qt widget
         self.writer.writeTaggedString(
             propty, 
-            value="ca://" + convertMacros(channel).rstrip("$"),
+            value=f"ca://{convertMacros(channel)}",
             )
-    
+
+    def write_display_format(self, parent, pv, block):
+        if (
+            # https://epics.anl.gov/EpicsDocumentation/ExtensionsManuals/MEDM/MEDM.html#TextFormat
+            # ? also "compact"
+            block.contents.get("format") in ("string", )
+            or 
+            # long string suffix found, render as string
+            convertMacros(pv).endswith("$")
+        ):
+            logger.debug("Setting 'string' format.")
+            self.writer.writeProperty(
+                parent, 
+                "displayFormat", 
+                f"{qw.attrib['class']}::String", 
+                tag="enum", 
+                stdset="0")
+
     def write_stylesheet(self, parent, block, **kwargs):
         """
         write the style sheet, principally, the colors
