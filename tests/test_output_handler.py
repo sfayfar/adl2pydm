@@ -1107,6 +1107,18 @@ class TestOutputHandler(unittest.TestCase):
                     height = item.text
             self.assertEqualPropertyString(widget, "text", "height: " + height)
 
+    # ----------------------------------------------------------
+
+    def test_write_all_example_file_process(self):
+        "ensure all example MEDM files are converted to PyDM"
+        path = os.path.join(
+            os.path.dirname(__file__), 
+            "medm")
+        for adl_file in os.listdir(path):
+            if os.path.isfile(adl_file) and adl_file.endswith(".adl"):
+                uiname = self.convertAdlFile(adl_file)
+                full_uiname = os.path.join(self.tempdir, uiname)
+                self.assertTrue(os.path.exists(full_uiname), uiname)
 
 class Test_PYDM_Writer_Support(unittest.TestCase):
 
