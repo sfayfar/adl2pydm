@@ -461,10 +461,10 @@ class Widget2Pydm(object):
                 )
                 names = []
                 if "xdata" in v:
-                    trace["x_channel"] = "ca://" + v["xdata"]
+                    trace["x_channel"] = "ca://" + v["xdata"].rstrip("$")
                     names.append("x=" + v["xdata"])
                 if "ydata" in v:
-                    trace["y_channel"] = "ca://" + v["ydata"]
+                    trace["y_channel"] = "ca://" + v["ydata"].rstrip("$")
                     names.append("y=" + v["ydata"])
                 trace["name"] = ", ".join(names)
 
@@ -692,7 +692,7 @@ class Widget2Pydm(object):
                     lineWidth = 1,
                 )
                 if "chan" in v:
-                    trace["channel"] = "ca://" + convertMacros(v["chan"])
+                    trace["channel"] = "ca://" + convertMacros(v["chan"]).rstrip("$")
                     trace["name"] = v["chan"]
 
                 curves.append(jsonEncode(trace))
@@ -781,7 +781,8 @@ class Widget2Pydm(object):
         # stdset=0 signals this attribute is from PyDM, not Qt widget
         self.writer.writeTaggedString(
             propty, 
-            value="ca://" + convertMacros(channel))
+            value="ca://" + convertMacros(channel).rstrip("$"),
+            )
     
     def write_stylesheet(self, parent, block, **kwargs):
         """
