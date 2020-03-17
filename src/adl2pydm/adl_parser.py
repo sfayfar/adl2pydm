@@ -204,7 +204,6 @@ class MedmBaseWidget(object):
         """generic handling, override as needed"""
         assignments = self.locateAssignments(buf)
         blocks = self.locateBlocks(buf)
-        # text = "".join(buf)
 
         # assign certain items in named attributes
         assignments = self.parseColorAssignments(assignments)
