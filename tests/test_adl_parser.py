@@ -44,6 +44,7 @@ class Test_Files(unittest.TestCase):
         # "beamHistory_full-R3-5.adl", # dl_color -- this .adl has content errors
         "ADBase-R3-3-1.adl",               # composite
         "simDetector-R3-3-31.adl",
+        "userArrayCalc.adl",               # format="string"
         ]
 
     def setUp(self):
@@ -672,6 +673,26 @@ class Test_Files(unittest.TestCase):
         control = w.contents["control"]
         self.assertEqual(len(control), 1)
         self.assertEqualDictKeyValue(control, "chan", "sky:userCalc2.A")
+
+    def test_parse_medm_userArrayCalc(self):
+        screen = self.parseFile("userArrayCalc.adl")
+        w = self.pickWidget(screen, 88, 24, "text entry", 442)
+
+        self.assertEqualGeometry(w, 235, 170, 150, 20)
+        self.assertEqualTitle(w, None)
+        self.assertEqualColor(w.color, 0, 0, 0)
+        self.assertEqualColor(w.background_color, 115, 223, 255)
+
+        self.assertIsInstance(w.contents, dict)
+        self.assertEqual(len(w.contents), 3)
+        self.assertEqualDictKeyValue(w.contents, "format", "string")
+        self.assertEqualDictKeyValue(w.contents, "limits", "")
+
+        self.assertIn("control", w.contents)
+        control = w.contents["control"]
+        self.assertIsInstance(control, dict)
+        self.assertEqual(len(control), 1)
+        self.assertEqualDictKeyValue(control, "chan", "$(P)$(C).AA")
 
 
 def suite(*args, **kw):
