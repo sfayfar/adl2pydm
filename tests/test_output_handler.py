@@ -1115,6 +1115,23 @@ class TestOutputHandler(unittest.TestCase):
                     height = item.text
             self.assertEqualPropertyString(widget, "text", "height: " + height)
 
+    def test_write_extends_customwidget(self):
+        uiname = self.convertAdlFile("table_setup_SRI.adl")
+        full_uiname = os.path.join(self.tempdir, uiname)
+        self.assertTrue(os.path.exists(full_uiname))
+
+        root = ElementTree.parse(full_uiname).getroot()
+        customwidgets = self.getSubElement(root, "customwidgets")
+        # self.print_xml_children(screen)
+        widgets = customwidgets.findall("customwidget")
+
+        customs = [
+            self.getSubElement(w, "class").text
+            for w in widgets
+        ]
+        self.assertIn("PyDMDrawingPie", customs)
+        self.assertIn("PyDMDrawingArc", customs)
+
     # ----------------------------------------------------------
 
     def test_write_all_example_files_process(self):
