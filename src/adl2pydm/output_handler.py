@@ -497,6 +497,14 @@ class Widget2Pydm(object):
         # for k, v in scales.items():
         #     self.writePropertyBoolean(qw, k, v, stdset="0")
 
+        color = self.writer.writeOpenProperty(qw, "axisColor", stdset="0")
+        self.write_color_element(color, block.color)
+        color = self.writer.writeOpenProperty(qw, "backgroundColor", stdset="0")
+        self.write_color_element(color, block.background_color)
+        block.color = None
+        block.background_color = None
+
+
     def write_block_composite(self, parent, block, nm, qw):
         # self.write_tooltip(qw, nm)
         self.write_dynamic_attribute(qw, block)
