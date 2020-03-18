@@ -348,7 +348,7 @@ class TestOutputHandler(unittest.TestCase):
         # self.print_xml_children(widget)
         self.assertEqualClassName(
             widget, 
-            "PyDMScatterPlot", 
+            "PyDMWaveformPlot", 
             key)
 
         self.assertEqualTitle(widget, "Calibration Curve (S1A:H1)")
