@@ -176,6 +176,14 @@ class TestOutputHandler(unittest.TestCase):
         self.assertIsNotNone(prop)
         self.assertEqualString(prop, expected)
 
+    def assertEqualPropertyStringlist(self, widget, tag, expected=[]):
+        prop = self.getNamedProperty(widget, tag)
+        stringlist = self.getSubElement(prop, "stringlist")
+        self.assertEqual(len(stringlist), len(expected))
+        for i, string in enumerate(stringlist.findall("string")):
+            expect_str = expected[i]
+            self.assertEqual(string.text, expect_str)
+
     def assertEqualStyleSheet(self, parent, expected):
         self.assertEqualPropertyString(parent, "styleSheet", expected)
 
@@ -344,23 +352,23 @@ class TestOutputHandler(unittest.TestCase):
             key)
 
         self.assertEqualTitle(widget, "Calibration Curve (S1A:H1)")
-        self.assertEqualPropertyString(widget, "xLabels", "Magnetic Field")
-        self.assertEqualPropertyString(widget, "yLabels", "Current")
+        self.assertEqualPropertyStringlist(widget, "xLabels", ["Magnetic Field",])
+        self.assertEqualPropertyStringlist(widget, "yLabels", ["Current",])
 
         prop = self.getNamedProperty(widget, "curves")
         stringlist = self.getSubElement(prop, "stringlist")
         self.assertEqual(len(stringlist), 1)
         trace = output_handler.jsonDecode(stringlist[0].text)
         expected = dict(
-                name = "x=%s, y=%s" % (
-                    "Xorbit:S1A:H1:CurrentAI.BARR",
-                    "Xorbit:S1A:H1:CurrentAI.IARR", 
-                    ),
+                name = "curve 1",
                 x_channel = "ca://Xorbit:S1A:H1:CurrentAI.BARR",
                 y_channel = "ca://Xorbit:S1A:H1:CurrentAI.IARR",
-                color = "#%02x%02x%02x" % (0, 0, 0),
+                color = "#000000",
                 lineStyle = 1,
+                lineWidth = 1,
                 block_size = 8,
+                redraw_mode = 2,
+                symbolSize = 10,
             )
         self.assertDictEqual(trace, expected)
 

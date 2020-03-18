@@ -21,6 +21,7 @@ QT_STYLESHEET_FILE = "stylesheet.qss"
 # the stylesheet should be in one of the directories in PYDM_DISPLAYS_PATH
 ENV_PYDM_DISPLAYS_PATH = "PYDM_DISPLAYS_PATH"
 SCREEN_FILE_EXTENSION = ".ui"
+DEFAULT_NUMBER_OF_POINTS = 1200
 
 logger = logging.getLogger(__name__)
 
@@ -436,63 +437,64 @@ class Widget2Pydm(object):
         self.write_tooltip(qw, nm)
         self.writer.writeProperty(qw, "title", block.title, stdset="0")
 
-        if len(block.contents["traces"]) > 0:
-            curves = []
+        count = block.contents.get("count", DEFAULT_NUMBER_OF_POINTS)
+        try:
+            count = int(count)
+        except ValueError:
+            logger.warning(
+                "number of plot points must be an integer, "
+                f"received '{count}', "
+                f"using {DEFAULT_NUMBER_OF_POINTS} points"
+            )
+            count = DEFAULT_NUMBER_OF_POINTS
 
-            # count: n where plot last n pts or plot n pts & stop
-            count = block.contents.get("count")
-            if count is not None:
-                try:
-                    count = int(count)
-                except ValueError as exc:
-                    logger.warning(f"{exc}")
-            if count in (None, ""):
-                count = 1200    # default for PyDMScatterPlot widget
+        xlabel = block.contents.get("xlabel")
+        ylabel = block.contents.get("ylabel")
 
-            for v in block.contents["traces"]:
-                c = v["color"]
-                trace = dict(
-                    color = "#%02x%02x%02x" % (c.r, c.g, c.b),
-                    lineStyle = 1,          # NoLine Solid Dash Dot DashDot DashDotDot
-                    # "lineWidth": 1,       # TODO:
-                    # "symbol": null,       # TODO:
-                    # "symbolSize": 10,     # TODO:
-                    # "redraw_mode": 2      # TODO:
-                )
-                names = []
-                if "xdata" in v:
-                    trace["x_channel"] = "ca://" + v["xdata"]
-                    names.append("x=" + v["xdata"])
-                if "ydata" in v:
-                    trace["y_channel"] = "ca://" + v["ydata"]
-                    names.append("y=" + v["ydata"])
-                trace["name"] = ", ".join(names)
+        curves = []
+        for i, trace in enumerate(block.contents.get("traces", [])):
+            # ignore trace["yaxis"], in PyDM, all traces share same Y axis
+            # collect any available information
+            curve = dict(
+                name = f"curve {i+1}",
+                # if x_channel is missing, y_channel is plotted aginst index
+                x_channel = trace.get("xdata"),
+                y_channel = trace.get("ydata"),
+                color = "#{:02x}{:02x}{:02x}".format(*trace["color"]),
+                lineStyle = 1,          # NoLine Solid Dash Dot DashDot DashDotDot
+                lineWidth = trace.get("lineWidth", 1),
+                symbol = trace.get("symbol"),
+                symbolSize = trace.get("symbolSize", 10),
+                redraw_mode = 2,    # "X or Y updates", "X updates", "Y updates", "Both update"
+                block_size = count,
+            )
+            curve = {   # remove undefined values from the dictionary
+                k: curve[k]
+                for k in list(curve.keys())
+                if curve[k] is not None
+                }
+            for k in "x_channel y_channel".split():
+                if k in curve:
+                    # add the "ca://" prefix
+                    curve[k] = f"ca://{curve[k]}"
+            if "y_channel" in curve:
+                curves.append(jsonEncode(curve))
 
-                style = block.contents.get("style", "line")
-                if style == "line":
-                    trace["lineStyle"] = 1  # Solid
-                elif style == "fill-under":
-                    # TODO: improve?  fill-under not available in PyDM
-                    trace["lineStyle"] = 1  # Solid
-                # elif style == "point":
-                #     trace["symbol"] = 1  # Circle
-                #     trace["symbolSize"] = 10
-                
-                if count is not None:
-                    trace["block_size"] = count
-                curves.append(jsonEncode(trace))
+        # write the PyDMScatterPlot contents
+        if xlabel is not None and len(xlabel) > 0:
+            self.writePropertyStringlist(qw, "xLabels", [xlabel,])
+        if ylabel is not None and len(ylabel) > 0:
+            self.writePropertyStringlist(qw, "yLabels", [ylabel,])
+        self.writePropertyStringlist(qw, "curves", curves, stdset="0")
 
-                scales = dict(autoRangeX=True, autoRangeY=True)
-                for axis in "x_axis y1_axis y2_axis".split():
-                    rangeStyle = block.contents.get(axis, {}).get("rangeStyle")
-                    option = rangeStyle == "auto-scale"
-                    scales["autoRange"+axis[0].upper()] = option
-                for k, v in scales.items():
-                    self.writePropertyBoolean(qw, k, v, stdset="0")
-            
-            self.writePropertyContentsLabel(qw, block, "xlabel", "xLabels")
-            self.writePropertyContentsLabel(qw, block, "ylabel", "yLabels")
-            self.writePropertyStringlist(qw, "curves", curves, stdset="0")
+        # TODO: add this code back?
+        # scales = dict(autoRangeX=True, autoRangeY=True)
+        # for axis in "x_axis y1_axis y2_axis".split():
+        #     rangeStyle = block.contents.get(axis, {}).get("rangeStyle")
+        #     option = rangeStyle == "auto-scale"
+        #     scales["autoRange"+axis[0].upper()] = option
+        # for k, v in scales.items():
+        #     self.writePropertyBoolean(qw, k, v, stdset="0")
 
     def write_block_composite(self, parent, block, nm, qw):
         # self.write_tooltip(qw, nm)
@@ -801,7 +803,7 @@ class Widget2Pydm(object):
             self.writer.writeProperty(
                 parent, 
                 "displayFormat", 
-                f"{qw.attrib['class']}::String", 
+                f"{parent.attrib['class']}::String", 
                 tag="enum", 
                 stdset="0")
 
