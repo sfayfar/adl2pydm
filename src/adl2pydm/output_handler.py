@@ -855,6 +855,25 @@ class Widget2Pydm(object):
     
     def write_customwidgets(self, parent):
         cw_set = self.writer.writeOpenTag(parent, "customwidgets")
+        
+        # some custom widgets extend other custom widgets
+        # include any inheritances
+        # example: PyDMDrawingPie extends PyDMDrawingArc
+        while True:     # do..until
+            additions = []
+            for widget in self.custom_widgets:
+                if widget == "PyDMDrawingPie":
+                    logger.debug("breakpoint")
+                item = symbols.pydm_widgets.get(widget)
+                if item is not None:
+                    klass = item.extends
+                    if klass.startswith("PyDM") and klass not in additions+self.custom_widgets:
+                        additions.append(klass)
+            if len(additions) > 0:
+                self.custom_widgets += additions
+            else:
+                break   #recurse until no new additions
+
         for widget in self.custom_widgets:
             item = symbols.pydm_widgets.get(widget)
             if item is not None:
