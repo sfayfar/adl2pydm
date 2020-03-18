@@ -70,6 +70,15 @@ def get_user_parameters():
             "Example --log debug', default='warning'"),
         )
 
+    parser.add_argument(
+        "--use-scatterplot", 
+        action="store_true",
+        default=False,
+        help=(
+            "Translate MEDM 'cartesian plot' widget as `PyDMScatterPlot` "
+            "instead of `PyDMWaveformPlot`, default=False"),
+        )
+
     return parser.parse_args()
 
 
@@ -95,6 +104,11 @@ def configure_logging(options):
 def main():
     options = get_user_parameters()
     configure_logging(options)
+
+    if options.use_scatterplot:
+        from .symbols import adl_widgets
+        adl_widgets["cartesian plot"]["pydm_widget"] = "PyDMScatterPlot"
+
     for adlfile in options.adlfiles:
         try:
             processFile(adlfile, options.dir)
