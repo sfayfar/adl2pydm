@@ -477,15 +477,15 @@ class Widget2Pydm(object):
             for k in "x_channel y_channel".split():
                 if k in curve and curve[k] is not None:
                     # add the "ca://" prefix
-                    curve[k] = f"ca://{curve[k]}"
+                    curve[k] = f"ca://{convertMacros(curve[k])}"
             if "y_channel" in curve:
                 curves.append(jsonEncode(curve))
 
         # write the PyDMScatterPlot contents
         if xlabel is not None and len(xlabel) > 0:
-            self.writePropertyStringlist(qw, "xLabels", [xlabel,])
+            self.writePropertyStringlist(qw, "xLabels", [convertMacros(xlabel),])
         if ylabel is not None and len(ylabel) > 0:
-            self.writePropertyStringlist(qw, "yLabels", [ylabel,])
+            self.writePropertyStringlist(qw, "yLabels", [convertMacros(ylabel),])
         self.writePropertyStringlist(qw, "curves", curves, stdset="0")
 
         # TODO: add this code back?
