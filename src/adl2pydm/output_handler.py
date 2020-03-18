@@ -443,8 +443,8 @@ class Widget2Pydm(object):
         except ValueError:
             logger.warning(
                 "number of plot points must be an integer, "
-                f"received '{count}', "
-                f"using {DEFAULT_NUMBER_OF_POINTS} points"
+                f"using {DEFAULT_NUMBER_OF_POINTS} points "
+                f"instead of '{count}'"
             )
             count = DEFAULT_NUMBER_OF_POINTS
 
@@ -473,8 +473,9 @@ class Widget2Pydm(object):
                 for k in list(curve.keys())
                 if curve[k] is not None
                 }
+            curve["x_channel"] = curve.get("x_channel", None)
             for k in "x_channel y_channel".split():
-                if k in curve:
+                if k in curve and curve[k] is not None:
                     # add the "ca://" prefix
                     curve[k] = f"ca://{curve[k]}"
             if "y_channel" in curve:
