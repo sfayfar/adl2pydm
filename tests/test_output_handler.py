@@ -760,7 +760,8 @@ class TestOutputHandler(unittest.TestCase):
             key)
         # self.print_xml_children(widget)
 
-        self.assertEqualPropertyString(widget, "toolTip", key)
+        tips = screen.findall("toolTip")
+        self.assertEqual(len(tips), 0, "no tooltip if no title")
         self.assertEqualPropertyString(widget, "text", key)
 
         expected = """PyDMRelatedDisplayButton#%s {
