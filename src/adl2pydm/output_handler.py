@@ -616,14 +616,18 @@ class Widget2Pydm(object):
         self.write_tooltip(qw, nm)
 
     def write_block_related_display(self, parent, block, nm, qw):
-        text = block.title or nm
-        showIcon = not text.startswith("-")
-        text = convertMacros(text.lstrip("-"))
-        self.write_tooltip(qw, text)
-        self.writer.writeProperty(qw, "text", text, tag="string")
-        self.write_font_size(qw, block)
+        text = block.title
+
+        showIcon = True
+        if text is not None:
+            showIcon = not text.startswith("-")
+            text = convertMacros(text.lstrip("-"))
+            self.write_tooltip(qw, text)
+            self.writer.writeProperty(qw, "text", text, tag="string")
         logger.debug(f"relatedDisplay showIcon={showIcon}  text='{text}''")
         self.writePropertyBoolean(qw, "showIcon", showIcon, stdset="0")
+
+        self.write_font_size(qw, block)
         self.write_stylesheet(qw, block)
         replaceDisplay = True
         if hasattr(block, "displays"):
