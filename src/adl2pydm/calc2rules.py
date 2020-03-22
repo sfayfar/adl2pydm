@@ -39,14 +39,22 @@ def convertCalcToRuleExpression(medm_calc):
         for tok in tokenize.generate_tokens(f.read):
             logger.debug(tok)
             if tok.type == tokenize.NAME:
-                idx = "ABCDEFGHIJKL".index(tok.string.upper())
-                if idx > 3:
-                    # TODO: consider handling these less common cases
-                    raise ValueError(
-                        f"unhandled complexity in MEDM calc '{medm_calc}''"
-                        f" uses special variable {tok.string}"
-                        )
-                calc += f"ch[{idx}]"
+                if len(tok.string) == 1:
+                    idx = "ABCDEFGHIJKL".index(tok.string.upper())
+                    if idx > 3:
+                        # TODO: consider handling these less common cases
+                        raise ValueError(
+                            f"unhandled complexity in MEDM calc '{medm_calc}''"
+                            f" uses special variable {tok.string}"
+                            )
+                    calc += f"ch[{idx}]"
+                else:
+                    # probably a math expression
+                    # TODO: need a mapping?
+                    # we have these imports available:
+                    #     from math import *
+                    #     import numpy as np
+                    calc += tok.string.lower()  # simply
             elif tok.type == tokenize.ERRORTOKEN:
                 op = tok.string
                 if op == "!":
