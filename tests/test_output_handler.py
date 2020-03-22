@@ -205,6 +205,15 @@ class TestOutputHandler(unittest.TestCase):
         prop = self.getNamedProperty(parent, propName)
         self.assertIsNone(prop)
 
+    def assertColor(self, parent, r, g, b, **kwargs):
+        for item in parent.iter():
+            if item.tag == "red":
+                self.assertEqual(item.text, str(r))
+            elif item.tag == "green":
+                self.assertEqual(item.text, str(g))
+            elif item.tag == "blue":
+                self.assertEqual(item.text, str(b))
+
     def assertPropertyColor(self, parent, r, g, b, **kwargs):
         self.assertEqual(parent.tag, "property")
         for item in parent.iter():
@@ -212,12 +221,7 @@ class TestOutputHandler(unittest.TestCase):
                 self.assertEqual(len(item.attrib), len(kwargs))
                 if len(kwargs) > 0:
                     self.assertExpectedAttrib(item, **kwargs)
-            elif item.tag == "red":
-                self.assertEqual(item.text, str(r))
-            elif item.tag == "green":
-                self.assertEqual(item.text, str(g))
-            elif item.tag == "blue":
-                self.assertEqual(item.text, str(b))
+                self.assertColor(item, r, g, b)
 
     # ----------------------------------------------------------
 
@@ -272,7 +276,7 @@ class TestOutputHandler(unittest.TestCase):
             "bar_6": ["right", True, False, False, False, (253,0,0), (187,187,187)],
         }
         widgets = screen.findall("widget")
-        self.assertEqual(len(widgets), 20)
+        self.assertEqual(len(widgets), 22)
         for w in widgets:
             if w.attrib["class"] == "PyDMScaleIndicator":
                 nm = w.attrib["name"]
@@ -596,6 +600,94 @@ class TestOutputHandler(unittest.TestCase):
         self.assertEqualPropertyBool(widget, "limitsFromChannel", False)
         self.assertEqualPropertyDouble(widget, "userUpperLimit", 10)
         self.assertEqualPropertyDouble(widget, "userLowerLimit", -10)
+
+    def test_write_widget_oval(self):
+        uiname = self.convertAdlFile("bar_monitor.adl")
+        full_uiname = os.path.join(self.tempdir, uiname)
+        self.assertTrue(os.path.exists(full_uiname))
+
+        root = ElementTree.parse(full_uiname).getroot()
+        screen = self.getSubElement(root, "widget")
+        # self.print_xml_children(screen, iter=True)
+
+        # brush (color)
+        # brush (brushstyle)
+        # penStyle
+        # penCapStyle
+        # penWidth
+        expectations = {
+            "oval" : [(0,0,0), "SolidPattern", "Qt::SolidLine", "Qt::FlatCap", 0],
+            "oval_1" : [(0,0,0), "NoBrush", "Qt::SolidLine", "Qt::FlatCap", 0],
+            "oval_2" : [(0,0,0), "NoBrush", "Qt::DashLine", "Qt::FlatCap", 0],
+            "oval_3" : [(253,0,0), "SolidPattern", "Qt::SolidLine", "Qt::FlatCap", 0],
+            "oval_4" : [(253,0,0), "NoBrush", "Qt::SolidLine", "Qt::FlatCap", 4],
+            "oval_5" : [(253,0,0), "NoBrush", "Qt::DashLine", "Qt::FlatCap", 0],
+            "oval_6" : [(253,0,0), "SolidPattern", "Qt::SolidLine", "Qt::FlatCap", 0],
+            "oval_7" : [(0,0,0), "SolidPattern", "Qt::SolidLine", "Qt::FlatCap", 0],
+        }
+        widgets = screen.findall("widget")
+        self.assertEqual(len(widgets), 22)
+        for w in widgets:
+            if w.attrib["class"] == "PyDMDrawingEllipse":
+                nm = w.attrib["name"]
+                self.assertIn(nm, expectations)
+                exp = expectations[nm]
+
+                brushProp = self.getNamedProperty(w, "brush")
+                self.assertIsNotNone(brushProp, nm)
+                brush = brushProp.find("brush")
+                self.assertIsNotNone(brush, nm)
+                brushstyle = brush.attrib.get("brushstyle")
+                self.assertEqual(brushstyle, exp[1])
+                color = brush.find("color")
+                self.assertColor(color, *exp[0])
+
+                penColor = self.getNamedProperty(w, "penColor")
+                self.assertPropertyColor(penColor, *exp[0])
+                self.assertEqualPropertyEnum(w, "penStyle", exp[2])
+                if exp[4] == 0:
+                    self.assertIsNone(
+                        self.getNamedProperty(w, "penWidth")
+                    )
+                else:
+                    self.assertEqualPropertyDouble(w, "penWidth", exp[4])
+
+                if nm == "oval_6":
+                    expected = {
+                        "name": "rule_0", 
+                        "property": "Visible", 
+                        "channels": [
+                            {
+                                "channel": "demo:bar_RBV", 
+                                "trigger": True
+                            }
+                        ], 
+                        "expression": "ch[0]>128"
+                        }
+                    self.assertEqualRules(w, expected)
+                elif nm == "oval_7":
+                    expected = {
+                        "name": "rule_0", 
+                        "property": "Visible", 
+                        "channels": [
+                            {
+                                "channel": "demo:bar", 
+                                "trigger": True
+                            }
+                        ], 
+                        "expression": "ch[0]==0"
+                        }
+                    self.assertEqualRules(w, expected)
+
+    def test_write_widget_polygon(self):
+        uiname = self.convertAdlFile("testDisplay.adl")
+        # TODO:
+        # full_uiname = os.path.join(self.tempdir, uiname)
+        # self.assertTrue(os.path.exists(full_uiname))
+
+        # root = ElementTree.parse(full_uiname).getroot()
+        # screen = self.getSubElement(root, "widget")
+        # self.print_xml_children(screen, iter=True)
 
     def test_write_widget_polyline(self):
         uiname = self.convertAdlFile("polyline.adl")
