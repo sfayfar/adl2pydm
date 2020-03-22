@@ -63,25 +63,24 @@ def convertDynamicAttribute_to_Rules(attr):
     PyDM  `${P}`
     ====  ======
     """
-    # TODO: refactor?
-    rule = dict(name="rule_0", property="Visible")
-    channels = []
-    for nm in "chan chanB chanC chanD".split():
-        if nm not in attr:
-            break
-        pv = convertMacros(attr[nm])
-        channels.append(dict(channel=pv, trigger=len(pv)>0))
+    rule = dict(name="visibility", property="Visible")
+    channels = {}
+    for nm, ref in dict(chan="A", chanB="B", chanC="C", chanD="D").items():
+        if nm in attr:
+            pv = convertMacros(attr[nm])
+            channels[ref] = dict(channel=pv, trigger=len(pv)>0)
 
     calc = attr.get("calc")
     if calc is not None and len(calc) > 0:
         logger.info(f"CALC: {calc}")
-    visibility_calc = {
-        "if zero": " == 0",
-        "if not zero": " != 0",
-        "calc": calc
-    }[attr.get("vis", "if not zero")]
+
     if len(channels) > 0:
-        rule["channels"] = channels
+        visibility_calc = {
+            "if zero": " == 0",
+            "if not zero": " != 0",
+            "calc": calc
+        }[attr.get("vis", "if not zero")]
+        rule["channels"] = list(channels.values())
         if calc is None:
             calc = "a" + visibility_calc
 
@@ -665,8 +664,27 @@ class Widget2Pydm(object):
                 qw, "penWidth", penWidth, tag="double", stdset="0")
 
     def write_block_polygon(self, parent, block, nm, qw):
-        self.write_tooltip(qw, nm)
+        self.write_tooltip(qw, "PyDMDrawingIrregularPolygon\nwidget not yet ready")
         # TODO:
+        # these lines from polyline support
+        self.write_tooltip(qw, nm)
+        self.write_basic_attribute(qw, block)
+        self.write_dynamic_attribute(qw, block)
+        # FIXME: needs to support fill = "solid"
+        ba = block.contents.get("basic attribute", {})
+        try:
+            penWidth = int(ba.get("width", 1))
+        except Exception as exc:
+            logger.critical(f"penWidth: {exc}")
+            penWidth = 1
+
+        pt_list = []
+        for pt in block.points:
+            # translate global to local
+            x = pt.x - block.geometry.x - penWidth
+            y = pt.y - block.geometry.y - penWidth
+            pt_list.append("%d, %d" % (x, y))
+        self.writePropertyStringlist(qw, "points", pt_list, stdset="0")
 
     def write_block_polyline(self, parent, block, nm, qw):
         self.write_tooltip(qw, nm)
