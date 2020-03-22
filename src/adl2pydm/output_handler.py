@@ -252,8 +252,19 @@ class Widget2Pydm(object):
     def write_direction(self, qw, block):
         # up & left only used in Bar Monitor
         direction = block.contents.get("direction", "right")
-        orientation = {"right": "Qt::Horizontal", "down": "Qt::Vertical"}[direction]
+        orientation = {
+            "left": "Qt::Horizontal", 
+            "right": "Qt::Horizontal", 
+            "up": "Qt::Vertical",
+            "down": "Qt::Vertical",
+        }[direction]
         self.writer.writeProperty(qw, "orientation", orientation, stdset="0")
+        if (
+            qw.attrib["class"] in ("PyDMScaleIndicator",) 
+            and 
+            direction in ("down", "left")
+        ):
+            self.writePropertyBoolean(qw, "invertedAppearance", True, stdset="0")
 
     def write_dynamic_attribute(self, qw, block):
         attr = block.contents.get("dynamic attribute")
@@ -366,15 +377,25 @@ class Widget2Pydm(object):
         self.write_direction(qw, block)
         self.write_limits(qw, block)
         self.writePropertyBoolean(qw, "barIndicator", True, stdset="0")
-        # showValue
-        # showTicks
-        # showLimits
-        # flipScale
-        # invertedAppearance
-        # backgroundColor
-        # indicatorColor
-        # originAtZero
-        # TODO:
+        showValue = False
+        showTicks = False
+        showLimits = False
+        if block.contents.get("label") in ("limits", "channel"):
+            showValue = True
+            showTicks = True
+        if block.contents.get("label") in ("limits",):
+            showLimits = True
+        self.writePropertyBoolean(qw, "showValue", showValue, stdset="0")
+        self.writePropertyBoolean(qw, "showTicks", showTicks, stdset="0")
+        self.writePropertyBoolean(qw, "showLimits", showLimits, stdset="0")
+        # TODO: originAtZero
+
+        color = self.writer.writeOpenProperty(qw, "indicatorColor", stdset="0")
+        self.write_color_element(color, block.color)
+        color = self.writer.writeOpenProperty(qw, "backgroundColor", stdset="0")
+        self.write_color_element(color, block.background_color)
+        block.color = None
+        block.background_color = None
 
     def write_block_byte_indicator(self, parent, block, nm, qw):
         try:
