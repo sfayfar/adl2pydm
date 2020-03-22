@@ -245,6 +245,16 @@ class TestOutputHandler(unittest.TestCase):
         self.assertEqualPropertyDouble(widget, "spanAngle", -320)
         self.assertEqualBrush(widget, "SolidPattern", 251, 243, 74)
 
+    def test_write_widget_bar(self):
+        uiname = self.convertAdlFile("testDisplay.adl")
+        full_uiname = os.path.join(self.tempdir, uiname)
+        self.assertTrue(os.path.exists(full_uiname))
+
+        root = ElementTree.parse(full_uiname).getroot()
+        screen = self.getSubElement(root, "widget")
+        # self.print_xml_children(screen, iter=True)
+        # TODO:
+
     def test_write_widget_byte(self):
         uiname = self.convertAdlFile("byte-monitor.adl")
         full_uiname = os.path.join(self.tempdir, uiname)
@@ -762,7 +772,8 @@ class TestOutputHandler(unittest.TestCase):
 
         tips = screen.findall("toolTip")
         self.assertEqual(len(tips), 0, "no tooltip if no title")
-        self.assertEqualPropertyString(widget, "text", key)
+        text = self.getNamedProperty(widget, "text")
+        self.assertIsNone(text)
 
         expected = """PyDMRelatedDisplayButton#%s {
   color: rgb(0, 0, 0);

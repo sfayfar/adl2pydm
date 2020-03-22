@@ -57,10 +57,9 @@ PyDM_CustomWidget = namedtuple('PyDM_CustomWidget', 'cls extends header')
 
 adl_widgets = {
     "arc" : dict(type="static", pydm_widget="PyDMDrawingPie"),
-    "bar" : dict(type="monitor", pydm_widget="PyDMDrawingRectangle"),
+    "bar" : dict(type="monitor", pydm_widget="PyDMScaleIndicator"),
     "byte" : dict(type="monitor", pydm_widget="PyDMByteIndicator"),
     "cartesian plot" : dict(type="monitor", pydm_widget="PyDMWaveformPlot"),
-    # "choice button" : dict(type="controller", pydm_widget="PyDMEnumComboBox"),
     "choice button" : dict(type="controller", pydm_widget="PyDMEnumButton"),
     "composite" : dict(type="static", pydm_widget="PyDMFrame"),
     "embedded display" : dict(type="static", pydm_widget="PyDMEmbeddedDisplay"),

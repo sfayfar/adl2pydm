@@ -111,7 +111,7 @@ class Widget2Pydm(object):
         self.unique_widget_names = {}
         self.pydm_widget_handlers = {
             "arc" : self.write_block_arc,
-            #"bar" : dict(type="monitor", pydm_widget="PyDMDrawingRectangle"),
+            "bar" : self.write_block_bar,
             "byte" : self.write_block_byte_indicator,
             "cartesian plot" : self.write_block_cartesian_plot,
             "choice button" : self.write_block_choice_button,
@@ -358,6 +358,23 @@ class Widget2Pydm(object):
                 str(-pathAngle),
                 tag="double", 
                 stdset="0")
+
+    def write_block_bar(self, parent, block, nm, qw):
+        pv = self.get_channel(block.contents["monitor"])
+        self.write_channel(qw, pv)
+        self.write_tooltip(qw, pv)
+        self.write_direction(qw, block)
+        self.write_limits(qw, block)
+        self.writePropertyBoolean(qw, "barIndicator", True, stdset="0")
+        # showValue
+        # showTicks
+        # showLimits
+        # flipScale
+        # invertedAppearance
+        # backgroundColor
+        # indicatorColor
+        # originAtZero
+        # TODO:
 
     def write_block_byte_indicator(self, parent, block, nm, qw):
         try:
