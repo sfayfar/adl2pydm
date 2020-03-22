@@ -654,7 +654,7 @@ class TestOutputHandler(unittest.TestCase):
 
                 if nm == "oval_6":
                     expected = {
-                        "name": "rule_0", 
+                        "name": "visibility", 
                         "property": "Visible", 
                         "channels": [
                             {
@@ -667,7 +667,7 @@ class TestOutputHandler(unittest.TestCase):
                     self.assertEqualRules(w, expected)
                 elif nm == "oval_7":
                     expected = {
-                        "name": "rule_0", 
+                        "name": "visibility", 
                         "property": "Visible", 
                         "channels": [
                             {
@@ -680,7 +680,7 @@ class TestOutputHandler(unittest.TestCase):
                     self.assertEqualRules(w, expected)
 
     def test_write_widget_polygon(self):
-        uiname = self.convertAdlFile("testDisplay.adl")
+        uiname = self.convertAdlFile("polygons.adl")
         # TODO:
         # full_uiname = os.path.join(self.tempdir, uiname)
         # self.assertTrue(os.path.exists(full_uiname))
@@ -743,7 +743,7 @@ class TestOutputHandler(unittest.TestCase):
 
         self.assertEqualChannel(widget, "ca://PYDM:visible")
         expected = {
-            "name": "rule_0", 
+            "name": "visibility", 
             "property": "Visible", 
                 "channels": [{
                 "channel": "PYDM:visible", "trigger": True
@@ -839,7 +839,7 @@ class TestOutputHandler(unittest.TestCase):
         rules = output_handler.jsonDecode(child.text)
         self.assertEqual(len(rules), 1)
         expected = {
-            'name': 'rule_0', 
+            'name': 'visibility', 
             'property': 'Visible', 
             'channels': [
                 {'channel': '${P}alldone', 
@@ -863,7 +863,7 @@ class TestOutputHandler(unittest.TestCase):
         self.assertEqualPenCapStyle(rect, "Qt::FlatCap")
 
         expected = {
-            'name': 'rule_0', 
+            'name': 'visibility', 
             'property': 'Visible', 
             'channels': [
                 {'channel': '${P}${M}.RBV', 
