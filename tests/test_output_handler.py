@@ -246,14 +246,56 @@ class TestOutputHandler(unittest.TestCase):
         self.assertEqualBrush(widget, "SolidPattern", 251, 243, 74)
 
     def test_write_widget_bar(self):
-        uiname = self.convertAdlFile("testDisplay.adl")
+        uiname = self.convertAdlFile("bar_monitor.adl")
         full_uiname = os.path.join(self.tempdir, uiname)
         self.assertTrue(os.path.exists(full_uiname))
 
         root = ElementTree.parse(full_uiname).getroot()
         screen = self.getSubElement(root, "widget")
         # self.print_xml_children(screen, iter=True)
-        # TODO:
+
+        # name
+        # orientation
+        # barIndicator
+        # showValue
+        # showTicks
+        # showLimits
+        # indicatorColor
+        # backgroundColor
+        expectations = {
+            "bar": ["left", True, False, False, False, (253,0,0), (187,187,187)],
+            "bar_1": ["left", True, False, False, False, (253,0,0), (187,187,187)],
+            "bar_2": ["left", True, True, True, False, (253,0,0), (187,187,187)],
+            "bar_3": ["up", True, False, False, False, (253,0,0), (187,187,187)],
+            "bar_4": ["down", True, False, False, False, (253,0,0), (187,187,187)],
+            "bar_5": ["right", True, False, False, False, (253,0,0), (187,187,187)],
+            "bar_6": ["right", True, False, False, False, (253,0,0), (187,187,187)],
+        }
+        widgets = screen.findall("widget")
+        self.assertEqual(len(widgets), 20)
+        for w in widgets:
+            if w.attrib["class"] == "PyDMScaleIndicator":
+                nm = w.attrib["name"]
+                self.assertIn(nm, expectations)
+                exp = expectations[nm]
+
+                direction = exp[0]
+                if direction in ("up", "down"):
+                    e = "Qt::Vertical"
+                else:
+                    e = "Qt::Horizontal"
+                self.assertEqualPropertyString(w, "orientation", e)
+                if direction in ("down", "right"):
+                    self.assertEqualPropertyBool(w, "invertedAppearance", True)
+                self.assertEqualPropertyBool(w, "barIndicator", exp[1])
+                self.assertEqualPropertyBool(w, "showValue", exp[2])
+                self.assertEqualPropertyBool(w, "showTicks", exp[3])
+                self.assertEqualPropertyBool(w, "showLimits", exp[4])
+
+                prop = self.getNamedProperty(w, "indicatorColor")
+                self.assertPropertyColor(prop, *exp[5])
+                prop = self.getNamedProperty(w, "backgroundColor")
+                self.assertPropertyColor(prop, *exp[6])
 
     def test_write_widget_byte(self):
         uiname = self.convertAdlFile("byte-monitor.adl")

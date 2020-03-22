@@ -1,0 +1,362 @@
+
+file {
+	name="/home/mintadmin/Documents/projects/demo-screens/medm/bar_monitor.adl"
+	version=030114
+}
+display {
+	object {
+		x=10
+		y=25
+		width=448
+		height=490
+	}
+	clr=14
+	bclr=4
+	cmap=""
+	gridSpacing=5
+	gridOn=0
+	snapToGrid=0
+}
+"color map" {
+	ncolors=65
+	colors {
+		ffffff,
+		ececec,
+		dadada,
+		c8c8c8,
+		bbbbbb,
+		aeaeae,
+		9e9e9e,
+		919191,
+		858585,
+		787878,
+		696969,
+		5a5a5a,
+		464646,
+		2d2d2d,
+		000000,
+		00d800,
+		1ebb00,
+		339900,
+		2d7f00,
+		216c00,
+		fd0000,
+		de1309,
+		be190b,
+		a01207,
+		820400,
+		5893ff,
+		597ee1,
+		4b6ec7,
+		3a5eab,
+		27548d,
+		fbf34a,
+		f9da3c,
+		eeb62b,
+		e19015,
+		cd6100,
+		ffb0ff,
+		d67fe2,
+		ae4ebc,
+		8b1a96,
+		610a75,
+		a4aaff,
+		8793e2,
+		6a73c1,
+		4d52a4,
+		343386,
+		c7bb6d,
+		b79d5c,
+		a47e3c,
+		7d5627,
+		58340f,
+		99ffff,
+		73dfff,
+		4ea5f9,
+		2a63e4,
+		0a00b8,
+		ebf1b5,
+		d4db9d,
+		bbc187,
+		a6a462,
+		8b8239,
+		73ff6b,
+		52da3b,
+		3cb420,
+		289315,
+		1a7309,
+	}
+}
+oval {
+	object {
+		x=20
+		y=65
+		width=84
+		height=38
+	}
+	"basic attribute" {
+		clr=14
+	}
+}
+text {
+	object {
+		x=29
+		y=20
+		width=350
+		height=28
+	}
+	"basic attribute" {
+		clr=14
+	}
+	textix="Ovals (static of PV-connected)"
+}
+oval {
+	object {
+		x=115
+		y=65
+		width=84
+		height=38
+	}
+	"basic attribute" {
+		clr=14
+		fill="outline"
+	}
+}
+oval {
+	object {
+		x=205
+		y=65
+		width=84
+		height=38
+	}
+	"basic attribute" {
+		clr=14
+		style="dash"
+		fill="outline"
+	}
+}
+oval {
+	object {
+		x=20
+		y=125
+		width=84
+		height=38
+	}
+	"basic attribute" {
+		clr=20
+	}
+}
+oval {
+	object {
+		x=110
+		y=125
+		width=84
+		height=38
+	}
+	"basic attribute" {
+		clr=20
+		fill="outline"
+	}
+}
+oval {
+	object {
+		x=205
+		y=125
+		width=84
+		height=38
+	}
+	"basic attribute" {
+		clr=20
+		style="dash"
+		fill="outline"
+	}
+}
+bar {
+	object {
+		x=95
+		y=330
+		width=80
+		height=36
+	}
+	monitor {
+		chan="demo:bar_RBV"
+		clr=20
+		bclr=4
+	}
+	limits {
+	}
+}
+text {
+	object {
+		x=22
+		y=250
+		width=400
+		height=28
+	}
+	"basic attribute" {
+		clr=14
+	}
+	textix="Bar Monitors (only PV-connected)"
+}
+text {
+	object {
+		x=22
+		y=288
+		width=60
+		height=12
+	}
+	"basic attribute" {
+		clr=14
+	}
+	textix="bar value"
+}
+"text update" {
+	object {
+		x=87
+		y=288
+		width=70
+		height=12
+	}
+	monitor {
+		chan="demo:bar"
+		clr=14
+		bclr=4
+	}
+	limits {
+	}
+}
+valuator {
+	object {
+		x=162
+		y=282
+		width=241
+		height=24
+	}
+	control {
+		chan="demo:bar"
+		clr=14
+		bclr=4
+	}
+	dPrecision=1.000000
+	limits {
+	}
+}
+bar {
+	object {
+		x=95
+		y=377
+		width=80
+		height=24
+	}
+	monitor {
+		chan="demo:bar_RBV"
+		clr=20
+		bclr=4
+	}
+	limits {
+	}
+}
+bar {
+	object {
+		x=15
+		y=418
+		width=400
+		height=60
+	}
+	monitor {
+		chan="demo:bar_RBV"
+		clr=20
+		bclr=4
+	}
+	label="channel"
+	limits {
+	}
+}
+bar {
+	object {
+		x=17
+		y=328
+		width=24
+		height=80
+	}
+	monitor {
+		chan="demo:bar_RBV"
+		clr=20
+		bclr=4
+	}
+	direction="up"
+	limits {
+	}
+}
+bar {
+	object {
+		x=52
+		y=328
+		width=24
+		height=80
+	}
+	monitor {
+		chan="demo:bar_RBV"
+		clr=20
+		bclr=4
+	}
+	direction="down"
+	limits {
+	}
+}
+bar {
+	object {
+		x=194
+		y=377
+		width=80
+		height=24
+	}
+	monitor {
+		chan="demo:bar_RBV"
+		clr=20
+		bclr=4
+	}
+	direction="left"
+	limits {
+	}
+}
+bar {
+	object {
+		x=194
+		y=330
+		width=80
+		height=36
+	}
+	monitor {
+		chan="demo:bar_RBV"
+		clr=20
+		bclr=4
+	}
+	direction="left"
+	limits {
+	}
+}
+text {
+	object {
+		x=284
+		y=347
+		width=150
+		height=12
+	}
+	"basic attribute" {
+		clr=14
+	}
+	textix="these bars follow"
+}
+text {
+	object {
+		x=284
+		y=368
+		width=150
+		height=12
+	}
+	"basic attribute" {
+		clr=14
+	}
+	textix="the slider's value"
+}
