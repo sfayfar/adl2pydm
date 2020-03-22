@@ -5,7 +5,7 @@ file {
 }
 display {
 	object {
-		x=10
+		x=0
 		y=25
 		width=448
 		height=490
@@ -108,11 +108,11 @@ text {
 	"basic attribute" {
 		clr=14
 	}
-	textix="Ovals (static of PV-connected)"
+	textix="Ovals (static or PV-connected)"
 }
 oval {
 	object {
-		x=115
+		x=109
 		y=65
 		width=84
 		height=38
@@ -124,7 +124,7 @@ oval {
 }
 oval {
 	object {
-		x=205
+		x=198
 		y=65
 		width=84
 		height=38
@@ -138,7 +138,7 @@ oval {
 oval {
 	object {
 		x=20
-		y=125
+		y=108
 		width=84
 		height=38
 	}
@@ -148,20 +148,21 @@ oval {
 }
 oval {
 	object {
-		x=110
-		y=125
+		x=109
+		y=108
 		width=84
 		height=38
 	}
 	"basic attribute" {
 		clr=20
 		fill="outline"
+		width=4
 	}
 }
 oval {
 	object {
-		x=205
-		y=125
+		x=198
+		y=108
 		width=84
 		height=38
 	}
@@ -359,4 +360,35 @@ text {
 		clr=14
 	}
 	textix="the slider's value"
+}
+oval {
+	object {
+		x=287
+		y=108
+		width=84
+		height=38
+	}
+	"basic attribute" {
+		clr=20
+	}
+	"dynamic attribute" {
+		vis="calc"
+		calc="A>128"
+		chan="demo:bar_RBV"
+	}
+}
+oval {
+	object {
+		x=287
+		y=65
+		width=84
+		height=38
+	}
+	"basic attribute" {
+		clr=14
+	}
+	"dynamic attribute" {
+		vis="if zero"
+		chan="demo:bar"
+	}
 }
