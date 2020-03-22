@@ -13,7 +13,7 @@ from xml.dom import minidom
 from xml.etree import ElementTree
 
 from . import symbols
-from .adl_parser import Geometry
+from .adl_parser import Color, Geometry
 from .calc2rules import convertCalcToRuleExpression
 
 
@@ -122,8 +122,8 @@ class Widget2Pydm(object):
             "menu" : self.write_block_menu,
             "message button" : self.write_block_message_button,
             "meter" : self.write_block_meter,
-            #"oval" : dict(type="static", pydm_widget="PyDMDrawingEllipse"),
-            #"polygon" : dict(type="static", pydm_widget="PyDMDrawingPolygon"),
+            "oval" : self.write_block_oval,
+            "polygon" : self.write_block_polygon,
             "polyline" : self.write_block_polyline,
             "rectangle" : self.write_block_rectangle,
             "related display" : self.write_block_related_display,
@@ -295,7 +295,7 @@ class Widget2Pydm(object):
 
         root = self.writer.openFile(ui_filename)
         logging.info("writing screen file: " + ui_filename)
-        self.writer.writeTaggedString(root, "class", title)
+        self.writer.writeTaggedString(root, "class", "Dialog")
         form = self.writer.writeOpenTag(root, "widget", cls=window_class, name="screen")
         
         self.write_geometry(form, screen.geometry)
@@ -623,7 +623,51 @@ class Widget2Pydm(object):
     def write_block_meter(self, parent, block, nm, qw):
         # handle same as indicator since PyDM does not have a meter widget
         self.write_block_indicator(parent, block, nm, qw)
-        
+
+    def write_block_oval(self, parent, block, nm, qw):
+        ba = block.contents["basic attribute"]
+        da = block.contents.get("dynamic attribute", {})
+        pv = self.get_channel(da)
+        if pv is not None:
+            self.write_channel(qw, pv)  
+            self.write_tooltip(qw, nm)
+            self.write_dynamic_attribute(qw, block)
+
+        brushstyles = {
+            "solid" : "SolidPattern",
+            "outline" : "NoBrush",
+        }
+        adl_fill = ba.get("fill", "solid")
+        brushstyle = brushstyles.get(adl_fill, "solid")
+        brushProp = self.writer.writeOpenProperty(qw, "brush", stdset="0")
+        brush = self.writer.writeOpenTag(
+            brushProp, "brush", brushstyle=brushstyle)
+        self.write_color_element(brush, block.color, alpha="255")
+
+        penStyles = {
+            "solid" : "Qt::SolidLine",
+            "dash" : "Qt::DashLine",
+        }
+        adl_style = ba.get("style", "solid")
+        penStyle = penStyles.get(adl_style, "solid")
+        self.writer.writeProperty(
+            qw, "penStyle", penStyle, tag="enum", stdset="0")
+
+        penColor = self.writer.writeOpenProperty(qw, "penColor", stdset="0")
+        self.write_color_element(penColor, block.color)
+
+        block.color = None
+        block.background_color = None
+
+        penWidth = float(ba.get("width", 0))
+        if penWidth > 0:
+            self.writer.writeProperty(
+                qw, "penWidth", penWidth, tag="double", stdset="0")
+
+    def write_block_polygon(self, parent, block, nm, qw):
+        self.write_tooltip(qw, nm)
+        # TODO:
+
     def write_block_polyline(self, parent, block, nm, qw):
         self.write_tooltip(qw, nm)
         self.write_basic_attribute(qw, block)
