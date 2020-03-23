@@ -19,7 +19,7 @@ _path = os.path.join(_test_path, '..', 'src')
 if _path not in sys.path:
     sys.path.insert(0, _path)
 
-from adl2pydm import cli, output_handler
+from adl2pydm import cli, output_handler, adl_parser
 
 
 class TestOutputHandler(unittest.TestCase):
@@ -193,8 +193,8 @@ class TestOutputHandler(unittest.TestCase):
     def assertEqualPropertyString(self, parent, propName, expected):
         doc = f"widget:{parent.attrib['name']}, property:{propName}"
         prop = self.getNamedProperty(parent, propName)
-        self.assertIsNotNone(prop)
-        self.assertEqualString(prop, expected)
+        self.assertIsNotNone(prop, doc)
+        self.assertEqualString(prop, expected, doc)
 
     def assertEqualPropertyStringlist(self, widget, tag, expected=[]):
         doc = f"widget:{widget.attrib['name']}"
@@ -714,13 +714,14 @@ class TestOutputHandler(unittest.TestCase):
 
     def test_write_widget_polygon(self):
         uiname = self.convertAdlFile("polygons.adl")
-        # TODO:
-        # full_uiname = os.path.join(self.tempdir, uiname)
-        # self.assertTrue(os.path.exists(full_uiname))
+        full_uiname = os.path.join(self.tempdir, uiname)
+        self.assertTrue(os.path.exists(full_uiname))
 
-        # root = ElementTree.parse(full_uiname).getroot()
-        # screen = self.getSubElement(root, "widget")
+        root = ElementTree.parse(full_uiname).getroot()
+        screen = self.getSubElement(root, "widget")
+        self.assertIsNotNone(screen, full_uiname)
         # self.print_xml_children(screen, iter=True)
+        # TODO: complete
 
     def test_write_widget_polyline(self):
         uiname = self.convertAdlFile("polyline.adl")
@@ -1204,25 +1205,23 @@ class TestOutputHandler(unittest.TestCase):
 
         # fields:
         # name :
-        # orientation
-        # label
-        # showValueLabel
-        # showLimitLabels
-        # showUnits
-        # tickPosition
-        # precision
-        # foregroundColor
-        # backgroundColor
+        # 0: orientation
+        # 1: showValueLabel
+        # 2: showLimitLabels
+        # 3: showUnits
+        # 4: tickPosition
+        # 5: precision
+        # 6: foregroundColor
+        # 7: backgroundColor
         expectations = {
-            "valuator":   ["up",    "", False,  True, False, None, 1, (0,0,0), (253,0,0)],
-            "valuator_1": ["down",  "", False,  True, False, None, 1, (0,0,0), (253,0,0)],
-            "valuator_2": ["right", "", False,  True, False, None, 1, (0,0,0), (253,0,0)],
-            "valuator_3": ["left",  "", False,  True, False, None, 1, (0,0,0), (253,0,0)],
-            "valuator_4": ["up",    "", False,  True, False, None, 5, (253,0,0), (0,255,0)],
-            "valuator_5": ["left",  "", True,   True, False, None, 1, (253,0,0), (0,255,0)],
-            "valuator_6": ["left",  "", True,   True, False, None, 1, (253,0,0), (0,255,0)],
+            "valuator":   ["up",    False,  True, False, "NoTicks", 1, (0,0,0), (187,187,187)],
+            "valuator_1": ["down",  False,  True, False, "NoTicks", 1, (0,0,0), (187,187,187)],
+            "valuator_2": ["right", False,  True, False, "NoTicks", 1, (0,0,0), (187,187,187)],
+            "valuator_3": ["left",  False,  True, False, "NoTicks", 1, (0,0,0), (187,187,187)],
+            "valuator_4": ["up",    False,  True, False, "NoTicks", 5, (253,0,0), (0,216,0)],
+            "valuator_5": ["left",  True,   True, False, "NoTicks", 1, (0,0,0), (187,187,187)],
+            "valuator_6": ["left",  True,   True, False, "NoTicks", 1, (0,0,0), (187,187,187)],
         }
-        # FIXME: support tickPosition property
         widgets = screen.findall("widget")
         self.assertEqual(len(widgets), 8)
         for w in widgets:
@@ -1241,23 +1240,27 @@ class TestOutputHandler(unittest.TestCase):
                     # self.assertEqualPropertyBool(w, "invertedAppearance", True)
                     # PyDMSLider does not have this property
                     self.assertIsNoneProperty(w, "invertedAppearance")
-                self.assertEqualPropertyBool(w, "showValueLabel", exp[2])
-                self.assertEqualPropertyBool(w, "showLimitLabels", exp[3])
-                self.assertEqualPropertyBool(w, "showUnits", exp[4])
-                if exp[5] is None:
+                self.assertEqualPropertyBool(w, "showValueLabel", exp[1])
+                self.assertEqualPropertyBool(w, "showLimitLabels", exp[2])
+                self.assertEqualPropertyBool(w, "showUnits", exp[3])
+                if exp[4] is None:
                     self.assertIsNoneProperty(w, "tickPosition")
                 else:
-                    self.assertEqualPropertyEnum(w, "tickPosition", exp[5])
-                if exp[6] is None:
+                    self.assertEqualPropertyEnum(w, "tickPosition", exp[4])
+                if exp[5] is None:
                     self.assertIsNoneProperty(w, "precision")
                 else:
-                    self.assertEqualPropertyNumber(w, "precision", exp[6])
+                    self.assertEqualPropertyNumber(w, "precision", exp[5])
 
-                # TODO: look in the stylesheet
-                # prop = self.getNamedProperty(w, "indicatorColor")
-                # self.assertPropertyColor(prop, *exp[7])
-                # prop = self.getNamedProperty(w, "backgroundColor")
-                # self.assertPropertyColor(prop, *exp[8])
+                c = adl_parser.Color(*exp[6])
+                bc = adl_parser.Color(*exp[7])
+                expected = (
+                    f"PyDMSlider#{nm}" " {\n"
+                    f"  color: rgb({c.r}, {c.g}, {c.b});\n"
+                    f"  background-color: rgb({bc.r}, {bc.g}, {bc.b});\n"
+                    "  }"
+                )
+                self.assertEqualStyleSheet(w, expected)
 
     def test_write_widget_valuator_variations(self):
         uiname = self.convertAdlFile("slider.adl")
