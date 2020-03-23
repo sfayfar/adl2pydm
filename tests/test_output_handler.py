@@ -1156,8 +1156,8 @@ class TestOutputHandler(unittest.TestCase):
 
         self.assertEqualChannel(widget, "ca://sky:m1")
         self.assertEqualPropertyString(widget, "orientation", "Qt::Horizontal")
-        self.assertIsNoneProperty(widget, "precision")
-        # this must be an integer for the slider widget
+        # precision must be an integer for the slider widget
+        self.assertEqualPropertyNumber(widget, "precision", 1)
         for propName in """showLimitLabels 
                            showValueLabel 
                            userDefinedLimits
@@ -1204,7 +1204,7 @@ class TestOutputHandler(unittest.TestCase):
 
         self.assertEqualChannel(widget, "ca://sky:userCalc2.A")
         self.assertEqualPropertyString(widget, "orientation", "Qt::Horizontal")
-        self.assertIsNoneProperty(widget, "precision")
+        self.assertEqualPropertyNumber(widget, "precision", 0.1)
         # self.print_xml_children(widget)
         self.assertEqualPropertyBool(widget, "userDefinedLimits", True)
         self.assertEqualPropertyDouble(widget, "userMaximum", 10)
