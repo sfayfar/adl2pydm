@@ -869,13 +869,15 @@ class Widget2Pydm(object):
         self.write_limits(qw, block)
 
         # TODO:
+        # TODO: https://github.com/BCDA-APS/adl2pydm/issues/50
         # self.assertEqualPropertyBool(w, "showValueLabel", False)
         # self.assertEqualPropertyBool(w, "showLimitLabels", False)
 
         # TODO: https://github.com/BCDA-APS/adl2pydm/issues/37
-        # precision = block.contents.get("dPrecision")
-        # if precision is not None:
-        #     self.writer.writeProperty(qw, "precision", str(precision), tag="number")
+        precision = block.contents.get("dPrecision")
+        if precision is not None:
+            self.writer.writeProperty(
+                qw, "precision", str(precision), tag="number")
 
     def write_block_wheel_switch(self, parent, block, nm, qw):
         pv = self.get_channel(block.contents["control"])
