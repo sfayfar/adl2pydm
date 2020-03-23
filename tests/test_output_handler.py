@@ -72,31 +72,37 @@ class TestOutputHandler(unittest.TestCase):
             for i, child in enumerate(parent):#  .iter(tag):
                 print(i, child.tag, child.attrib)
 
-    def assertEqualBool(self, prop, value):
-        child = self.getSubElement(prop, "bool")
-        self.assertEqual(child.text, str(value).lower())
+    def assertEqualBool(self, parent, value, doc=None):
+        doc = doc or f"widget:{parent.attrib['name']}"
+        child = self.getSubElement(parent, "bool")
+        self.assertEqual(child.text, str(value).lower(), doc)
 
-    def assertEqualBrush(self, parent, brushstyle, r, g, b):
+    def assertEqualBrush(self, parent, brushstyle, r, g, b, doc=None):
+        doc = doc or f"widget:{parent.attrib['name']}"
         prop = self.getNamedProperty(parent, "brush")
-        self.assertIsNotNone(prop)
-        self.assertExpectedAttrib(prop, stdset="0")
+        self.assertIsNotNone(prop, doc)
+        self.assertExpectedAttrib(prop, stdset="0", doc=doc)
         for item in prop.iter():
             if item.tag == "brush":
-                self.assertExpectedAttrib(item, brushstyle=brushstyle)
+                self.assertExpectedAttrib(item, brushstyle=brushstyle, doc=doc)
         self.assertPropertyColor(prop, r, g, b, alpha="255")
 
-    def assertEqualChannel(self, parent, channel):
+    def assertEqualChannel(self, parent, channel, doc=None):
+        doc = doc or f"widget:{parent.attrib['name']}"
         self.assertEqualPropertyString(parent, "channel", channel)
 
-    def assertEqualClassName(self, parent, cls, nm):
+    def assertEqualClassName(self, parent, cls, nm, doc=None):
+        doc = doc or f"widget:{parent.attrib['name']}"
         self.assertExpectedAttrib(parent, **{"class":cls, "name":nm})
 
-    def assertEqualDouble(self, prop, expected):
-        self.assertIsNotNone(prop)
-        child = self.getSubElement(prop, "double")
+    def assertEqualDouble(self, parent, expected, doc=None):
+        doc = doc or f"widget:{parent.attrib['name']}"
+        self.assertIsNotNone(parent)
+        child = self.getSubElement(parent, "double")
         self.assertEqual(float(child.text), float(expected))
 
-    def assertEqualGeometry(self, parent, x, y, w, h):
+    def assertEqualGeometry(self, parent, x, y, w, h, doc=None):
+        doc = doc or f"widget:{parent.attrib['name']}"
         prop = self.getNamedProperty(parent, "geometry")
         self.assertIsNotNone(prop)
         for item in prop.iter():
@@ -111,72 +117,87 @@ class TestOutputHandler(unittest.TestCase):
             elif item.tag == "height":
                 self.assertEqual(item.text, str(h))
 
-    def assertEqualEnum(self, prop, expected):
-        self.assertIsNotNone(prop)
-        child = self.getSubElement(prop, "enum")
+    def assertEqualEnum(self, parent, expected, doc=None):
+        doc = doc or f"widget:{parent.attrib['name']}"
+        self.assertIsNotNone(parent)
+        child = self.getSubElement(parent, "enum")
         self.assertEqual(child.text, expected)
 
-    def assertEqualNumber(self, prop, expected, dtype=float):
-        child = self.getSubElement(prop, "number")
-        self.assertIsNotNone(prop)
-        self.assertEqual(dtype(child.text), dtype(expected))
+    def assertEqualNumber(self, parent, expected, doc=None, dtype=float):
+        doc = doc or f"widget:{parent.attrib['name']}, expected:{expected}"
+        child = self.getSubElement(parent, "number")
+        self.assertIsNotNone(parent, doc)
+        self.assertIsNotNone(child.text, doc)
+        self.assertIsNotNone(expected, doc)
+        self.assertEqual(dtype(child.text), dtype(expected), doc)
 
-    def assertEqualPenColor(self, parent, r, g, b):
+    def assertEqualPenColor(self, parent, r, g, b, doc=None):
+        doc = doc or f"widget:{parent.attrib['name']}"
         prop = self.getNamedProperty(parent, "penColor")
         self.assertIsNotNone(prop)
         self.assertExpectedAttrib(prop, stdset="0")
         self.assertPropertyColor(prop, r, g, b)
 
-    def assertEqualPenStyle(self, parent, value):
+    def assertEqualPenStyle(self, parent, value, doc=None):
+        doc = doc or f"widget:{parent.attrib['name']}"
         prop = self.getNamedProperty(parent, "penStyle")
-        self.assertIsNotNone(prop)
+        self.assertIsNotNone(prop, doc)
         self.assertExpectedAttrib(prop, stdset="0")
         self.assertEqualEnum(prop, value)
 
-    def assertEqualPenCapStyle(self, parent, expected):
+    def assertEqualPenCapStyle(self, parent, expected, doc=None):
+        doc = doc or f"widget:{parent.attrib['name']}"
         self.assertEqualPropertyEnum(parent, "penCapStyle", expected)
 
-    def assertEqualPenWidth(self, parent, expected):
+    def assertEqualPenWidth(self, parent, expected, doc=None):
+        doc = doc or f"widget:{parent.attrib['name']}"
         prop = self.assertEqualPropertyDouble(parent, "penWidth", expected)
 
-    def assertEqualString(self, parent, text=""):
+    def assertEqualString(self, parent, text="", doc=None):
         child = self.getSubElement(parent, "string")
-        self.assertEqual(child.text, str(text))
+        self.assertEqual(child.text, str(text), doc)
 
-    def assertEqualTitle(self, parent, title):
+    def assertEqualTitle(self, parent, title, doc=None):
+        doc = doc or f"widget:{parent.attrib['name']}"
         prop = self.getNamedProperty(parent, "title")
         if title is None:
-            self.assertIsNone(prop)
+            self.assertIsNone(prop, doc)
         else:
-            self.assertIsNotNone(prop)
-            self.assertEqualString(prop, title)
+            self.assertIsNotNone(prop, doc)
+            self.assertEqualString(prop, title, doc)
 
     def assertEqualPropertyBool(self, parent, propName, expected):
+        doc = f"widget:{parent.attrib['name']}, property:{propName}"
         prop = self.getNamedProperty(parent, propName)
-        self.assertIsNotNone(prop)
-        self.assertEqualBool(prop, expected)
+        self.assertIsNotNone(prop, doc)
+        self.assertEqualBool(prop, expected, doc)
 
     def assertEqualPropertyDouble(self, parent, propName, expected):
+        doc = f"widget:{parent.attrib['name']}, property:{propName}"
         prop = self.getNamedProperty(parent, propName)
-        self.assertIsNotNone(prop)
-        self.assertEqualDouble(prop, expected)
+        self.assertIsNotNone(prop, doc)
+        self.assertEqualDouble(prop, expected, doc)
 
     def assertEqualPropertyEnum(self, parent, propName, expected):
+        doc = f"widget:{parent.attrib['name']}, property:{propName}"
         prop = self.getNamedProperty(parent, propName)
-        self.assertIsNotNone(prop)
-        self.assertEqualEnum(prop, expected)
+        self.assertIsNotNone(prop, doc)
+        self.assertEqualEnum(prop, expected, doc)
 
     def assertEqualPropertyNumber(self, parent, propName, expected, dtype=float):
+        doc = f"widget:{parent.attrib['name']}, property:{propName}"
         prop = self.getNamedProperty(parent, propName)
-        self.assertIsNotNone(prop)
-        self.assertEqualNumber(prop, expected, dtype=dtype)
+        self.assertIsNotNone(prop, doc)
+        self.assertEqualNumber(prop, expected, doc=doc, dtype=dtype)
 
     def assertEqualPropertyString(self, parent, propName, expected):
+        doc = f"widget:{parent.attrib['name']}, property:{propName}"
         prop = self.getNamedProperty(parent, propName)
         self.assertIsNotNone(prop)
         self.assertEqualString(prop, expected)
 
     def assertEqualPropertyStringlist(self, widget, tag, expected=[]):
+        doc = f"widget:{widget.attrib['name']}"
         prop = self.getNamedProperty(widget, tag)
         stringlist = self.getSubElement(prop, "stringlist")
         self.assertEqual(len(stringlist), len(expected))
@@ -185,25 +206,29 @@ class TestOutputHandler(unittest.TestCase):
             self.assertEqual(string.text, expect_str)
 
     def assertEqualStyleSheet(self, parent, expected):
+        doc = f"widget:{parent.attrib['name']}"
         self.assertEqualPropertyString(parent, "styleSheet", expected)
 
     def assertEqualToolTip(self, parent, expected):
+        doc = f"widget:{parent.attrib['name']}"
         self.assertEqualPropertyString(parent, "toolTip", expected)
 
-    def assertExpectedAttrib(self, parent, **kwargs):
+    def assertExpectedAttrib(self, parent, doc=None, **kwargs):
+        doc = doc or f"element:{parent.tag}"
         self.assertTrue(hasattr(parent, "attrib"))
         self.assertExpectedDictInRef(parent.attrib, **kwargs)
 
-    def assertExpectedDictInRef(self, ref, **kwargs):
-        self.assertIsInstance(ref, dict)
-        self.assertIsInstance(kwargs, dict)
+    def assertExpectedDictInRef(self, ref, doc=None, **kwargs):
+        self.assertIsInstance(ref, dict, doc)
+        self.assertIsInstance(kwargs, dict, doc)
         for k, v in kwargs.items():
-            self.assertTrue(k in ref)
-            self.assertEqual(v, ref[k])
+            self.assertTrue(k in ref, f"{doc}, k={k}, v={v}")
+            self.assertEqual(v, ref[k], f"{doc}, k={k}, v={v}")
 
     def assertIsNoneProperty(self, parent, propName):
+        doc = f"widget:{parent.attrib['name']}, property:{propName}"
         prop = self.getNamedProperty(parent, propName)
-        self.assertIsNone(prop)
+        self.assertIsNone(prop, doc)
 
     def assertColor(self, parent, r, g, b, **kwargs):
         for item in parent.iter():
@@ -215,12 +240,13 @@ class TestOutputHandler(unittest.TestCase):
                 self.assertEqual(item.text, str(b))
 
     def assertPropertyColor(self, parent, r, g, b, **kwargs):
+        doc = f"widget:{parent.attrib['name']}"
         self.assertEqual(parent.tag, "property")
         for item in parent.iter():
             if item.tag == "color":
                 self.assertEqual(len(item.attrib), len(kwargs))
                 if len(kwargs) > 0:
-                    self.assertExpectedAttrib(item, **kwargs)
+                    self.assertExpectedAttrib(item, doc=doc, **kwargs)
                 self.assertColor(item, r, g, b)
 
     # ----------------------------------------------------------
@@ -544,8 +570,10 @@ class TestOutputHandler(unittest.TestCase):
         # meter widget has no title
         self.assertEqualTitle(widget, None)
 
+        self.assertEqualPropertyBool(widget, "limitsFromChannel", False)
+
         # if not found, then gets default value in PyDM
-        for item in "limitsFromChannel userUpperLimit userLowerLimit".split():
+        for item in "userUpperLimit userLowerLimit".split():
             prop = self.getNamedProperty(widget, item)
             self.assertIsNone(prop, item)
 
@@ -1158,13 +1186,21 @@ class TestOutputHandler(unittest.TestCase):
         self.assertEqualPropertyString(widget, "orientation", "Qt::Horizontal")
         # precision must be an integer for the slider widget
         self.assertEqualPropertyNumber(widget, "precision", 1)
-        for propName in """showLimitLabels 
-                           showValueLabel 
-                           userDefinedLimits
-                           userMaximum
+        self.assertEqualPropertyBool(widget, "showLimitLabels", True)
+        self.assertEqualPropertyBool(widget, "showValueLabel", True)
+        # self.assertEqualPropertyBool(widget, "userDefinedLimits", False)
+        for propName in """userMaximum
                            userMinimum
+                           userDefinedLimits
                            """.split():
             self.assertIsNoneProperty(widget, propName)
+
+        uiname = self.convertAdlFile("valuators.adl")
+        full_uiname = os.path.join(self.tempdir, uiname)
+        self.assertTrue(os.path.exists(full_uiname))
+        root = ElementTree.parse(full_uiname).getroot()
+        screen = self.getSubElement(root, "widget")
+        self.assertIsNotNone(screen)
 
         # fields:
         # name :
@@ -1174,14 +1210,54 @@ class TestOutputHandler(unittest.TestCase):
         # showLimitLabels
         # showUnits
         # tickPosition
+        # precision
         # foregroundColor
         # backgroundColor
         expectations = {
-            "valuator": ["up", "", False, False, False, "NoTicks", (0,0,0), (253,0,0)],
-            "valuator_1": ["down", "", False, False, False, "NoTicks", (0,0,0), (253,0,0)],
-            "valuator_2": ["right", "", False, False, False, "NoTicks", (0,0,0), (253,0,0)],
-            "valuator_3": ["left", "", False, False, False, "NoTicks", (0,0,0), (253,0,0)],
+            "valuator":   ["up",    "", False,  True, False, None, 1, (0,0,0), (253,0,0)],
+            "valuator_1": ["down",  "", False,  True, False, None, 1, (0,0,0), (253,0,0)],
+            "valuator_2": ["right", "", False,  True, False, None, 1, (0,0,0), (253,0,0)],
+            "valuator_3": ["left",  "", False,  True, False, None, 1, (0,0,0), (253,0,0)],
+            "valuator_4": ["up",    "", False,  True, False, None, 5, (253,0,0), (0,255,0)],
+            "valuator_5": ["left",  "", True,   True, False, None, 1, (253,0,0), (0,255,0)],
+            "valuator_6": ["left",  "", True,   True, False, None, 1, (253,0,0), (0,255,0)],
         }
+        # FIXME: support tickPosition property
+        widgets = screen.findall("widget")
+        self.assertEqual(len(widgets), 8)
+        for w in widgets:
+            if w.attrib["class"] == "PyDMSlider":
+                nm = w.attrib["name"]
+                self.assertIn(nm, expectations)
+                exp = expectations[nm]
+
+                direction = exp[0]
+                if direction in ("up", "down"):
+                    e = "Qt::Vertical"
+                else:
+                    e = "Qt::Horizontal"
+                self.assertEqualPropertyString(w, "orientation", e)
+                if direction in ("down", "right"):
+                    # self.assertEqualPropertyBool(w, "invertedAppearance", True)
+                    # PyDMSLider does not have this property
+                    self.assertIsNoneProperty(w, "invertedAppearance")
+                self.assertEqualPropertyBool(w, "showValueLabel", exp[2])
+                self.assertEqualPropertyBool(w, "showLimitLabels", exp[3])
+                self.assertEqualPropertyBool(w, "showUnits", exp[4])
+                if exp[5] is None:
+                    self.assertIsNoneProperty(w, "tickPosition")
+                else:
+                    self.assertEqualPropertyEnum(w, "tickPosition", exp[5])
+                if exp[6] is None:
+                    self.assertIsNoneProperty(w, "precision")
+                else:
+                    self.assertEqualPropertyNumber(w, "precision", exp[6])
+
+                # TODO: look in the stylesheet
+                # prop = self.getNamedProperty(w, "indicatorColor")
+                # self.assertPropertyColor(prop, *exp[7])
+                # prop = self.getNamedProperty(w, "backgroundColor")
+                # self.assertPropertyColor(prop, *exp[8])
 
     def test_write_widget_valuator_variations(self):
         uiname = self.convertAdlFile("slider.adl")
@@ -1204,7 +1280,7 @@ class TestOutputHandler(unittest.TestCase):
 
         self.assertEqualChannel(widget, "ca://sky:userCalc2.A")
         self.assertEqualPropertyString(widget, "orientation", "Qt::Horizontal")
-        self.assertEqualPropertyNumber(widget, "precision", 0.1)
+        self.assertEqualPropertyNumber(widget, "precision", int(.1))
         # self.print_xml_children(widget)
         self.assertEqualPropertyBool(widget, "userDefinedLimits", True)
         self.assertEqualPropertyDouble(widget, "userMaximum", 10)
