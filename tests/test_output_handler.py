@@ -300,6 +300,11 @@ class TestOutputHandler(unittest.TestCase):
                 self.assertPropertyColor(prop, *exp[5])
                 prop = self.getNamedProperty(w, "backgroundColor")
                 self.assertPropertyColor(prop, *exp[6])
+            if w.attrib["class"] == "PyDMSlider":
+                nm = w.attrib["name"]
+                self.assertEqual(nm, "valuator")
+                # self.assertEqualPropertyBool(w, "showValueLabel", False)
+                # self.assertEqualPropertyBool(w, "showLimitLabels", False)
 
     def test_write_widget_byte(self):
         uiname = self.convertAdlFile("byte-monitor.adl")
@@ -1160,6 +1165,23 @@ class TestOutputHandler(unittest.TestCase):
                            userMinimum
                            """.split():
             self.assertIsNoneProperty(widget, propName)
+
+        # fields:
+        # name :
+        # orientation
+        # label
+        # showValueLabel
+        # showLimitLabels
+        # showUnits
+        # tickPosition
+        # foregroundColor
+        # backgroundColor
+        expectations = {
+            "valuator": ["up", "", False, False, False, "NoTicks", (0,0,0), (253,0,0)],
+            "valuator_1": ["down", "", False, False, False, "NoTicks", (0,0,0), (253,0,0)],
+            "valuator_2": ["right", "", False, False, False, "NoTicks", (0,0,0), (253,0,0)],
+            "valuator_3": ["left", "", False, False, False, "NoTicks", (0,0,0), (253,0,0)],
+        }
 
     def test_write_widget_valuator_variations(self):
         uiname = self.convertAdlFile("slider.adl")

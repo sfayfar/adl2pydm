@@ -867,7 +867,11 @@ class Widget2Pydm(object):
         self.write_tooltip(qw, pv)
         self.write_direction(qw, block)
         self.write_limits(qw, block)
-        
+
+        # TODO:
+        # self.assertEqualPropertyBool(w, "showValueLabel", False)
+        # self.assertEqualPropertyBool(w, "showLimitLabels", False)
+
         # TODO: https://github.com/BCDA-APS/adl2pydm/issues/37
         # precision = block.contents.get("dPrecision")
         # if precision is not None:
