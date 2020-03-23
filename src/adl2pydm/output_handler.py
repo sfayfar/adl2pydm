@@ -866,7 +866,12 @@ class Widget2Pydm(object):
         self.write_channel(qw, pv)
         self.write_tooltip(qw, pv)
         self.write_direction(qw, block)
+        label = block.contents.get("label")
+        if label is not None:
+            logger.debug("breakpoint")
         self.write_limits(qw, block)
+
+        self.writePropertyBoolean(qw, "showUnits", False, stdset="0")
 
         # TODO:
         # TODO: https://github.com/BCDA-APS/adl2pydm/issues/50
@@ -876,8 +881,15 @@ class Widget2Pydm(object):
         # TODO: https://github.com/BCDA-APS/adl2pydm/issues/37
         precision = block.contents.get("dPrecision")
         if precision is not None:
+            precision = float(precision)
+            iprecision = int(precision)
+            if iprecision != precision:
+                logger.warning(
+                    "truncation warning: "
+                    f"precision {precision} truncated to {iprecision}"
+                )
             self.writer.writeProperty(
-                qw, "precision", str(precision), tag="number")
+                qw, "precision", str(iprecision), tag="number", stdset="0")
 
     def write_block_wheel_switch(self, parent, block, nm, qw):
         pv = self.get_channel(block.contents["control"])
@@ -1011,6 +1023,37 @@ class Widget2Pydm(object):
         self.writer.writeTaggedString(rect, "height", str(geom.height))
 
     def write_limits(self, qw, block):
+        label = block.contents.get("label")
+        # https://epics.anl.gov/EpicsDocumentation/ExtensionsManuals/MEDM/MEDM.html#Label
+        if label is None:
+            show = dict(limits=True, values=False)
+        elif label == "no decorations":
+            # TODO: For the Bar Monitor, only the background and the bar show
+            show = dict(limits=True, values=False)
+        elif label == "outline":
+            show = dict(limits=True, values=False)
+        elif label == "limits":
+            show = dict(limits=True, values=True)
+        elif label == "channel":
+            show = dict(limits=True, values=True)
+        self.writePropertyBoolean(qw, "showLimitLabels", show["limits"], stdset="0")
+        self.writePropertyBoolean(qw, "showValueLabel", show["values"], stdset="0")
+
+        if qw.attrib["class"] == "PyDMScaleIndicator":
+            self.writePropertyBoolean(qw, "limitsFromChannel", False, stdset="0")
+            hiLimitName = "userUpperLimit"
+            loLimitName = "userLowerLimit"
+        elif qw.attrib["class"] == "PyDMSlider":
+            hiLimitName = "userMaximum"
+            loLimitName = "userMinimum"
+        elif qw.attrib["class"] == "PyDMSpinbox":
+            hiLimitName = "maximum"
+            loLimitName = "minimum"
+        else:
+            raise NotImplementedError(
+                f"limits for {qw.attrib['class']} widget not handled"
+                )
+
         if (
             block.contents.get("hoprSrc") == "default"
             or 
@@ -1019,37 +1062,6 @@ class Widget2Pydm(object):
             # TODO: precDefault gives info about the step size if precSrc == "default"
             precSrc = block.contents.get("precSrc")
             precDefault = block.contents.get("precDefault")
-
-            label = block.contents.get("label")
-            # https://epics.anl.gov/EpicsDocumentation/ExtensionsManuals/MEDM/MEDM.html#Label
-            if label is None:
-                show = dict(limits=True, values=False)
-            elif label == "no decorations":
-                # TODO: For the Bar Monitor, only the background and the bar show
-                show = dict(limits=True, values=False)
-            elif label == "outline":
-                show = dict(limits=True, values=False)
-            elif label == "limits":
-                show = dict(limits=True, values=True)
-            elif label == "channel":
-                show = dict(limits=True, values=True)
-            self.writePropertyBoolean(qw, "showLimitLabels", show["limits"], stdset="0")
-            self.writePropertyBoolean(qw, "showValueLabel", show["values"], stdset="0")
-
-            if qw.attrib["class"] == "PyDMScaleIndicator":
-                self.writePropertyBoolean(qw, "limitsFromChannel", False, stdset="0")
-                hiLimitName = "userUpperLimit"
-                loLimitName = "userLowerLimit"
-            elif qw.attrib["class"] == "PyDMSlider":
-                hiLimitName = "userMaximum"
-                loLimitName = "userMinimum"
-            elif qw.attrib["class"] == "PyDMSpinbox":
-                hiLimitName = "maximum"
-                loLimitName = "minimum"
-            else:
-                raise NotImplementedError(
-                    f"limits for {qw.attrib['class']} widget not handled"
-                    )
 
             self.writePropertyBoolean(qw, "userDefinedLimits", True, stdset="0")
             self.writer.writeProperty(
