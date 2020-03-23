@@ -671,6 +671,7 @@ class Widget2Pydm(object):
         self.write_basic_attribute(qw, block)
         self.write_dynamic_attribute(qw, block)
         # FIXME: needs to support fill = "solid"
+        # https://github.com/BCDA-APS/adl2pydm/issues/51
         ba = block.contents.get("basic attribute", {})
         try:
             penWidth = int(ba.get("width", 1))
@@ -690,6 +691,8 @@ class Widget2Pydm(object):
         self.write_tooltip(qw, nm)
         self.write_basic_attribute(qw, block)
         self.write_dynamic_attribute(qw, block)
+        # FIXME: needs to support fill = "solid"
+        # https://github.com/BCDA-APS/adl2pydm/issues/51
         ba = block.contents.get("basic attribute", {})
         try:
             penWidth = int(ba.get("width", 1))
@@ -873,12 +876,13 @@ class Widget2Pydm(object):
 
         self.writePropertyBoolean(qw, "showUnits", False, stdset="0")
 
-        # TODO:
         # TODO: https://github.com/BCDA-APS/adl2pydm/issues/50
         # self.assertEqualPropertyBool(w, "showValueLabel", False)
         # self.assertEqualPropertyBool(w, "showLimitLabels", False)
 
-        # TODO: https://github.com/BCDA-APS/adl2pydm/issues/37
+        # tickPosition
+        self.writer.writeProperty(qw, "tickPosition", "NoTicks", tag="enum", stdset="0")
+
         precision = block.contents.get("dPrecision")
         if precision is not None:
             precision = float(precision)
@@ -890,6 +894,8 @@ class Widget2Pydm(object):
                 )
             self.writer.writeProperty(
                 qw, "precision", str(iprecision), tag="number", stdset="0")
+
+        self.write_stylesheet(qw, block)
 
     def write_block_wheel_switch(self, parent, block, nm, qw):
         pv = self.get_channel(block.contents["control"])
