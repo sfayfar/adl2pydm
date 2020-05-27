@@ -191,7 +191,7 @@ class Widget2Pydm(object):
         brush = self.writer.writeOpenTag(propty, "brush", brushstyle=fill)
         self.write_color_element(brush, block.color, alpha="255")
 
-        if qw.attrib["class"] not in ("PyDMLabel",):
+        if qw.attrib["class"] not in ("PyDMLabel", "QLabel"):
             propty = self.writer.writeOpenProperty(qw, "penStyle", stdset="0")
             pen = dict(
                 solid = "Qt::SolidLine",
@@ -230,7 +230,13 @@ class Widget2Pydm(object):
         handler = self.pydm_widget_handlers.get(
             block.symbol, 
             self.write_block_default)
+
         cls = widget_info["pydm_widget"]
+        if cls == 'PyDMLabel' and not (block.contents.get('monitor') or
+                                       block.contents.get('control')):
+            # Fall back to QLabel, as there is no associated channel.
+            cls = 'QLabel'
+
         # if block.symbol.find("chart") >= 0:
         #     _z = 2
         # TODO: PyDMDrawingMMM (Line, Polygon, Oval, ...) need more decisions here 
