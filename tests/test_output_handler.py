@@ -15,7 +15,7 @@ from xml.etree import ElementTree
 logging.basicConfig(level=logging.CRITICAL)
 
 _test_path = os.path.dirname(__file__)
-_path = os.path.join(_test_path, '..', 'src')
+_path = os.path.join(_test_path, '..')
 if _path not in sys.path:
     sys.path.insert(0, _path)
 
@@ -153,7 +153,7 @@ class TestOutputHandler(unittest.TestCase):
         doc = doc or f"widget:{parent.attrib['name']}"
         prop = self.assertEqualPropertyDouble(parent, "penWidth", expected)
 
-    def assertEqualString(self, parent, text="", doc=None):
+    def assertEqualStringChild(self, parent, text="", doc=None):
         child = self.getSubElement(parent, "string")
         self.assertEqual(child.text, str(text), doc)
 
@@ -164,7 +164,7 @@ class TestOutputHandler(unittest.TestCase):
             self.assertIsNone(prop, doc)
         else:
             self.assertIsNotNone(prop, doc)
-            self.assertEqualString(prop, title, doc)
+            self.assertEqualStringChild(prop, title, doc)
 
     def assertEqualPropertyBool(self, parent, propName, expected):
         doc = f"widget:{parent.attrib['name']}, property:{propName}"
@@ -194,7 +194,7 @@ class TestOutputHandler(unittest.TestCase):
         doc = f"widget:{parent.attrib['name']}, property:{propName}"
         prop = self.getNamedProperty(parent, propName)
         self.assertIsNotNone(prop, doc)
-        self.assertEqualString(prop, expected, doc)
+        self.assertEqualStringChild(prop, expected, doc)
 
     def assertEqualPropertyStringlist(self, widget, tag, expected=[]):
         doc = f"widget:{widget.attrib['name']}"
@@ -813,7 +813,7 @@ class TestOutputHandler(unittest.TestCase):
 
         prop = self.getNamedProperty(screen, "windowTitle")
         self.assertExpectedAttrib(prop, name="windowTitle")
-        self.assertEqualString(prop, "rectangle")
+        self.assertEqualStringChild(prop, "rectangle")
 
         children = screen.findall("widget")
         self.assertEqual(len(children), 5)
@@ -955,12 +955,12 @@ class TestOutputHandler(unittest.TestCase):
         prop = self.getNamedProperty(widget, "filenames")
         stringlist = prop.find("stringlist")
         self.assertEqual(len(stringlist), 1)
-        self.assertEqualString(stringlist, "junk.ui")
+        self.assertEqualStringChild(stringlist, "junk.ui")
 
         prop = self.getNamedProperty(widget, "titles")
         stringlist = prop.find("stringlist")
         self.assertEqual(len(stringlist), 1)
-        self.assertEqualString(stringlist, "Another Junk")
+        self.assertEqualStringChild(stringlist, "Another Junk")
 
         prop = self.getNamedProperty(widget, "macros")
         stringlist = prop.find("stringlist")
@@ -1100,7 +1100,7 @@ class TestOutputHandler(unittest.TestCase):
 
         key = "text"
         widget = self.getNamedWidget(screen, key)
-        self.assertEqualClassName(widget, "PyDMLabel", key)
+        self.assertEqualClassName(widget, "QLabel", key)
 
         self.assertEqualPropertyString(widget, "text", "Test Display")
 
@@ -1337,11 +1337,7 @@ class TestOutputHandler(unittest.TestCase):
 
         key = "text"
         widget = self.getNamedWidget(screen, key)
-        self.assertEqualClassName(
-            widget, 
-            "PyDMLabel", 
-            key)
-
+        self.assertEqualClassName(widget, "QLabel", key)
         self.assertEqualPropertyString(widget, "text", "macro P=${P}")
 
         key = "text_update"

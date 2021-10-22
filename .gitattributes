@@ -1,1 +1,1 @@
-src/adl2pydm/_version.py export-subst
+adl2pydm/_version.py export-subst

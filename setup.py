@@ -9,7 +9,7 @@ import sys
 import versioneer
 
 here = path.abspath(path.dirname(__file__))
-sys.path.insert(0, path.join('src',))
+sys.path.insert(0, path.join('.',))
 import adl2pydm as package
 
 
@@ -31,9 +31,9 @@ setup(
     install_requires = package.__install_requires__,
     name             = package.__project__,
     #platforms        = package.__platforms__,
-    package_dir      = {'': 'src'},
+    package_dir      = {'': '.'},
     packages         = find_namespace_packages(
-                        "src", 
+                        ".", 
                         exclude=package.__exclude_project_dirs__),
     url              = package.__url__,
     python_requires  = package.__python_version_required__,

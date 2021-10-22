@@ -105,7 +105,7 @@ venv.bak/
 /test.xml
 
 # development screens
-src/adl2pydm/screens/pydm/*.ui
+adl2pydm/screens/pydm/*.ui
 
 # Microsoft VS Code configuration
 .vscode/
