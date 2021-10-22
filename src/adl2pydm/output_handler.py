@@ -1065,6 +1065,7 @@ class Widget2Pydm(object):
             or 
             block.contents.get("loprSrc") == "default"
         ):
+            # TODO: assignments to precSrc and precDefault are not used
             # TODO: precDefault gives info about the step size if precSrc == "default"
             precSrc = block.contents.get("precSrc")
             precDefault = block.contents.get("precDefault")
