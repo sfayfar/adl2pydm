@@ -351,7 +351,7 @@ class MedmMainWidget(MedmBaseWidget):
         for symbol, handler in xref.items():
             block = self.getNamedBlock(symbol, blocks)
             if block is None:
-                logger.warn("Did not find %s block" % symbol)
+                logger.warning("Did not find %s block" % symbol)
             else:
                 logger.debug("Processing %s block" % symbol)
                 handler(buf[block.start+1:block.end])
