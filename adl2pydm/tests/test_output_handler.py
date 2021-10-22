@@ -126,7 +126,6 @@ def test_write_widget_text(tempdir):
 
     key = "text"
     widget = getNamedWidget(screen, key)
-    # TODO: was PyDMLabel, why QLabel now?
     assertEqualClassName(widget, "QLabel", key)
     assertEqualPropertyString(widget, "text", "Test Display")
 

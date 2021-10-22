@@ -1100,7 +1100,6 @@ class TestOutputHandler(unittest.TestCase):
 
         key = "text"
         widget = self.getNamedWidget(screen, key)
-        # TODO: was PyDMLabel, why QLabel now?
         self.assertEqualClassName(widget, "QLabel", key)
 
         self.assertEqualPropertyString(widget, "text", "Test Display")
@@ -1338,7 +1337,6 @@ class TestOutputHandler(unittest.TestCase):
 
         key = "text"
         widget = self.getNamedWidget(screen, key)
-        # TODO: was PyDMLabel, why QLabel now?
         self.assertEqualClassName(widget, "QLabel", key)
         self.assertEqualPropertyString(widget, "text", "macro P=${P}")
 
