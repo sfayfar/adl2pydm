@@ -2,4 +2,4 @@ include README.md
 include CHANGES*
 include LICENSE.txt
 include versioneer.py
-include src/adl2pydm/_version.py
+include adl2pydm/_version.py
