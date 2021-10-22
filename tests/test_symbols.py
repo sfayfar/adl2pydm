@@ -14,7 +14,7 @@ import unittest
 logging.basicConfig(level=logging.CRITICAL)
 
 _test_path = os.path.dirname(__file__)
-_path = os.path.join(_test_path, '..', 'src')
+_path = os.path.join(_test_path, '..')
 if _path not in sys.path:
     sys.path.insert(0, _path)
 

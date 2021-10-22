@@ -43,7 +43,7 @@ def get_config():
     cfg.style = "pep440"
     cfg.tag_prefix = ""
     cfg.parentdir_prefix = "adl2pydm-"
-    cfg.versionfile_source = "src/adl2pydm/_version.py"
+    cfg.versionfile_source = "adl2pydm/_version.py"
     cfg.verbose = False
     return cfg
 
