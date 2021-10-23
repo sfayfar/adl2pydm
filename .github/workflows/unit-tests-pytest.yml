@@ -14,43 +14,22 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Setup Miniconda
-      uses: conda-incubator/setup-miniconda@v2
+    - name: Setup Python
+      uses: actions/setup-python@v2 conda-incubator/setup-miniconda@v2
       with:
-        activate-environment:
-            anaconda-test-env-py-${{ matrix.python-version }}
-        auto-update-conda: true
-        channel-priority: true
-        channels: defaults
-        # environment-file: environment.yml
-        mamba-version: "*"
         python-version: ${{ matrix.python-version }}
-        use-only-tar-bz2: true  # required for caching
+
     - shell: bash -l {0}
-      run: |
-        conda info
-        conda list
-        conda config --show-sources
-        conda config --show
-        conda env list
-        printenv | sort
-
-    # $CONDA is an environment variable pointing to the
-    # root of the miniconda directory
-
-    - name: Install Python package requirements
-      run: |
-        $CONDA/bin/conda env update --file environment.yml --name $ENV_NAME
-        $CONDA/bin/conda install pytest --name $ENV_NAME
-        $CONDA/bin/conda list -r --name $ENV_NAME
-      env:
-        PY_VER: ${{ matrix.python-version }}
-        ENV_NAME: anaconda-test-env-py-${{ matrix.python-version }}
+      run: pip install pytest
 
     - name: Run tests with pytest
       run: |
-        source $CONDA/bin/activate $ENV_NAME
         pytest -vvv .
       env:
         PY_VER: ${{ matrix.python-version }}
-        ENV_NAME: anaconda-test-env-py-${{ matrix.python-version }}
+
+    - name: Run the application, show version
+      run: |
+        adl2pydm --version
+      env:
+        PY_VER: ${{ matrix.python-version }}
