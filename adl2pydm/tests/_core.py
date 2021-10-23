@@ -176,6 +176,11 @@ def assertExpectedDictInRef(ref, doc=None, **kwargs):
         assert v == ref[k], f"{doc}, k={k}, v={v}"
 
 
+def assertEqualStyleSheet(parent, expected):
+    # doc = f"widget:{parent.attrib['name']}"
+    assertEqualPropertyString(parent, "styleSheet", expected)
+
+
 def assertIsNoneProperty(parent, propName):
     doc = f"widget:{parent.attrib['name']}, property:{propName}"
     prop = getNamedProperty(parent, propName)

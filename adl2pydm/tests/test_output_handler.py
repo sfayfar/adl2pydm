@@ -5,6 +5,7 @@ from xml.etree import ElementTree
 
 from . import _core
 from ._core import tempdir
+from .. import adl_parser
 
 
 
@@ -137,3 +138,174 @@ def test_write_widget_wheel_switch(tempdir):
     _core.assertEqualPropertyBool(widget, "showLimitLabels", True)
     _core.assertEqualPropertyBool(widget, "showValueLabel", False)
     _core.assertEqualPropertyBool(widget, "userDefinedLimits", True)
+
+
+def test_write_widget_valuator(tempdir):
+    uiname = _core.convertAdlFile("testDisplay.adl", tempdir)
+    full_uiname = os.path.join(tempdir, uiname)
+    assert os.path.exists(full_uiname)
+
+    root = ElementTree.parse(full_uiname).getroot()
+    screen = _core.getSubElement(root, "widget")
+    widgets = screen.findall("widget")
+    assert len(widgets) == 64
+
+    key = "valuator"
+    widget = _core.getNamedWidget(screen, key)
+    _core.assertEqualClassName(widget, "PyDMSlider", key)
+    _core.assertEqualChannel(widget, "ca://sky:m1")
+    _core.assertEqualPropertyString(widget, "orientation", "Qt::Horizontal")
+    # precision must be an integer for the slider widget
+    _core.assertEqualPropertyNumber(widget, "precision", 1)
+    _core.assertEqualPropertyBool(widget, "showLimitLabels", True)
+    _core.assertEqualPropertyBool(widget, "showValueLabel", True)
+    # self.assertEqualPropertyBool(widget, "userDefinedLimits", False)
+    for propName in """userMaximum
+                        userMinimum
+                        userDefinedLimits
+                        """.split():
+        _core.assertIsNoneProperty(widget, propName)
+
+    uiname = _core.convertAdlFile("valuators.adl", tempdir)
+    full_uiname = os.path.join(tempdir, uiname)
+    assert os.path.exists(full_uiname)
+    root = ElementTree.parse(full_uiname).getroot()
+    screen = _core.getSubElement(root, "widget")
+    assert screen is not None
+
+    # fields:
+    # name :
+    # 0: orientation
+    # 1: showValueLabel
+    # 2: showLimitLabels
+    # 3: showUnits
+    # 4: tickPosition
+    # 5: precision
+    # 6: foregroundColor
+    # 7: backgroundColor
+    import collections
+    Expectation = collections.namedtuple(
+        "Expectations", """
+        name
+        orientation
+        showValueLabel
+        showLimitLabels
+        showUnits
+        tickPosition
+        precision
+        foregroundColor
+        backgroundColor
+        """.split()
+    )
+    expectations = {
+        "valuator": [
+            "up",
+            False,
+            True,
+            False,
+            "NoTicks",
+            1,
+            (0, 0, 0),
+            (187, 187, 187),
+        ],
+        "valuator_1": [
+            "down",
+            False,
+            True,
+            False,
+            "NoTicks",
+            1,
+            (0, 0, 0),
+            (187, 187, 187),
+        ],
+        "valuator_2": [
+            "right",
+            False,
+            True,
+            False,
+            "NoTicks",
+            1,
+            (0, 0, 0),
+            (187, 187, 187),
+        ],
+        "valuator_3": [
+            "left",
+            False,
+            True,
+            False,
+            "NoTicks",
+            1,
+            (0, 0, 0),
+            (187, 187, 187),
+        ],
+        "valuator_4": [
+            "up",
+            False,
+            True,
+            False,
+            "NoTicks",
+            5,
+            (253, 0, 0),
+            (0, 216, 0),
+        ],
+        "valuator_5": [
+            "left",
+            True,
+            True,
+            False,
+            "NoTicks",
+            1,
+            (0, 0, 0),
+            (187, 187, 187),
+        ],
+        "valuator_6": [
+            "left",
+            True,
+            True,
+            False,
+            "NoTicks",
+            1,
+            (0, 0, 0),
+            (187, 187, 187),
+        ],
+    }
+    widgets = screen.findall("widget")
+    assert len(widgets) == 8
+    for w in widgets:
+        if w.attrib["class"] == "PyDMSlider":
+            nm = w.attrib["name"]
+            assert nm in expectations
+            exp = expectations[nm]
+
+            direction = exp[0]
+            if direction in ("up", "down"):
+                e = "Qt::Vertical"
+            else:
+                e = "Qt::Horizontal"
+            _core.assertEqualPropertyString(w, "orientation", e)
+            if direction in ("down", "right"):
+                # self.assertEqualPropertyBool(w, "invertedAppearance", True)
+                # PyDMSLider does not have this property
+                _core.assertIsNoneProperty(w, "invertedAppearance")
+            _core.assertEqualPropertyBool(w, "showValueLabel", exp[1])
+            _core.assertEqualPropertyBool(w, "showLimitLabels", exp[2])
+            _core.assertEqualPropertyBool(w, "showUnits", exp[3])
+            if exp[4] is None:
+                _core.assertIsNoneProperty(w, "tickPosition")
+            else:
+                _core.assertEqualPropertyEnum(w, "tickPosition", exp[4])
+            if exp[5] is None:
+                _core.assertIsNoneProperty(w, "precision")
+            else:
+                _core.assertEqualPropertyNumber(w, "precision", exp[5])
+
+            c = adl_parser.Color(*exp[6])
+            bc = adl_parser.Color(*exp[7])
+            expected = (
+                f"PyDMSlider#{nm}"
+                " {\n"
+                f"  color: rgb({c.r}, {c.g}, {c.b});\n"
+                f"  background-color: rgb({bc.r}, {bc.g}, {bc.b});\n"
+                "  }"
+            )
+            _core.assertEqualStyleSheet(w, expected)
