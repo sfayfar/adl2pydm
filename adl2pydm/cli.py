@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-convert MEDM .adl screen file(s) to PyDM .ui format
+Convert MEDM's .adl screen file(s) to PyDM .ui format.
 
 Only rely on packages in this project or from the standard Python distribution.
 """

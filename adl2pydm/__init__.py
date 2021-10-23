@@ -1,5 +1,7 @@
+"""Convert MEDM's .adl files to PyDM's .ui format."""
+
 __project__ = u"adl2pydm"
-__description__ = u"Convert MEDM's .adl files to PyDM's .ui format"
+__description__ = __doc__
 __copyright__ = u"2017-2021, UChicago Argonne, LLC"
 __authors__ = [
     u"Pete Jemian",
@@ -12,8 +14,8 @@ __license__ = u"(c) " + __copyright__
 __license__ += u" (see LICENSE.txt file for details)"
 __platforms__ = "any"
 __zip_safe__ = False
-__exclude_project_dirs__ = ("tests",)
-__python_version_required__ = ">=2.7"
+__exclude_project_dirs__ = "adl2pydm/tests tests conda-recipe build".split()
+__python_version_required__ = ">=3.7"
 
 __package_name__ = __project__
 __long_description__ = __description__
