@@ -1,4 +1,3 @@
-
 """
 unit tests for module: symbols
 """
@@ -14,7 +13,7 @@ import unittest
 logging.basicConfig(level=logging.CRITICAL)
 
 _test_path = os.path.dirname(__file__)
-_path = os.path.join(_test_path, '..')
+_path = os.path.join(_test_path, "..")
 if _path not in sys.path:
     sys.path.insert(0, _path)
 
@@ -24,12 +23,12 @@ from adl2pydm import symbols
 class Test_Module(unittest.TestCase):
 
     # def setUp(self): ...
-    
+
     # def tearDown(self): ...
-    
+
     def test_symbols(self):
         self.assertEqual(len(symbols.adl_widgets), 24)
-        
+
         self.assertIsInstance(symbols.adl_widgets, dict)
         for k, w in symbols.adl_widgets.items():
             self.assertIsInstance(w, dict)
@@ -52,17 +51,16 @@ class Test_Module(unittest.TestCase):
         self.assertEqual(w.header, "pydm.widgets.label")
 
 
-
 def suite(*args, **kw):
     test_suite = unittest.TestSuite()
     test_list = [
         Test_Module,
-        ]
+    ]
     for test_case in test_list:
         test_suite.addTest(unittest.makeSuite(test_case))
     return test_suite
 
 
 if __name__ == "__main__":
-    runner=unittest.TextTestRunner()
+    runner = unittest.TextTestRunner()
     runner.run(suite())

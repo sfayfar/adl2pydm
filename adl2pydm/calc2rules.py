@@ -46,7 +46,7 @@ def convertCalcToRuleExpression(medm_calc):
                         raise ValueError(
                             f"unhandled complexity in MEDM calc '{medm_calc}''"
                             f" uses special variable {tok.string}"
-                            )
+                        )
                     calc += f"ch[{idx}]"
                 else:
                     # probably a math expression
@@ -61,11 +61,9 @@ def convertCalcToRuleExpression(medm_calc):
                     op = " not "
                 calc += op
             elif tok.type == tokenize.OP:
-                calc += {
-                    "=": "==",
-                    "|": " or ",
-                    "&": " and ",
-                }.get(tok.string, tok.string)
+                calc += {"=": "==", "|": " or ", "&": " and ", }.get(
+                    tok.string, tok.string
+                )
             elif tok.type not in (tokenize.NEWLINE, tokenize.ENDMARKER):
                 calc += tok.string
 
