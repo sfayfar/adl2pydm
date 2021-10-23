@@ -1,7 +1,7 @@
 
 __project__     = u'adl2pydm'
 __description__ = u"Convert MEDM's .adl files to PyDM's .ui format"
-__copyright__   = u'2017-2019, UChicago Argonne, LLC'
+__copyright__   = u'2017-2021, UChicago Argonne, LLC'
 __authors__     = [u'Pete Jemian', ]
 __author__      = ', '.join(__authors__)
 __institution__ = u"Advanced Photon Source, Argonne National Laboratory"
@@ -17,9 +17,7 @@ __python_version_required__ = ">=2.7"
 __package_name__ = __project__
 __long_description__ = __description__
 
-from ._requirements import learn_requirements
-__install_requires__ = learn_requirements()
-del learn_requirements
+__install_requires__ = []  # no requirements, only standard libraries
 
 __classifiers__ = [
     'Development Status :: 5 - Production/Stable',
@@ -27,12 +25,11 @@ __classifiers__ = [
     'Intended Audience :: Science/Research',
     'License :: Freely Distributable',
     'License :: Public Domain',
-    'Programming Language :: Python',
-    'Programming Language :: Python :: 2',
-    'Programming Language :: Python :: 2.7',
     'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.6',
     'Programming Language :: Python :: 3.7',
+    'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
     'Topic :: Scientific/Engineering',
     'Topic :: Scientific/Engineering :: Astronomy',
     'Topic :: Scientific/Engineering :: Bio-Informatics',

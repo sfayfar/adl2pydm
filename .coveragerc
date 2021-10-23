@@ -3,11 +3,9 @@
 [run]
 omit = .
     versioneer.py
-    adl2pydm/_requirements.py
     adl2pydm/_version.py
 
 [report]
 omit = .
     versioneer.py
-    adl2pydm/_requirements.py
     adl2pydm/_version.py
