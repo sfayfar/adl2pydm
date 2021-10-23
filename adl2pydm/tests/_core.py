@@ -1,24 +1,10 @@
-__all__ = """
-    ALL_EXAMPLE_FILES
-    MEDM_SCREEN_DIR
-    assertEqualClassName
-    assertEqualPropertyString
-    assertEqualPropertyStringlist
-    assertEqualStringChild
-    assertExpectedAttrib
-    assertExpectedDictInRef
-    convertAdlFile
-    getNamedProperty
-    getNamedWidget
-    getSubElement
-""".split()
-
 import os
 import pytest
 import shutil
 import sys
 import tempfile
 
+from .. import adl_parser
 from .. import cli
 from .. import output_handler
 
@@ -83,7 +69,17 @@ def getWidgetsClass(parent, cls):
     return findings
 
 
+def pickWidget(parent, num_widgets, n, symbol, line_offset):
+    assertHasAttribute(parent, "widgets")
+    assertEqual(len(parent.widgets), num_widgets)
+    w = parent.widgets[n]
+    assertEqual(w.symbol, symbol)
+    assertEqual(w.line_offset, line_offset)
+    return w
+
+
 # custom assertions
+# some assertions are for compatibility with code that used unittest
 
 def assertColor(parent, r, g, b, **kwargs):
     for item in parent.iter():
@@ -103,14 +99,6 @@ def assertDictEqual(a, b, doc=None):
 
 def assertEqual(a, b, doc=None):
     assert a == b, doc
-
-
-def assertIsNone(a, doc=None):
-    assert a is None, doc
-
-
-def assertIsNotNone(a, doc=None):
-    assert a is not None, doc
 
 
 def assertEqualBool(parent, value, doc=None):
@@ -138,6 +126,18 @@ def assertEqualChannel(parent, channel, doc=None):
 def assertEqualClassName(parent, cls, nm, doc=None):
     doc = doc or f"widget:{parent.attrib['name']}"
     assertExpectedAttrib(parent, **{"class": cls, "name": nm})
+
+
+def assertEqualColor(color, r=None, g=None, b=None):
+    if color is None:
+        assertIsNone(r)
+        assertIsNone(g)
+        assertIsNone(b)
+    else:
+        assertIsInstance(color, adl_parser.Color)
+        assertEqual(color.r, r)
+        assertEqual(color.b, b)
+        assertEqual(color.g, g)
 
 
 def assertEqualDouble(parent, expected, doc=None):
@@ -204,7 +204,6 @@ def assertEqualPenCapStyle(parent, expected, doc=None):
 def assertEqualPenWidth(parent, expected, doc=None):
     doc = doc or f"widget:{parent.attrib['name']}"
     assertEqualPropertyDouble(parent, "penWidth", expected)
-
 
 
 def assertEqualPropertyBool(parent, propName, expected):
@@ -317,14 +316,39 @@ def assertExpectedDictInRef(ref, doc=None, **kwargs):
         assert v == ref[k], f"{doc}, k={k}, v={v}"
 
 
+def assertGreater(a, b, doc=None):
+    assert a > b, doc
+
+
+def assertHasAttribute(parent, attr_name):
+    assertTrue(hasattr(parent, attr_name))
+
+
+def assertIsNone(a, doc=None):
+    assert a is None, doc
+
+
 def assertIsNoneProperty(parent, propName):
     doc = f"widget:{parent.attrib['name']}, property:{propName}"
     prop = getNamedProperty(parent, propName)
     assert prop is None, doc
 
 
+def assertIsNotNone(a, doc=None):
+    assert a is not None, doc
+
+
 def assertIn(a, b, doc=None):
     assert a in b, doc
+
+
+def assertNotIn(a, b, doc=None):
+    assert a not in b, doc
+
+
+def assertIsInstance(a, b, doc=None):
+    assert isinstance(a, b), doc
+
 
 def assertTrue(a, doc=None):
     assert a, doc
