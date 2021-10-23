@@ -434,7 +434,7 @@ class MedmGenericWidget(MedmBaseWidget):
         self.symbol = symbol
 
     def parseAdlBuffer(self, buf):  # lgtm [py/similar-function]
-        # assignments, blocks = 
+        # assignments, blocks =
         MedmBaseWidget.parseAdlBuffer(
             self, buf
         )
