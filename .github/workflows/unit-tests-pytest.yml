@@ -28,6 +28,12 @@ jobs:
       env:
         PY_VER: ${{ matrix.python-version }}
 
+    - name: Install application with pip
+      run: |
+        pip install -e .
+      env:
+        PY_VER: ${{ matrix.python-version }}
+
     - name: Run the application, show version
       run: |
         adl2pydm --version
