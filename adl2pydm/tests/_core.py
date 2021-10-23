@@ -9,7 +9,7 @@ from .. import cli
 from .. import output_handler
 
 
-MEDM_SCREEN_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "tests", "medm")
+MEDM_SCREEN_DIR = os.path.join(os.path.dirname(__file__), "medm")
 ALL_EXAMPLE_FILES = os.listdir(MEDM_SCREEN_DIR)
 
 
