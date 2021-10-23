@@ -1,7 +1,0 @@
-#
-# database for testing PyDM display rules
-#
-# run with this command:
-#     softIoc -d ioc-database.db
-#
-record(bo, "PYDM:visible")
