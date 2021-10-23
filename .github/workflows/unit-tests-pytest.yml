@@ -39,3 +39,9 @@ jobs:
         adl2pydm --version
       env:
         PY_VER: ${{ matrix.python-version }}
+
+    - name: Run the application, show help
+      run: |
+        adl2pydm --help
+      env:
+        PY_VER: ${{ matrix.python-version }}
