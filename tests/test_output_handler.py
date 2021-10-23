@@ -1,4 +1,3 @@
-
 """
 simple unit tests for this package
 """
@@ -15,7 +14,7 @@ from xml.etree import ElementTree
 logging.basicConfig(level=logging.CRITICAL)
 
 _test_path = os.path.dirname(__file__)
-_path = os.path.join(_test_path, '..')
+_path = os.path.join(_test_path, "..")
 if _path not in sys.path:
     sys.path.insert(0, _path)
 
@@ -23,14 +22,13 @@ from adl2pydm import cli, output_handler, adl_parser
 
 
 class TestOutputHandler(unittest.TestCase):
-
     def setUp(self):
         self.tempdir = tempfile.mkdtemp()
-    
+
     def tearDown(self):
         if os.path.exists(self.tempdir):
             shutil.rmtree(self.tempdir, ignore_errors=True)
-    
+
     def convertAdlFile(self, adlname):
         medm_path = os.path.join(os.path.dirname(__file__), "medm")
         self.assertTrue(os.path.exists(medm_path))
@@ -69,7 +67,7 @@ class TestOutputHandler(unittest.TestCase):
             for i, child in enumerate(parent.iter(tag)):
                 print(i, child.tag, child.attrib)
         else:
-            for i, child in enumerate(parent):#  .iter(tag):
+            for i, child in enumerate(parent):  #  .iter(tag):
                 print(i, child.tag, child.attrib)
 
     def assertEqualBool(self, parent, value, doc=None):
@@ -93,7 +91,7 @@ class TestOutputHandler(unittest.TestCase):
 
     def assertEqualClassName(self, parent, cls, nm, doc=None):
         doc = doc or f"widget:{parent.attrib['name']}"
-        self.assertExpectedAttrib(parent, **{"class":cls, "name":nm})
+        self.assertExpectedAttrib(parent, **{"class": cls, "name": nm})
 
     def assertEqualDouble(self, parent, expected, doc=None):
         doc = doc or f"widget:{parent.attrib['name']}"
@@ -264,14 +262,11 @@ class TestOutputHandler(unittest.TestCase):
 
         key = "arc"
         widget = self.getNamedWidget(screen, key)
-        self.assertEqualClassName(
-            widget, 
-            "PyDMDrawingPie", 
-            key)
+        self.assertEqualClassName(widget, "PyDMDrawingPie", key)
         # self.print_xml_children(widget)
 
         self.assertEqualPenStyle(widget, "Qt::SolidLine")
-        self.assertIsNoneProperty(widget, "startAngle")   # default: 0
+        self.assertIsNoneProperty(widget, "startAngle")  # default: 0
         self.assertEqualPropertyDouble(widget, "spanAngle", -320)
         self.assertEqualBrush(widget, "SolidPattern", 251, 243, 74)
 
@@ -293,13 +288,13 @@ class TestOutputHandler(unittest.TestCase):
         # indicatorColor
         # backgroundColor
         expectations = {
-            "bar": ["left", True, False, False, False, (253,0,0), (187,187,187)],
-            "bar_1": ["left", True, False, False, False, (253,0,0), (187,187,187)],
-            "bar_2": ["left", True, True, True, False, (253,0,0), (187,187,187)],
-            "bar_3": ["up", True, False, False, False, (253,0,0), (187,187,187)],
-            "bar_4": ["down", True, False, False, False, (253,0,0), (187,187,187)],
-            "bar_5": ["right", True, False, False, False, (253,0,0), (187,187,187)],
-            "bar_6": ["right", True, False, False, False, (253,0,0), (187,187,187)],
+            "bar": ["left", True, False, False, False, (253, 0, 0), (187, 187, 187)],
+            "bar_1": ["left", True, False, False, False, (253, 0, 0), (187, 187, 187)],
+            "bar_2": ["left", True, True, True, False, (253, 0, 0), (187, 187, 187)],
+            "bar_3": ["up", True, False, False, False, (253, 0, 0), (187, 187, 187)],
+            "bar_4": ["down", True, False, False, False, (253, 0, 0), (187, 187, 187)],
+            "bar_5": ["right", True, False, False, False, (253, 0, 0), (187, 187, 187)],
+            "bar_6": ["right", True, False, False, False, (253, 0, 0), (187, 187, 187)],
         }
         widgets = screen.findall("widget")
         self.assertEqual(len(widgets), 22)
@@ -346,11 +341,8 @@ class TestOutputHandler(unittest.TestCase):
         key = "byte"
         widget = self.getNamedWidget(screen, key)
         # self.print_xml_children(widget)
-        self.assertEqualClassName(
-            widget, 
-            "PyDMByteIndicator", 
-            key)
-        
+        self.assertEqualClassName(widget, "PyDMByteIndicator", key)
+
         self.assertEqualChannel(widget, "ca://sky:interp_mode")
 
         prop = self.getNamedProperty(widget, "onColor")
@@ -365,11 +357,8 @@ class TestOutputHandler(unittest.TestCase):
         key = "byte_1"
         widget = self.getNamedWidget(screen, key)
         # self.print_xml_children(widget)
-        self.assertEqualClassName(
-            widget, 
-            "PyDMByteIndicator", 
-            key)
-        
+        self.assertEqualClassName(widget, "PyDMByteIndicator", key)
+
         self.assertEqualChannel(widget, "ca://sky:interp_mode")
 
         prop = self.getNamedProperty(widget, "onColor")
@@ -384,11 +373,8 @@ class TestOutputHandler(unittest.TestCase):
         key = "byte_2"
         widget = self.getNamedWidget(screen, key)
         # self.print_xml_children(widget)
-        self.assertEqualClassName(
-            widget, 
-            "PyDMByteIndicator", 
-            key)
-        
+        self.assertEqualClassName(widget, "PyDMByteIndicator", key)
+
         self.assertEqualChannel(widget, "ca://sky:interp_mode")
 
         prop = self.getNamedProperty(widget, "onColor")
@@ -403,11 +389,8 @@ class TestOutputHandler(unittest.TestCase):
         key = "byte_3"
         widget = self.getNamedWidget(screen, key)
         # self.print_xml_children(widget)
-        self.assertEqualClassName(
-            widget, 
-            "PyDMByteIndicator", 
-            key)
-        
+        self.assertEqualClassName(widget, "PyDMByteIndicator", key)
+
         self.assertEqualChannel(widget, "ca://sky:interp_mode")
 
         prop = self.getNamedProperty(widget, "onColor")
@@ -433,10 +416,7 @@ class TestOutputHandler(unittest.TestCase):
         key = "cartesian_plot"
         widget = self.getNamedWidget(screen, key)
         # self.print_xml_children(widget)
-        self.assertEqualClassName(
-            widget, 
-            "PyDMWaveformPlot", 
-            key)
+        self.assertEqualClassName(widget, "PyDMWaveformPlot", key)
 
         self.assertEqualTitle(widget, "Calibration Curve (S1A:H1)")
         self.assertEqualPropertyStringlist(widget, "xLabels", ["Magnetic Field",])
@@ -447,16 +427,16 @@ class TestOutputHandler(unittest.TestCase):
         self.assertEqual(len(stringlist), 1)
         trace = output_handler.jsonDecode(stringlist[0].text)
         expected = dict(
-                name = "curve 1",
-                x_channel = "ca://Xorbit:S1A:H1:CurrentAI.BARR",
-                y_channel = "ca://Xorbit:S1A:H1:CurrentAI.IARR",
-                color = "#000000",
-                lineStyle = 1,
-                lineWidth = 1,
-                block_size = 8,
-                redraw_mode = 2,
-                symbolSize = 10,
-            )
+            name="curve 1",
+            x_channel="ca://Xorbit:S1A:H1:CurrentAI.BARR",
+            y_channel="ca://Xorbit:S1A:H1:CurrentAI.IARR",
+            color="#000000",
+            lineStyle=1,
+            lineWidth=1,
+            block_size=8,
+            redraw_mode=2,
+            symbolSize=10,
+        )
         self.assertDictEqual(trace, expected)
 
     def test_write_widget_choice_button(self):
@@ -472,10 +452,7 @@ class TestOutputHandler(unittest.TestCase):
 
         key = "choice_button"
         widget = self.getNamedWidget(screen, key)
-        self.assertEqualClassName(
-            widget, 
-            "PyDMEnumButton", 
-            key)
+        self.assertEqualClassName(widget, "PyDMEnumButton", key)
 
         self.assertEqualChannel(widget, "ca://sky:m1.SCAN")
 
@@ -498,7 +475,7 @@ class TestOutputHandler(unittest.TestCase):
 
     def test_write_widget_embedded_display(self):
         # Actually. MEDM writes as a composite
-        # but we redirect (in the output_handler module) 
+        # but we redirect (in the output_handler module)
         # that to be an "embedded display".
         uiname = self.convertAdlFile("configMenu.adl")
         full_uiname = os.path.join(self.tempdir, uiname)
@@ -550,21 +527,15 @@ class TestOutputHandler(unittest.TestCase):
         key = "indicator"
         widget = self.getNamedWidget(screen, key)
         # self.print_xml_children(widget)
-        self.assertEqualClassName(
-            widget, 
-            "PyDMScaleIndicator", 
-            key)
-        
+        self.assertEqualClassName(widget, "PyDMScaleIndicator", key)
+
         self.assertEqualChannel(widget, "ca://sky:m1.RBV")
 
         key = "meter"
         widget = self.getNamedWidget(screen, key)
         # self.print_xml_children(widget)
-        self.assertEqualClassName(
-            widget, 
-            "PyDMScaleIndicator", 
-            key)
-        
+        self.assertEqualClassName(widget, "PyDMScaleIndicator", key)
+
         self.assertEqualChannel(widget, "ca://sky:m1.RBV")
 
         # meter widget has no title
@@ -590,10 +561,7 @@ class TestOutputHandler(unittest.TestCase):
 
         key = "menu"
         widget = self.getNamedWidget(screen, key)
-        self.assertEqualClassName(
-            widget, 
-            "PyDMEnumComboBox", 
-            key)
+        self.assertEqualClassName(widget, "PyDMEnumComboBox", key)
         # self.print_xml_children(widget)
 
         self.assertEqualChannel(widget, "ca://sky:m1.SPMG")
@@ -629,7 +597,7 @@ class TestOutputHandler(unittest.TestCase):
         key = "meter"
         widget = self.getNamedWidget(screen, key)
         self.assertEqualClassName(widget, "PyDMScaleIndicator", key)
-        self.assertEqualTitle(widget, None) # meter widget has no title
+        self.assertEqualTitle(widget, None)  # meter widget has no title
         self.assertEqualPropertyBool(widget, "limitsFromChannel", False)
         self.assertEqualPropertyDouble(widget, "userUpperLimit", 10)
         self.assertEqualPropertyDouble(widget, "userLowerLimit", -10)
@@ -649,14 +617,14 @@ class TestOutputHandler(unittest.TestCase):
         # penCapStyle
         # penWidth
         expectations = {
-            "oval" : [(0,0,0), "SolidPattern", "Qt::SolidLine", "Qt::FlatCap", 0],
-            "oval_1" : [(0,0,0), "NoBrush", "Qt::SolidLine", "Qt::FlatCap", 0],
-            "oval_2" : [(0,0,0), "NoBrush", "Qt::DashLine", "Qt::FlatCap", 0],
-            "oval_3" : [(253,0,0), "SolidPattern", "Qt::SolidLine", "Qt::FlatCap", 0],
-            "oval_4" : [(253,0,0), "NoBrush", "Qt::SolidLine", "Qt::FlatCap", 4],
-            "oval_5" : [(253,0,0), "NoBrush", "Qt::DashLine", "Qt::FlatCap", 0],
-            "oval_6" : [(253,0,0), "SolidPattern", "Qt::SolidLine", "Qt::FlatCap", 0],
-            "oval_7" : [(0,0,0), "SolidPattern", "Qt::SolidLine", "Qt::FlatCap", 0],
+            "oval": [(0, 0, 0), "SolidPattern", "Qt::SolidLine", "Qt::FlatCap", 0],
+            "oval_1": [(0, 0, 0), "NoBrush", "Qt::SolidLine", "Qt::FlatCap", 0],
+            "oval_2": [(0, 0, 0), "NoBrush", "Qt::DashLine", "Qt::FlatCap", 0],
+            "oval_3": [(253, 0, 0), "SolidPattern", "Qt::SolidLine", "Qt::FlatCap", 0],
+            "oval_4": [(253, 0, 0), "NoBrush", "Qt::SolidLine", "Qt::FlatCap", 4],
+            "oval_5": [(253, 0, 0), "NoBrush", "Qt::DashLine", "Qt::FlatCap", 0],
+            "oval_6": [(253, 0, 0), "SolidPattern", "Qt::SolidLine", "Qt::FlatCap", 0],
+            "oval_7": [(0, 0, 0), "SolidPattern", "Qt::SolidLine", "Qt::FlatCap", 0],
         }
         widgets = screen.findall("widget")
         self.assertEqual(len(widgets), 22)
@@ -679,37 +647,25 @@ class TestOutputHandler(unittest.TestCase):
                 self.assertPropertyColor(penColor, *exp[0])
                 self.assertEqualPropertyEnum(w, "penStyle", exp[2])
                 if exp[4] == 0:
-                    self.assertIsNone(
-                        self.getNamedProperty(w, "penWidth")
-                    )
+                    self.assertIsNone(self.getNamedProperty(w, "penWidth"))
                 else:
                     self.assertEqualPropertyDouble(w, "penWidth", exp[4])
 
                 if nm == "oval_6":
                     expected = {
-                        "name": "visibility", 
-                        "property": "Visible", 
-                        "channels": [
-                            {
-                                "channel": "demo:bar_RBV", 
-                                "trigger": True
-                            }
-                        ], 
-                        "expression": "ch[0]>128"
-                        }
+                        "name": "visibility",
+                        "property": "Visible",
+                        "channels": [{"channel": "demo:bar_RBV", "trigger": True}],
+                        "expression": "ch[0]>128",
+                    }
                     self.assertEqualRules(w, expected)
                 elif nm == "oval_7":
                     expected = {
-                        "name": "visibility", 
-                        "property": "Visible", 
-                        "channels": [
-                            {
-                                "channel": "demo:bar", 
-                                "trigger": True
-                            }
-                        ], 
-                        "expression": "ch[0]==0"
-                        }
+                        "name": "visibility",
+                        "property": "Visible",
+                        "channels": [{"channel": "demo:bar", "trigger": True}],
+                        "expression": "ch[0]==0",
+                    }
                     self.assertEqualRules(w, expected)
 
     def test_write_widget_polygon(self):
@@ -737,10 +693,7 @@ class TestOutputHandler(unittest.TestCase):
         key = "polyline"
         widget = self.getNamedWidget(screen, key)
         # self.print_xml_children(widget)
-        self.assertEqualClassName(
-            widget, 
-            "PyDMDrawingPolyline", 
-            key)
+        self.assertEqualClassName(widget, "PyDMDrawingPolyline", key)
 
         prop = self.getNamedProperty(widget, "points")
         stringlist = self.getSubElement(prop, "stringlist")
@@ -770,20 +723,15 @@ class TestOutputHandler(unittest.TestCase):
         key = "polyline"
         widget = self.getNamedWidget(screen, key)
         # self.print_xml_children(widget)
-        self.assertEqualClassName(
-            widget, 
-            "PyDMDrawingPolyline", 
-            key)
+        self.assertEqualClassName(widget, "PyDMDrawingPolyline", key)
 
         self.assertEqualChannel(widget, "ca://PYDM:visible")
         expected = {
-            "name": "visibility", 
-            "property": "Visible", 
-                "channels": [{
-                "channel": "PYDM:visible", "trigger": True
-                }], 
-            "expression": "ch[0]!=0"
-            }
+            "name": "visibility",
+            "property": "Visible",
+            "channels": [{"channel": "PYDM:visible", "trigger": True}],
+            "expression": "ch[0]!=0",
+        }
         self.assertEqualRules(widget, expected)
 
     def test_write_widget_rectangle(self):
@@ -822,10 +770,10 @@ class TestOutputHandler(unittest.TestCase):
         rect = children[0]
         self.assertEqualClassName(rect, "PyDMDrawingRectangle", key)
         self.assertEqualGeometry(rect, 10, 15, 113, 35)
-#         expected = """PyDMDrawingRectangle#%s {
-#   color: rgb(0, 0, 0);
-#   }""" % key
-#         self.assertEqualStyleSheet(rect, expected)
+        #         expected = """PyDMDrawingRectangle#%s {
+        #   color: rgb(0, 0, 0);
+        #   }""" % key
+        #         self.assertEqualStyleSheet(rect, expected)
         self.assertEqualToolTip(rect, key)
 
         key = "rectangle_1"
@@ -873,14 +821,11 @@ class TestOutputHandler(unittest.TestCase):
         rules = output_handler.jsonDecode(child.text)
         self.assertEqual(len(rules), 1)
         expected = {
-            'name': 'visibility', 
-            'property': 'Visible', 
-            'channels': [
-                {'channel': '${P}alldone', 
-                 'trigger': True}
-                ], 
-            'expression': 'ch[0]==0'
-            }
+            "name": "visibility",
+            "property": "Visible",
+            "channels": [{"channel": "${P}alldone", "trigger": True}],
+            "expression": "ch[0]==0",
+        }
         self.assertExpectedDictInRef(rules[0], **expected)
 
         key = "rectangle_4"
@@ -897,16 +842,14 @@ class TestOutputHandler(unittest.TestCase):
         self.assertEqualPenCapStyle(rect, "Qt::FlatCap")
 
         expected = {
-            'name': 'visibility', 
-            'property': 'Visible', 
-            'channels': [
-                {'channel': '${P}${M}.RBV', 
-                 'trigger': True},
-                {'channel': '${P}${M}.VAL', 
-                 'trigger': True}
-                ], 
-            'expression': 'ch[0]==ch[1]'
-            }
+            "name": "visibility",
+            "property": "Visible",
+            "channels": [
+                {"channel": "${P}${M}.RBV", "trigger": True},
+                {"channel": "${P}${M}.VAL", "trigger": True},
+            ],
+            "expression": "ch[0]==ch[1]",
+        }
         self.assertEqualRules(rect, expected)
 
     def assertEqualRules(self, parent, expected):
@@ -932,10 +875,7 @@ class TestOutputHandler(unittest.TestCase):
 
         key = "related_display"
         widget = self.getNamedWidget(screen, key)
-        self.assertEqualClassName(
-            widget, 
-            "PyDMRelatedDisplayButton", 
-            key)
+        self.assertEqualClassName(widget, "PyDMRelatedDisplayButton", key)
         # self.print_xml_children(widget)
 
         tips = screen.findall("toolTip")
@@ -943,10 +883,13 @@ class TestOutputHandler(unittest.TestCase):
         text = self.getNamedProperty(widget, "text")
         self.assertIsNone(text)
 
-        expected = """PyDMRelatedDisplayButton#%s {
+        expected = (
+            """PyDMRelatedDisplayButton#%s {
   color: rgb(0, 0, 0);
   background-color: rgb(115, 223, 255);
-  }""" % key
+  }"""
+            % key
+        )
         self.assertEqualStyleSheet(widget, expected)
 
         self.assertEqualPropertyBool(widget, "openInNewWindow", True)
@@ -980,10 +923,7 @@ class TestOutputHandler(unittest.TestCase):
 
         key = "strip_chart"
         widget = self.getNamedWidget(screen, key)
-        self.assertEqualClassName(
-            widget, 
-            "PyDMTimePlot", 
-            key)
+        self.assertEqualClassName(widget, "PyDMTimePlot", key)
 
         self.assertEqualTitle(widget, "chart title text")
         self.assertEqualPropertyString(widget, "xLabels", "x axis text")
@@ -1003,10 +943,7 @@ class TestOutputHandler(unittest.TestCase):
         key = "shell_command"
         widget = self.getNamedWidget(screen, key)
         # self.print_xml_children(widget)
-        self.assertEqualClassName(
-            widget, 
-            "PyDMShellCommand", 
-            key)
+        self.assertEqualClassName(widget, "PyDMShellCommand", key)
 
         self.assertEqualPropertyString(widget, "text", "shell commands")
         self.assertEqualPropertyBool(widget, "showIcon", False)
@@ -1017,11 +954,11 @@ class TestOutputHandler(unittest.TestCase):
         self.assertEqual(len(stringlist), 4)
         titles = [t.text for t in stringlist]
         expected = [
-            "Eyes", 
-            "System Load", 
+            "Eyes",
+            "System Load",
             "Command with Arguments",
             "Command with Arguments",
-            ]
+        ]
         self.assertEqual(titles, expected)
 
         prop = self.getNamedProperty(widget, "commands")
@@ -1029,11 +966,11 @@ class TestOutputHandler(unittest.TestCase):
         self.assertEqual(len(stringlist), 4)
         commands = [t.text for t in stringlist]
         expected = [
-            "xeyes", 
-            "xload", 
+            "xeyes",
+            "xload",
             "pvview sky:UPTIME",
             "pvview sky:datetime",
-            ]
+        ]
         self.assertEqual(commands, expected)
 
     def test_write_widget_strip_chart(self):
@@ -1050,10 +987,7 @@ class TestOutputHandler(unittest.TestCase):
         key = "strip_chart"
         widget = self.getNamedWidget(screen, key)
         # self.print_xml_children(widget)
-        self.assertEqualClassName(
-            widget, 
-            "PyDMTimePlot", 
-            key)
+        self.assertEqualClassName(widget, "PyDMTimePlot", key)
 
         self.assertEqualTitle(widget, "Horizontal Correctors")
 
@@ -1066,8 +1000,8 @@ class TestOutputHandler(unittest.TestCase):
             "lineStyle": 1,
             "lineWidth": 1,
             "channel": "ca://sky:m1",
-            "name": "sky:m1"
-            }
+            "name": "sky:m1",
+        }
         self.assertDictEqual(trace, expected)
         trace = output_handler.jsonDecode(stringlist[1].text)
         expected = {
@@ -1075,8 +1009,8 @@ class TestOutputHandler(unittest.TestCase):
             "lineStyle": 1,
             "lineWidth": 1,
             "channel": "ca://Xorbit:S1A:H2:CurrentAO",
-            "name": "Xorbit:S1A:H2:CurrentAO"
-            }
+            "name": "Xorbit:S1A:H2:CurrentAO",
+        }
         self.assertDictEqual(trace, expected)
         trace = output_handler.jsonDecode(stringlist[2].text)
         expected = {
@@ -1084,8 +1018,8 @@ class TestOutputHandler(unittest.TestCase):
             "lineStyle": 1,
             "lineWidth": 1,
             "channel": "ca://Xorbit:S1A:H3:CurrentAO",
-            "name": "Xorbit:S1A:H3:CurrentAO"
-            }
+            "name": "Xorbit:S1A:H3:CurrentAO",
+        }
         self.assertDictEqual(trace, expected)
 
     def test_write_widget_text(self):
@@ -1146,10 +1080,13 @@ class TestOutputHandler(unittest.TestCase):
         key = "text_update"
         widget = self.getNamedWidget(screen, key)
         self.assertEqualClassName(widget, "PyDMLabel", key)
-        expected = """PyDMLabel#%s {
+        expected = (
+            """PyDMLabel#%s {
   color: rgb(88, 147, 255);
   background-color: rgb(236, 236, 236);
-  }""" % key
+  }"""
+            % key
+        )
         self.assertEqualStyleSheet(widget, expected)
 
         self.assertEqualChannel(widget, "ca://sky:m1.RBV")
@@ -1161,8 +1098,8 @@ class TestOutputHandler(unittest.TestCase):
         child = self.getSubElement(prop, "set")
         self.assertIsNotNone(child)
         self.assertEqual(
-            child.text, 
-            "Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse")
+            child.text, "Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse"
+        )
 
     def test_write_widget_valuator(self):
         uiname = self.convertAdlFile("testDisplay.adl")
@@ -1178,10 +1115,7 @@ class TestOutputHandler(unittest.TestCase):
         key = "valuator"
         widget = self.getNamedWidget(screen, key)
         # self.print_xml_children(widget)
-        self.assertEqualClassName(
-            widget, 
-            "PyDMSlider", 
-            key)
+        self.assertEqualClassName(widget, "PyDMSlider", key)
 
         self.assertEqualChannel(widget, "ca://sky:m1")
         self.assertEqualPropertyString(widget, "orientation", "Qt::Horizontal")
@@ -1214,13 +1148,76 @@ class TestOutputHandler(unittest.TestCase):
         # 6: foregroundColor
         # 7: backgroundColor
         expectations = {
-            "valuator":   ["up",    False,  True, False, "NoTicks", 1, (0,0,0), (187,187,187)],
-            "valuator_1": ["down",  False,  True, False, "NoTicks", 1, (0,0,0), (187,187,187)],
-            "valuator_2": ["right", False,  True, False, "NoTicks", 1, (0,0,0), (187,187,187)],
-            "valuator_3": ["left",  False,  True, False, "NoTicks", 1, (0,0,0), (187,187,187)],
-            "valuator_4": ["up",    False,  True, False, "NoTicks", 5, (253,0,0), (0,216,0)],
-            "valuator_5": ["left",  True,   True, False, "NoTicks", 1, (0,0,0), (187,187,187)],
-            "valuator_6": ["left",  True,   True, False, "NoTicks", 1, (0,0,0), (187,187,187)],
+            "valuator": [
+                "up",
+                False,
+                True,
+                False,
+                "NoTicks",
+                1,
+                (0, 0, 0),
+                (187, 187, 187),
+            ],
+            "valuator_1": [
+                "down",
+                False,
+                True,
+                False,
+                "NoTicks",
+                1,
+                (0, 0, 0),
+                (187, 187, 187),
+            ],
+            "valuator_2": [
+                "right",
+                False,
+                True,
+                False,
+                "NoTicks",
+                1,
+                (0, 0, 0),
+                (187, 187, 187),
+            ],
+            "valuator_3": [
+                "left",
+                False,
+                True,
+                False,
+                "NoTicks",
+                1,
+                (0, 0, 0),
+                (187, 187, 187),
+            ],
+            "valuator_4": [
+                "up",
+                False,
+                True,
+                False,
+                "NoTicks",
+                5,
+                (253, 0, 0),
+                (0, 216, 0),
+            ],
+            "valuator_5": [
+                "left",
+                True,
+                True,
+                False,
+                "NoTicks",
+                1,
+                (0, 0, 0),
+                (187, 187, 187),
+            ],
+            "valuator_6": [
+                "left",
+                True,
+                True,
+                False,
+                "NoTicks",
+                1,
+                (0, 0, 0),
+                (187, 187, 187),
+            ],
         }
         widgets = screen.findall("widget")
         self.assertEqual(len(widgets), 8)
@@ -1255,7 +1252,8 @@ class TestOutputHandler(unittest.TestCase):
                 c = adl_parser.Color(*exp[6])
                 bc = adl_parser.Color(*exp[7])
                 expected = (
-                    f"PyDMSlider#{nm}" " {\n"
+                    f"PyDMSlider#{nm}"
+                    " {\n"
                     f"  color: rgb({c.r}, {c.g}, {c.b});\n"
                     f"  background-color: rgb({bc.r}, {bc.g}, {bc.b});\n"
                     "  }"
@@ -1276,14 +1274,11 @@ class TestOutputHandler(unittest.TestCase):
         key = "valuator"
         widget = self.getNamedWidget(screen, key)
         # self.print_xml_children(widget)
-        self.assertEqualClassName(
-            widget, 
-            "PyDMSlider", 
-            key)
+        self.assertEqualClassName(widget, "PyDMSlider", key)
 
         self.assertEqualChannel(widget, "ca://sky:userCalc2.A")
         self.assertEqualPropertyString(widget, "orientation", "Qt::Horizontal")
-        self.assertEqualPropertyNumber(widget, "precision", int(.1))
+        self.assertEqualPropertyNumber(widget, "precision", int(0.1))
         # self.print_xml_children(widget)
         self.assertEqualPropertyBool(widget, "userDefinedLimits", True)
         self.assertEqualPropertyDouble(widget, "userMaximum", 10)
@@ -1305,10 +1300,7 @@ class TestOutputHandler(unittest.TestCase):
         key = "wheel_switch"
         widget = self.getNamedWidget(screen, key)
         # self.print_xml_children(widget)
-        self.assertEqualClassName(
-            widget, 
-            "PyDMSpinbox", 
-            key)
+        self.assertEqualClassName(widget, "PyDMSpinbox", key)
 
         self.assertEqualChannel(widget, "ca://sky:userCalc2.A")
         self.assertEqualPropertyDouble(widget, "maximum", 10)
@@ -1330,10 +1322,7 @@ class TestOutputHandler(unittest.TestCase):
 
         key = "text_update"
         widget = self.getNamedWidget(screen, key)
-        self.assertEqualClassName(
-            widget, 
-            "PyDMLabel", 
-            key)
+        self.assertEqualClassName(widget, "PyDMLabel", key)
 
         key = "text"
         widget = self.getNamedWidget(screen, key)
@@ -1342,10 +1331,7 @@ class TestOutputHandler(unittest.TestCase):
 
         key = "text_update"
         widget = self.getNamedWidget(screen, key)
-        self.assertEqualClassName(
-            widget, 
-            "PyDMLabel", 
-            key)
+        self.assertEqualClassName(widget, "PyDMLabel", key)
 
         self.assertEqualChannel(widget, "ca://${P}")
 
@@ -1368,10 +1354,7 @@ class TestOutputHandler(unittest.TestCase):
         # self.print_xml_children(screen)
         widgets = customwidgets.findall("customwidget")
 
-        customs = [
-            self.getSubElement(w, "class").text
-            for w in widgets
-        ]
+        customs = [self.getSubElement(w, "class").text for w in widgets]
         self.assertIn("PyDMDrawingPie", customs)
         self.assertIn("PyDMDrawingArc", customs)
 
@@ -1379,24 +1362,20 @@ class TestOutputHandler(unittest.TestCase):
 
     def test_write_all_example_files_process(self):
         "ensure all example MEDM files are converted to PyDM"
-        path = os.path.join(
-            os.path.dirname(__file__), 
-            "medm")
+        path = os.path.join(os.path.dirname(__file__), "medm")
         for adl_file in os.listdir(path):
-            if (
-                os.path.isfile(os.path.join(path, adl_file) )
-                and 
-                adl_file.endswith(".adl")
+            if os.path.isfile(os.path.join(path, adl_file)) and adl_file.endswith(
+                ".adl"
             ):
                 uiname = self.convertAdlFile(adl_file)
                 full_uiname = os.path.join(self.tempdir, uiname)
                 self.assertTrue(os.path.exists(full_uiname), uiname)
 
-class Test_PYDM_Writer_Support(unittest.TestCase):
 
+class Test_PYDM_Writer_Support(unittest.TestCase):
     def setUp(self):
         self.tempdir = tempfile.mkdtemp()
-    
+
     def tearDown(self):
         if os.path.exists(self.tempdir):
             shutil.rmtree(self.tempdir, ignore_errors=True)
@@ -1410,11 +1389,10 @@ class Test_PYDM_Writer_Support(unittest.TestCase):
             ("widget_0", 2, "first"),
             ("widget_4", 0, "last"),
             ("widget_1", -3, 3),
-            ("widget_2", 2, 4)
+            ("widget_2", 2, 4),
         ]
         for args in specs:
-            writer.widget_stacking_info.append(
-                output_handler.Qt_zOrder(*args))
+            writer.widget_stacking_info.append(output_handler.Qt_zOrder(*args))
         writer.closeFile()
         self.assertTrue(os.path.exists(fname))
 
@@ -1423,16 +1401,15 @@ class Test_PYDM_Writer_Support(unittest.TestCase):
         expected = (
             '<?xml version="1.0" ?>',
             '<ui version="4.0">',
-            '  <zorder>first</zorder>',
-            '  <zorder>3</zorder>',
-            '  <zorder>4</zorder>',
-            '  <zorder>last</zorder>',
-            '</ui>',
+            "  <zorder>first</zorder>",
+            "  <zorder>3</zorder>",
+            "  <zorder>4</zorder>",
+            "  <zorder>last</zorder>",
+            "</ui>",
         )
         self.assertEqual(len(buf), len(expected))
         for idx in range(len(buf)):
             self.assertEqual(buf[idx].rstrip(), expected[idx])
-
 
     def test_xml_subelements(self):
         fname = os.path.join(self.tempdir, "test.xml")
@@ -1453,20 +1430,20 @@ class Test_PYDM_Writer_Support(unittest.TestCase):
             '<?xml version="1.0" ?>',
             '<ui version="4.0">',
             '  <property name="example">',
-            '    <string>text value</string>',
-            '  </property>',
+            "    <string>text value</string>",
+            "  </property>",
             '  <property name="another_example">',
-            '    <enum>upper</enum>',
-            '  </property>',
-            '  <banana>',
-            '    <banana>',
-            '      <banana>',
-            '        <orange/>',
-            '      </banana>',
-            '    </banana>',
-            '  </banana>',
-            '</ui>',
-            )
+            "    <enum>upper</enum>",
+            "  </property>",
+            "  <banana>",
+            "    <banana>",
+            "      <banana>",
+            "        <orange/>",
+            "      </banana>",
+            "    </banana>",
+            "  </banana>",
+            "</ui>",
+        )
         self.assertEqual(len(buf), len(expected))
 
 
@@ -1475,12 +1452,12 @@ def suite(*args, **kw):
     test_list = [
         Test_PYDM_Writer_Support,
         TestOutputHandler,
-        ]
+    ]
     for test_case in test_list:
         test_suite.addTest(unittest.makeSuite(test_case))
     return test_suite
 
 
 if __name__ == "__main__":
-    runner=unittest.TextTestRunner()
+    runner = unittest.TextTestRunner()
     runner.run(suite())

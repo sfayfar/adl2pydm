@@ -16,6 +16,8 @@ conda activate pydm-environment
 
 ### Install PyDM & Bluesky in custom environment
 
+NOTE: these instructions from 2019 are out-of-date
+
 ```
 # name the custom environment
 ENVO=bluesky-pydm

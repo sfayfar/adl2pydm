@@ -1,4 +1,3 @@
-
 """
 simple unit tests for this package
 """
@@ -13,7 +12,7 @@ import unittest
 logging.basicConfig(level=logging.CRITICAL)
 
 _test_path = os.path.dirname(__file__)
-_path = os.path.join(_test_path, '..')
+_path = os.path.join(_test_path, "..")
 if _path not in sys.path:
     sys.path.insert(0, _path)
 
@@ -21,18 +20,14 @@ from adl2pydm import calc2rules
 
 
 class TestSuite(unittest.TestCase):
-
     def setUp(self):
         path = os.path.abspath(
-            os.path.join(
-                os.path.dirname(__file__),
-                "test_calcs.json",
-            )
+            os.path.join(os.path.dirname(__file__), "test_calcs.json",)
         )
 
         with open(path, "r") as f:
             buf = f.read()
-        
+
         self.test_calcs = json.loads(buf)
 
     # ----------------------------------------------------------
@@ -48,12 +43,12 @@ def suite(*args, **kw):
     test_suite = unittest.TestSuite()
     test_list = [
         TestSuite,
-        ]
+    ]
     for test_case in test_list:
         test_suite.addTest(unittest.makeSuite(test_case))
     return test_suite
 
 
 if __name__ == "__main__":
-    runner=unittest.TextTestRunner()
+    runner = unittest.TextTestRunner()
     runner.run(suite())

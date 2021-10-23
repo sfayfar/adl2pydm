@@ -1,4 +1,3 @@
-
 """
 write the screen in the new XML protocol
 
@@ -68,18 +67,16 @@ def convertDynamicAttribute_to_Rules(attr):
     for nm, ref in dict(chan="A", chanB="B", chanC="C", chanD="D").items():
         if nm in attr:
             pv = convertMacros(attr[nm])
-            channels[ref] = dict(channel=pv, trigger=len(pv)>0)
+            channels[ref] = dict(channel=pv, trigger=len(pv) > 0)
 
     calc = attr.get("calc")
     if calc is not None and len(calc) > 0:
         logger.info(f"CALC: {calc}")
 
     if len(channels) > 0:
-        visibility_calc = {
-            "if zero": " == 0",
-            "if not zero": " != 0",
-            "calc": calc
-        }[attr.get("vis", "if not zero")]
+        visibility_calc = {"if zero": " == 0", "if not zero": " != 0", "calc": calc}[
+            attr.get("vis", "if not zero")
+        ]
         rule["channels"] = list(channels.values())
         if calc is None:
             calc = "a" + visibility_calc
@@ -109,31 +106,31 @@ class Widget2Pydm(object):
         self.custom_widgets = []
         self.unique_widget_names = {}
         self.pydm_widget_handlers = {
-            "arc" : self.write_block_arc,
-            "bar" : self.write_block_bar,
-            "byte" : self.write_block_byte_indicator,
-            "cartesian plot" : self.write_block_cartesian_plot,
-            "choice button" : self.write_block_choice_button,
-            "composite" : self.write_block_composite,
-            "embedded display" : self.write_block_embedded_display,
-            "image" : self.write_block_image,
-            "indicator" : self.write_block_indicator,
-            "menu" : self.write_block_menu,
-            "message button" : self.write_block_message_button,
-            "meter" : self.write_block_meter,
-            "oval" : self.write_block_oval,
-            "polygon" : self.write_block_polygon,
-            "polyline" : self.write_block_polyline,
-            "rectangle" : self.write_block_rectangle,
-            "related display" : self.write_block_related_display,
-            "shell command" : self.write_block_shell_command,
-            "strip chart" : self.write_block_strip_chart,
-            "text" : self.write_block_text,
-            "text entry" : self.write_block_text_entry,
-            "text update" : self.write_block_text_update,
-            "valuator" : self.write_block_valuator,
-            "wheel switch" : self.write_block_wheel_switch,
-            }
+            "arc": self.write_block_arc,
+            "bar": self.write_block_bar,
+            "byte": self.write_block_byte_indicator,
+            "cartesian plot": self.write_block_cartesian_plot,
+            "choice button": self.write_block_choice_button,
+            "composite": self.write_block_composite,
+            "embedded display": self.write_block_embedded_display,
+            "image": self.write_block_image,
+            "indicator": self.write_block_indicator,
+            "menu": self.write_block_menu,
+            "message button": self.write_block_message_button,
+            "meter": self.write_block_meter,
+            "oval": self.write_block_oval,
+            "polygon": self.write_block_polygon,
+            "polyline": self.write_block_polyline,
+            "rectangle": self.write_block_rectangle,
+            "related display": self.write_block_related_display,
+            "shell command": self.write_block_shell_command,
+            "strip chart": self.write_block_strip_chart,
+            "text": self.write_block_text,
+            "text entry": self.write_block_text_entry,
+            "text update": self.write_block_text_update,
+            "valuator": self.write_block_valuator,
+            "wheel switch": self.write_block_wheel_switch,
+        }
 
     def get_unique_widget_name(self, suggestion):
         """
@@ -151,7 +148,7 @@ class Widget2Pydm(object):
             unique = "%s_%d" % (suggestion, len(knowns))
             if unique in self.unique_widget_names:
                 msg = "trouble getting a unique name from " + suggestion
-                msg += "\n  complicated:\n%s" % str(unique_widget_names)
+                msg += "\n  complicated:\n%s" % str(self.unique_widget_names)
                 raise ValueError(msg)
         else:
             unique = suggestion
@@ -185,18 +182,15 @@ class Widget2Pydm(object):
         if attr is None:
             return
         propty = self.writer.writeOpenProperty(qw, "brush", stdset="0")
-        fill = dict(
-            solid = "SolidPattern",
-            outline = "NoBrush")[attr.get("fill", "solid")]
+        fill = dict(solid="SolidPattern", outline="NoBrush")[attr.get("fill", "solid")]
         brush = self.writer.writeOpenTag(propty, "brush", brushstyle=fill)
         self.write_color_element(brush, block.color, alpha="255")
 
         if qw.attrib["class"] not in ("PyDMLabel", "QLabel"):
             propty = self.writer.writeOpenProperty(qw, "penStyle", stdset="0")
-            pen = dict(
-                solid = "Qt::SolidLine",
-                dash = "Qt::DashLine"
-            )[attr.get("style", "solid")]
+            pen = dict(solid="Qt::SolidLine", dash="Qt::DashLine")[
+                attr.get("style", "solid")
+            ]
             self.writer.writeTaggedString(propty, "enum", pen)
 
             propty = self.writer.writeOpenProperty(qw, "penColor", stdset="0")
@@ -205,7 +199,7 @@ class Widget2Pydm(object):
             propty = self.writer.writeOpenProperty(qw, "penWidth", stdset="0")
             width = attr.get("width", 0)
             if fill == "NoBrush":
-                width = max(1, float(width))   # make sure the outline is seen
+                width = max(1, float(width))  # make sure the outline is seen
             self.writer.writeTaggedString(propty, "double", str(width))
 
             propty = self.writer.writeOpenProperty(qw, "penCapStyle", stdset="0")
@@ -216,9 +210,11 @@ class Widget2Pydm(object):
     def write_block(self, parent, block):
         nm = self.get_unique_widget_name(block.symbol.replace(" ", "_"))
 
-        if (block.symbol == "composite"
-                and len(block.widgets) == 0
-                and "composite file" in block.contents):
+        if (
+            block.symbol == "composite"
+            and len(block.widgets) == 0
+            and "composite file" in block.contents
+        ):
             block.symbol = "embedded display"
 
         widget_info = symbols.adl_widgets.get(block.symbol)
@@ -227,15 +223,14 @@ class Widget2Pydm(object):
             if cls not in self.custom_widgets:
                 self.custom_widgets.append(cls)
 
-        handler = self.pydm_widget_handlers.get(
-            block.symbol,
-            self.write_block_default)
+        handler = self.pydm_widget_handlers.get(block.symbol, self.write_block_default)
 
         cls = widget_info["pydm_widget"]
-        if cls == 'PyDMLabel' and not (block.contents.get('monitor') or
-                                       block.contents.get('control')):
+        if cls == "PyDMLabel" and not (
+            block.contents.get("monitor") or block.contents.get("control")
+        ):
             # Fall back to QLabel, as there is no associated channel.
-            cls = 'QLabel'
+            cls = "QLabel"
 
         # if block.symbol.find("chart") >= 0:
         #     _z = 2
@@ -264,10 +259,9 @@ class Widget2Pydm(object):
             "down": "Qt::Vertical",
         }[direction]
         self.writer.writeProperty(qw, "orientation", orientation, stdset="0")
-        if (
-            qw.attrib["class"] in ("PyDMScaleIndicator",)
-            and
-            direction in ("down", "left")
+        if qw.attrib["class"] in ("PyDMScaleIndicator",) and direction in (
+            "down",
+            "left",
         ):
             self.writePropertyBoolean(qw, "invertedAppearance", True, stdset="0")
 
@@ -284,7 +278,7 @@ class Widget2Pydm(object):
         smallest = 4
         largest = 10
         margin = 3
-        pointsize = int(max(smallest, min(largest, block.geometry.height - 2*margin)))
+        pointsize = int(max(smallest, min(largest, block.geometry.height - 2 * margin)))
 
         propty = self.writer.writeOpenProperty(qw, "font", stdset="0")
         font = self.writer.writeOpenTag(propty, "font")
@@ -294,7 +288,10 @@ class Widget2Pydm(object):
         """main entry point to write the .ui file"""
         window_class = "QWidget"
         # window_class = "QMainWindow"
-        title = screen.title or os.path.split(os.path.splitext(screen.given_filename)[0])[-1]
+        title = (
+            screen.title
+            or os.path.split(os.path.splitext(screen.given_filename)[0])[-1]
+        )
         if output_path is not None:
             ui_filename = os.path.join(output_path, title + SCREEN_FILE_EXTENSION)
         else:
@@ -342,11 +339,11 @@ class Widget2Pydm(object):
             self.writeStringText(stringlist, text=s.strip())
 
     def writePropertyTextAlignment(self, widget, attr):
-        align =  {
+        align = {
             "horiz. left": "Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter",
-            "horiz. centered" : "Qt::AlignCenter",
-            "horiz. right" : "Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter",
-            "justify" : "Qt::AlignJustify|Qt::AlignVCenter",
+            "horiz. centered": "Qt::AlignCenter",
+            "horiz. right": "Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter",
+            "justify": "Qt::AlignJustify|Qt::AlignVCenter",
         }[attr.get("align", "horiz. left")]
         self.writer.writeProperty(widget, "alignment", align, tag="set")
 
@@ -366,18 +363,12 @@ class Widget2Pydm(object):
 
         if beginAngle != 0:
             self.writer.writeProperty(
-                qw,
-                "startAngle",
-                str(beginAngle),
-                tag="double",
-                stdset="0")
+                qw, "startAngle", str(beginAngle), tag="double", stdset="0"
+            )
         if pathAngle != 0:
             self.writer.writeProperty(
-                qw,
-                "spanAngle",
-                str(-pathAngle),
-                tag="double",
-                stdset="0")
+                qw, "spanAngle", str(-pathAngle), tag="double", stdset="0"
+            )
 
     def write_block_bar(self, parent, block, nm, qw):
         pv = self.get_channel(block.contents["monitor"])
@@ -445,7 +436,7 @@ class Widget2Pydm(object):
             # but MEDM shows a row with stacking = column
             "row": "Qt::Vertical",
             "column": "Qt::Horizontal",
-            }
+        }
         stacking = block.contents.get("stacking", "row")
         if stacking not in stacking_choices:
             logger.warning(f"stacking '{stacking}' not supported, using 'row'")
@@ -462,12 +453,12 @@ class Widget2Pydm(object):
         self.write_stylesheet(
             qw,
             block,
-            margin = "0px",
-            padding = "0px",
-            spacing = "0px",
+            margin="0px",
+            padding="0px",
+            spacing="0px",
             # PyDMEnumButton: add color styles for the buttons
-            extra_classes = "QPushButton QRadioButton".split(),
-            )
+            extra_classes="QPushButton QRadioButton".split(),
+        )
 
     def writePropertyContentsLabel(self, qw, block, label, tag=None):
         tag = tag or label
@@ -479,7 +470,9 @@ class Widget2Pydm(object):
         """
         Could be either PyDMWaveformPlot or PyDMScatterPlot
         """
-        logger.debug("line %d in file: %s" % (block.line_offset, block.main.given_filename))
+        logger.debug(
+            "line %d in file: %s" % (block.line_offset, block.main.given_filename)
+        )
         # logger.debug("contents:\n" + json.dumps(block.contents, indent=2))
         self.write_tooltip(qw, nm)
         self.writer.writeProperty(qw, "title", block.title, stdset="0")
@@ -503,23 +496,21 @@ class Widget2Pydm(object):
             # ignore trace["yaxis"], in PyDM, all traces share same Y axis
             # collect any available information
             curve = dict(
-                name = f"curve {i+1}",
+                name=f"curve {i+1}",
                 # if x_channel is missing, y_channel is plotted aginst index
-                x_channel = trace.get("xdata"),
-                y_channel = trace.get("ydata"),
-                color = "#{:02x}{:02x}{:02x}".format(*trace["color"]),
-                lineStyle = 1,          # NoLine Solid Dash Dot DashDot DashDotDot
-                lineWidth = trace.get("lineWidth", 1),
-                symbol = trace.get("symbol"),
-                symbolSize = trace.get("symbolSize", 10),
-                redraw_mode = 2,    # "X or Y updates", "X updates", "Y updates", "Both update"
-                block_size = count,
+                x_channel=trace.get("xdata"),
+                y_channel=trace.get("ydata"),
+                color="#{:02x}{:02x}{:02x}".format(*trace["color"]),
+                lineStyle=1,  # NoLine Solid Dash Dot DashDot DashDotDot
+                lineWidth=trace.get("lineWidth", 1),
+                symbol=trace.get("symbol"),
+                symbolSize=trace.get("symbolSize", 10),
+                redraw_mode=2,  # "X or Y updates", "X updates", "Y updates", "Both update"
+                block_size=count,
             )
-            curve = {   # remove undefined values from the dictionary
-                k: curve[k]
-                for k in list(curve.keys())
-                if curve[k] is not None
-                }
+            curve = {  # remove undefined values from the dictionary
+                k: curve[k] for k in list(curve.keys()) if curve[k] is not None
+            }
             curve["x_channel"] = curve.get("x_channel", None)
             for k in "x_channel y_channel".split():
                 if k in curve and curve[k] is not None:
@@ -530,9 +521,9 @@ class Widget2Pydm(object):
 
         # write the PyDMScatterPlot contents
         if xlabel is not None and len(xlabel) > 0:
-            self.writePropertyStringlist(qw, "xLabels", [convertMacros(xlabel),])
+            self.writePropertyStringlist(qw, "xLabels", [convertMacros(xlabel), ])
         if ylabel is not None and len(ylabel) > 0:
-            self.writePropertyStringlist(qw, "yLabels", [convertMacros(ylabel),])
+            self.writePropertyStringlist(qw, "yLabels", [convertMacros(ylabel), ])
         self.writePropertyStringlist(qw, "curves", curves, stdset="0")
 
         # TODO: add this code back?
@@ -550,7 +541,6 @@ class Widget2Pydm(object):
         self.write_color_element(color, block.background_color)
         block.color = None
         block.background_color = None
-
 
     def write_block_composite(self, parent, block, nm, qw):
         # self.write_tooltip(qw, nm)
@@ -580,7 +570,10 @@ class Widget2Pydm(object):
                 macros = convertMacros(filelist[1])
             elif len(filelist) < 1:
                 emsg = "'composite file' list was empty"
-                emsg += " (file: %s, line %d)" % (block.main.given_filename, block.line_offset)
+                emsg += " (file: %s, line %d)" % (
+                    block.main.given_filename,
+                    block.line_offset,
+                )
                 logger.error(emsg)
                 return
             # else:
@@ -607,7 +600,7 @@ class Widget2Pydm(object):
         self.write_limits(qw, block)
         self.write_direction(qw, block)
 
-        precision = block.contents.get("precision")        # TODO: needs an example from .adl
+        precision = block.contents.get("precision")  # TODO: needs an example from .adl
         if precision is not None:
             logger.warning("precision needs an example .adl file")
 
@@ -643,24 +636,22 @@ class Widget2Pydm(object):
             self.write_dynamic_attribute(qw, block)
 
         brushstyles = {
-            "solid" : "SolidPattern",
-            "outline" : "NoBrush",
+            "solid": "SolidPattern",
+            "outline": "NoBrush",
         }
         adl_fill = ba.get("fill", "solid")
         brushstyle = brushstyles.get(adl_fill, "solid")
         brushProp = self.writer.writeOpenProperty(qw, "brush", stdset="0")
-        brush = self.writer.writeOpenTag(
-            brushProp, "brush", brushstyle=brushstyle)
+        brush = self.writer.writeOpenTag(brushProp, "brush", brushstyle=brushstyle)
         self.write_color_element(brush, block.color, alpha="255")
 
         penStyles = {
-            "solid" : "Qt::SolidLine",
-            "dash" : "Qt::DashLine",
+            "solid": "Qt::SolidLine",
+            "dash": "Qt::DashLine",
         }
         adl_style = ba.get("style", "solid")
         penStyle = penStyles.get(adl_style, "solid")
-        self.writer.writeProperty(
-            qw, "penStyle", penStyle, tag="enum", stdset="0")
+        self.writer.writeProperty(qw, "penStyle", penStyle, tag="enum", stdset="0")
 
         penColor = self.writer.writeOpenProperty(qw, "penColor", stdset="0")
         self.write_color_element(penColor, block.color)
@@ -671,7 +662,8 @@ class Widget2Pydm(object):
         penWidth = float(ba.get("width", 0))
         if penWidth > 0:
             self.writer.writeProperty(
-                qw, "penWidth", penWidth, tag="double", stdset="0")
+                qw, "penWidth", penWidth, tag="double", stdset="0"
+            )
 
     def write_block_polygon(self, parent, block, nm, qw):
         self.write_tooltip(qw, "PyDMDrawingIrregularPolygon\nwidget not yet ready")
@@ -745,15 +737,17 @@ class Widget2Pydm(object):
         replaceDisplay = True
         if hasattr(block, "displays"):
             displays = {
-                "titles" : [convertMacros(d.get("label", "")) for d in block.displays],
-                "filenames" : [replaceExtension(d.get("name", "")) for d in block.displays],
-                "macros" : [convertMacros(d.get("args", "")) for d in block.displays],
+                "titles": [convertMacros(d.get("label", "")) for d in block.displays],
+                "filenames": [
+                    replaceExtension(d.get("name", "")) for d in block.displays
+                ],
+                "macros": [convertMacros(d.get("args", "")) for d in block.displays],
             }
             for tag, items in displays.items():
                 self.writePropertyStringlist(qw, tag, items, stdset="0")
             policies = [
-                d.get("policy", "") == "replace display"
-                for d in block.displays]
+                d.get("policy", "") == "replace display" for d in block.displays
+            ]
             replaceDisplay = True not in policies
 
         self.writePropertyBoolean(qw, "openInNewWindow", replaceDisplay, stdset="0")
@@ -782,7 +776,7 @@ class Widget2Pydm(object):
         title = block.title or ""
         if len(title) > 0:
             logger.debug(f"title={title}")
-            if title.startswith("-"):     # MEDM rule, use "-" prefix to hide the icon
+            if title.startswith("-"):  # MEDM rule, use "-" prefix to hide the icon
                 self.writePropertyBoolean(qw, "showIcon", False, stdset="0")
                 title = title[1:]
             self.writer.writeProperty(qw, "text", title)
@@ -797,10 +791,8 @@ class Widget2Pydm(object):
         if period is not None:
             # The period is the time between updates (s)
             self.writer.writeProperty(
-                qw, "updateInterval",
-                str(period),
-                tag="double",
-                stdset="0")
+                qw, "updateInterval", str(period), tag="double", stdset="0"
+            )
 
         if len(block.contents["pens"]) > 0:
             text = block.contents.get("xlabel")
@@ -814,10 +806,10 @@ class Widget2Pydm(object):
             for v in block.contents["pens"]:
                 c = v["color"]
                 trace = dict(
-                    color = "#%02x%02x%02x" % (c.r, c.g, c.b),
+                    color="#%02x%02x%02x" % (c.r, c.g, c.b),
                     # MEDM only supports Solid line with color, width=1
-                    lineStyle = 1,          # NoLine Solid Dash Dot DashDot DashDotDot
-                    lineWidth = 1,
+                    lineStyle=1,  # NoLine Solid Dash Dot DashDot DashDotDot
+                    lineWidth=1,
                 )
                 if "chan" in v:
                     trace["channel"] = "ca://" + convertMacros(v["chan"])
@@ -855,11 +847,11 @@ class Widget2Pydm(object):
         self.write_stylesheet(
             qw,
             block,
-            border="1px solid black",   # alternative to QFrame
+            border="1px solid black",  # alternative to QFrame
             margin="0px",
             padding="0px",
             spacing="0px",
-            )
+        )
 
     def write_block_text_update(self, parent, block, nm, qw):
         pv = self.get_channel(block.contents["monitor"])
@@ -903,7 +895,8 @@ class Widget2Pydm(object):
                     f"precision {precision} truncated to {iprecision}"
                 )
             self.writer.writeProperty(
-                qw, "precision", str(iprecision), tag="number", stdset="0")
+                qw, "precision", str(iprecision), tag="number", stdset="0"
+            )
 
         self.write_stylesheet(qw, block)
 
@@ -933,15 +926,14 @@ class Widget2Pydm(object):
         propty = self.writer.writeOpenProperty(parent, "channel", stdset="0")
         # stdset=0 signals this attribute is from PyDM, not Qt widget
         self.writer.writeTaggedString(
-            propty,
-            value=f"ca://{convertMacros(channel)}",
-            )
+            propty, value=f"ca://{convertMacros(channel)}",
+        )
 
     def write_display_format(self, parent, pv, block):
         if (
             # https://epics.anl.gov/EpicsDocumentation/ExtensionsManuals/MEDM/MEDM.html#TextFormat
             # ? also "compact"
-            block.contents.get("format") in ("string", )
+            block.contents.get("format") in ("string",)
             or
             # long string suffix found, render as string
             convertMacros(pv).endswith("$")
@@ -952,7 +944,8 @@ class Widget2Pydm(object):
                 "displayFormat",
                 f"{parent.attrib['class']}::String",
                 tag="enum",
-                stdset="0")
+                stdset="0",
+            )
 
     def write_stylesheet(self, parent, block, **kwargs):
         """
@@ -977,7 +970,9 @@ class Widget2Pydm(object):
 
         if len(parts) > 0:
             #
-            settings = [f"{parent.attrib['class']}#{parent.attrib['name']}" + " {",]
+            settings = [
+                f"{parent.attrib['class']}#{parent.attrib['name']}" + " {",
+            ]
             settings += parts
             settings.append("  }")
             for cls in others:
@@ -987,10 +982,7 @@ class Widget2Pydm(object):
                 settings += [
                     v
                     for v in parts
-                    if v.strip().split()[0] in (
-                        "color:",
-                        "background-color:"
-                    )
+                    if v.strip().split()[0] in ("color:", "background-color:")
                 ]
                 settings.append("  }")
             style = "\n".join(settings)
@@ -1005,7 +997,7 @@ class Widget2Pydm(object):
         # some custom widgets extend other custom widgets
         # include any inheritances
         # example: PyDMDrawingPie extends PyDMDrawingArc
-        while True:     # do..until
+        while True:  # do..until
             additions = []
             for widget in self.custom_widgets:
                 if widget == "PyDMDrawingPie":
@@ -1013,12 +1005,15 @@ class Widget2Pydm(object):
                 item = symbols.pydm_widgets.get(widget)
                 if item is not None:
                     klass = item.extends
-                    if klass.startswith("PyDM") and klass not in additions+self.custom_widgets:
+                    if (
+                        klass.startswith("PyDM")
+                        and klass not in additions + self.custom_widgets
+                    ):
                         additions.append(klass)
             if len(additions) > 0:
                 self.custom_widgets += additions
             else:
-                break   #recurse until no new additions
+                break  # recurse until no new additions
 
         for widget in self.custom_widgets:
             item = symbols.pydm_widgets.get(widget)
@@ -1031,8 +1026,6 @@ class Widget2Pydm(object):
     def write_geometry(self, parent, geom):
         propty = self.writer.writeOpenProperty(parent, "geometry")
         rect = self.writer.writeOpenTag(propty, "rect")
-        # if str(geom.x) == "-":
-        #     _debug_ = True
         self.writer.writeTaggedString(rect, "x", str(geom.x))
         self.writer.writeTaggedString(rect, "y", str(geom.y))
         self.writer.writeTaggedString(rect, "width", str(geom.width))
@@ -1068,17 +1061,16 @@ class Widget2Pydm(object):
         else:
             raise NotImplementedError(
                 f"limits for {qw.attrib['class']} widget not handled"
-                )
+            )
 
         if (
             block.contents.get("hoprSrc") == "default"
-            or
-            block.contents.get("loprSrc") == "default"
+            or block.contents.get("loprSrc") == "default"
         ):
             # TODO: assignments to precSrc and precDefault are not used
             # TODO: precDefault gives info about the step size if precSrc == "default"
-            precSrc = block.contents.get("precSrc")
-            precDefault = block.contents.get("precDefault")
+            # precSrc = block.contents.get("precSrc")
+            # precDefault = block.contents.get("precDefault")
 
             self.writePropertyBoolean(qw, "userDefinedLimits", True, stdset="0")
             self.writer.writeProperty(
@@ -1086,13 +1078,15 @@ class Widget2Pydm(object):
                 hiLimitName,
                 block.contents.get("hoprDefault", str(0.0)),
                 tag="double",
-                stdset="0")
+                stdset="0",
+            )
             self.writer.writeProperty(
                 qw,
                 loLimitName,
                 block.contents.get("loprDefault", str(0.0)),
                 tag="double",
-                stdset="0")
+                stdset="0",
+            )
 
     def writeStringText(self, parent, tag="string", text=""):
         s = self.writer.writeOpenTag(parent, tag)
@@ -1136,7 +1130,7 @@ Example how the zorder is given in the .ui file:
     <zorder>caLabel_1</zorder>
     ...
 """
-Qt_zOrder = namedtuple('Qt_zOrder', 'order vis text')
+Qt_zOrder = namedtuple("Qt_zOrder", "order vis text")
 
 
 class PYDM_Writer(object):
@@ -1152,7 +1146,7 @@ class PYDM_Writer(object):
         self.stylesheet = None
         self.root = None
         self.outFile = None
-        self.widget_stacking_info = []        # stacking order
+        self.widget_stacking_info = []  # stacking order
 
     def openFile(self, outFile):
         """actually, begin to create the .ui file content IN MEMORY"""
@@ -1200,7 +1194,7 @@ class PYDM_Writer(object):
         # ElementTree needs help to pretty print
         # (easier in lxml but that's an additional package to add)
         text = ElementTree.tostring(self.root)
-        return minidom.parseString(text).toprettyxml(indent=" "*2)
+        return minidom.parseString(text).toprettyxml(indent=" " * 2)
 
     def closeFile(self):
         """finally, write .ui file (XML content)"""
@@ -1251,14 +1245,14 @@ def findFile(fname):
     if fname is None or len(fname) == 0:
         return None
 
-    if os.name =="nt":
+    if os.name == "nt":
         delimiter = ";"
     else:
         delimiter = ":"
 
     path = os.environ.get(ENV_PYDM_DISPLAYS_PATH)
     if path is None:
-        paths = [os.getcwd()]      # safe choice that becomes redundant
+        paths = [os.getcwd()]  # safe choice that becomes redundant
     else:
         paths = path.split(delimiter)
 

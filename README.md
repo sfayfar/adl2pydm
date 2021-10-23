@@ -22,20 +22,21 @@ adl2pydm: error: the following arguments are required: adlfile
 
 ## Help
 
-```
+```bash
 user@localhost ~ $ adl2pydm -h
-usage: adl2pydm [-h] [-d DIR] [-v] adlfile
+usage: adl2pydm [-h] [-d DIR] [-v] [-log LOG] [--use-scatterplot] adlfiles [adlfiles ...]
 
-convert MEDM .adl screen file(s) to PyDM .ui format (https://github.com/BCDA-
-APS/adl2pydm) v0.0.1+10.gb491da1
+Convert MEDM's .adl screen file(s) to PyDM .ui format. (https://github.com/BCDA-APS/adl2pydm) v0.0.1+279.g5d2b329.dirty
 
 positional arguments:
-  adlfile            MEDM '.adl' file to convert
+  adlfiles             MEDM '.adl' file(s) to convert
 
 optional arguments:
-  -h, --help         show this help message and exit
-  -d DIR, --dir DIR  output directory, default: same directory as input file
-  -v, --version      show program's version number and exit
+  -h, --help           show this help message and exit
+  -d DIR, --dir DIR    output directory, default: same directory as input file
+  -v, --version        show program's version number and exit
+  -log LOG, --log LOG  Provide logging level. Example --log debug', default='warning'
+  --use-scatterplot    Translate MEDM 'cartesian plot' widget as `PyDMScatterPlot` instead of `PyDMWaveformPlot`, default=False
 ```
 
 ## Install
@@ -45,4 +46,5 @@ Either:
 * `pip install adl2pydm`
 * `conda install adl2pydm -c aps-anl-tag`
 
-Note:  Only the standard Python packages are needed to run *adl2pydm*. No additional packages are required.
+Note:  Only the standard Python (3.7 or higher) packages are needed to run
+*adl2pydm*. No additional packages are required.
