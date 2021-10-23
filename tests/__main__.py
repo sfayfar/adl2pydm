@@ -13,11 +13,11 @@ if _path not in sys.path:
 def suite(*args, **kw):
 
     from tests import test_adl_parser
-    from tests import test_output_handler
+    # from tests import test_output_handler
 
     test_list = [
         test_adl_parser,
-        test_output_handler,
+        # test_output_handler,
     ]
 
     test_suite = unittest.TestSuite()
