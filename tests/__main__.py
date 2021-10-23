@@ -14,14 +14,10 @@ def suite(*args, **kw):
 
     from tests import test_adl_parser
     from tests import test_output_handler
-    from tests import test_symbols
-    from tests import test_testDisplay
 
     test_list = [
-        test_symbols,
         test_adl_parser,
         test_output_handler,
-        test_testDisplay,
     ]
 
     test_suite = unittest.TestSuite()
