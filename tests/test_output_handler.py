@@ -1260,116 +1260,116 @@ class TestOutputHandler(unittest.TestCase):
                 )
                 self.assertEqualStyleSheet(w, expected)
 
-    def test_write_widget_valuator_variations(self):
-        uiname = self.convertAdlFile("slider.adl")
-        full_uiname = os.path.join(self.tempdir, uiname)
-        self.assertTrue(os.path.exists(full_uiname))
+    # def test_write_widget_valuator_variations(self):
+    #     uiname = self.convertAdlFile("slider.adl")
+    #     full_uiname = os.path.join(self.tempdir, uiname)
+    #     self.assertTrue(os.path.exists(full_uiname))
 
-        root = ElementTree.parse(full_uiname).getroot()
-        screen = self.getSubElement(root, "widget")
-        # self.print_xml_children(screen)
-        widgets = screen.findall("widget")
-        self.assertEqual(len(widgets), 1)
+    #     root = ElementTree.parse(full_uiname).getroot()
+    #     screen = self.getSubElement(root, "widget")
+    #     # self.print_xml_children(screen)
+    #     widgets = screen.findall("widget")
+    #     self.assertEqual(len(widgets), 1)
 
-        key = "valuator"
-        widget = self.getNamedWidget(screen, key)
-        # self.print_xml_children(widget)
-        self.assertEqualClassName(widget, "PyDMSlider", key)
+    #     key = "valuator"
+    #     widget = self.getNamedWidget(screen, key)
+    #     # self.print_xml_children(widget)
+    #     self.assertEqualClassName(widget, "PyDMSlider", key)
 
-        self.assertEqualChannel(widget, "ca://sky:userCalc2.A")
-        self.assertEqualPropertyString(widget, "orientation", "Qt::Horizontal")
-        self.assertEqualPropertyNumber(widget, "precision", int(0.1))
-        # self.print_xml_children(widget)
-        self.assertEqualPropertyBool(widget, "userDefinedLimits", True)
-        self.assertEqualPropertyDouble(widget, "userMaximum", 10)
-        self.assertEqualPropertyDouble(widget, "userMinimum", -10)
-        self.assertEqualPropertyBool(widget, "showLimitLabels", True)
-        self.assertEqualPropertyBool(widget, "showValueLabel", True)
+    #     self.assertEqualChannel(widget, "ca://sky:userCalc2.A")
+    #     self.assertEqualPropertyString(widget, "orientation", "Qt::Horizontal")
+    #     self.assertEqualPropertyNumber(widget, "precision", int(0.1))
+    #     # self.print_xml_children(widget)
+    #     self.assertEqualPropertyBool(widget, "userDefinedLimits", True)
+    #     self.assertEqualPropertyDouble(widget, "userMaximum", 10)
+    #     self.assertEqualPropertyDouble(widget, "userMinimum", -10)
+    #     self.assertEqualPropertyBool(widget, "showLimitLabels", True)
+    #     self.assertEqualPropertyBool(widget, "showValueLabel", True)
 
-    def test_write_widget_wheel_switch(self):
-        uiname = self.convertAdlFile("wheel_switch.adl")
-        full_uiname = os.path.join(self.tempdir, uiname)
-        self.assertTrue(os.path.exists(full_uiname))
+    # def test_write_widget_wheel_switch(self):
+    #     uiname = self.convertAdlFile("wheel_switch.adl")
+    #     full_uiname = os.path.join(self.tempdir, uiname)
+    #     self.assertTrue(os.path.exists(full_uiname))
 
-        root = ElementTree.parse(full_uiname).getroot()
-        screen = self.getSubElement(root, "widget")
-        # self.print_xml_children(screen)
-        widgets = screen.findall("widget")
-        self.assertEqual(len(widgets), 1)
+    #     root = ElementTree.parse(full_uiname).getroot()
+    #     screen = self.getSubElement(root, "widget")
+    #     # self.print_xml_children(screen)
+    #     widgets = screen.findall("widget")
+    #     self.assertEqual(len(widgets), 1)
 
-        key = "wheel_switch"
-        widget = self.getNamedWidget(screen, key)
-        # self.print_xml_children(widget)
-        self.assertEqualClassName(widget, "PyDMSpinbox", key)
+    #     key = "wheel_switch"
+    #     widget = self.getNamedWidget(screen, key)
+    #     # self.print_xml_children(widget)
+    #     self.assertEqualClassName(widget, "PyDMSpinbox", key)
 
-        self.assertEqualChannel(widget, "ca://sky:userCalc2.A")
-        self.assertEqualPropertyDouble(widget, "maximum", 10)
-        self.assertEqualPropertyDouble(widget, "minimum", -10)
-        self.assertEqualPropertyBool(widget, "showLimitLabels", True)
-        self.assertEqualPropertyBool(widget, "showValueLabel", False)
-        self.assertEqualPropertyBool(widget, "userDefinedLimits", True)
+    #     self.assertEqualChannel(widget, "ca://sky:userCalc2.A")
+    #     self.assertEqualPropertyDouble(widget, "maximum", 10)
+    #     self.assertEqualPropertyDouble(widget, "minimum", -10)
+    #     self.assertEqualPropertyBool(widget, "showLimitLabels", True)
+    #     self.assertEqualPropertyBool(widget, "showValueLabel", False)
+    #     self.assertEqualPropertyBool(widget, "userDefinedLimits", True)
 
-    def test_write_widget_text_examples(self):
-        uiname = self.convertAdlFile("text_examples.adl")
-        full_uiname = os.path.join(self.tempdir, uiname)
-        self.assertTrue(os.path.exists(full_uiname))
+    # def test_write_widget_text_examples(self):
+    #     uiname = self.convertAdlFile("text_examples.adl")
+    #     full_uiname = os.path.join(self.tempdir, uiname)
+    #     self.assertTrue(os.path.exists(full_uiname))
 
-        root = ElementTree.parse(full_uiname).getroot()
-        screen = self.getSubElement(root, "widget")
-        # self.print_xml_children(screen)
-        widgets = screen.findall("widget")
-        self.assertEqual(len(widgets), 17)
+    #     root = ElementTree.parse(full_uiname).getroot()
+    #     screen = self.getSubElement(root, "widget")
+    #     # self.print_xml_children(screen)
+    #     widgets = screen.findall("widget")
+    #     self.assertEqual(len(widgets), 17)
 
-        key = "text_update"
-        widget = self.getNamedWidget(screen, key)
-        self.assertEqualClassName(widget, "PyDMLabel", key)
+    #     key = "text_update"
+    #     widget = self.getNamedWidget(screen, key)
+    #     self.assertEqualClassName(widget, "PyDMLabel", key)
 
-        key = "text"
-        widget = self.getNamedWidget(screen, key)
-        self.assertEqualClassName(widget, "QLabel", key)
-        self.assertEqualPropertyString(widget, "text", "macro P=${P}")
+    #     key = "text"
+    #     widget = self.getNamedWidget(screen, key)
+    #     self.assertEqualClassName(widget, "QLabel", key)
+    #     self.assertEqualPropertyString(widget, "text", "macro P=${P}")
 
-        key = "text_update"
-        widget = self.getNamedWidget(screen, key)
-        self.assertEqualClassName(widget, "PyDMLabel", key)
+    #     key = "text_update"
+    #     widget = self.getNamedWidget(screen, key)
+    #     self.assertEqualClassName(widget, "PyDMLabel", key)
 
-        self.assertEqualChannel(widget, "ca://${P}")
+    #     self.assertEqualChannel(widget, "ca://${P}")
 
-        # check that widget text will announce widget height
-        for widget in widgets[2:]:
-            geom = self.getNamedProperty(widget, "geometry")
-            height = None
-            for item in geom.iter():
-                if item.tag == "height":
-                    height = item.text
-            self.assertEqualPropertyString(widget, "text", "height: " + height)
+    #     # check that widget text will announce widget height
+    #     for widget in widgets[2:]:
+    #         geom = self.getNamedProperty(widget, "geometry")
+    #         height = None
+    #         for item in geom.iter():
+    #             if item.tag == "height":
+    #                 height = item.text
+    #         self.assertEqualPropertyString(widget, "text", "height: " + height)
 
-    def test_write_extends_customwidget(self):
-        uiname = self.convertAdlFile("table_setup_SRI.adl")
-        full_uiname = os.path.join(self.tempdir, uiname)
-        self.assertTrue(os.path.exists(full_uiname))
+    # def test_write_extends_customwidget(self):
+    #     uiname = self.convertAdlFile("table_setup_SRI.adl")
+    #     full_uiname = os.path.join(self.tempdir, uiname)
+    #     self.assertTrue(os.path.exists(full_uiname))
 
-        root = ElementTree.parse(full_uiname).getroot()
-        customwidgets = self.getSubElement(root, "customwidgets")
-        # self.print_xml_children(screen)
-        widgets = customwidgets.findall("customwidget")
+    #     root = ElementTree.parse(full_uiname).getroot()
+    #     customwidgets = self.getSubElement(root, "customwidgets")
+    #     # self.print_xml_children(screen)
+    #     widgets = customwidgets.findall("customwidget")
 
-        customs = [self.getSubElement(w, "class").text for w in widgets]
-        self.assertIn("PyDMDrawingPie", customs)
-        self.assertIn("PyDMDrawingArc", customs)
+    #     customs = [self.getSubElement(w, "class").text for w in widgets]
+    #     self.assertIn("PyDMDrawingPie", customs)
+    #     self.assertIn("PyDMDrawingArc", customs)
 
     # ----------------------------------------------------------
 
-    def test_write_all_example_files_process(self):
-        "ensure all example MEDM files are converted to PyDM"
-        path = os.path.join(os.path.dirname(__file__), "medm")
-        for adl_file in os.listdir(path):
-            if os.path.isfile(os.path.join(path, adl_file)) and adl_file.endswith(
-                ".adl"
-            ):
-                uiname = self.convertAdlFile(adl_file)
-                full_uiname = os.path.join(self.tempdir, uiname)
-                self.assertTrue(os.path.exists(full_uiname), uiname)
+    # def test_write_all_example_files_process(self):
+    #     "ensure all example MEDM files are converted to PyDM"
+    #     path = os.path.join(os.path.dirname(__file__), "medm")
+    #     for adl_file in os.listdir(path):
+    #         if os.path.isfile(os.path.join(path, adl_file)) and adl_file.endswith(
+    #             ".adl"
+    #         ):
+    #             uiname = self.convertAdlFile(adl_file)
+    #             full_uiname = os.path.join(self.tempdir, uiname)
+    #             self.assertTrue(os.path.exists(full_uiname), uiname)
 
 
 class Test_PYDM_Writer_Support(unittest.TestCase):

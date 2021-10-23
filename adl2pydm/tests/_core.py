@@ -71,9 +71,73 @@ def getSubElement(xmlparent, tag):
     return child
 
 
+# custom assertions
+
+def assertEqualBool(parent, value, doc=None):
+    doc = doc or f"widget:{parent.attrib['name']}"
+    child = getSubElement(parent, "bool")
+    assert child.text == str(value).lower(), doc
+
+
+def assertEqualChannel(parent, channel, doc=None):
+    doc = doc or f"widget:{parent.attrib['name']}"
+    assertEqualPropertyString(parent, "channel", channel)
+
+
 def assertEqualClassName(parent, cls, nm, doc=None):
     doc = doc or f"widget:{parent.attrib['name']}"
     assertExpectedAttrib(parent, **{"class": cls, "name": nm})
+
+
+def assertEqualDouble(parent, expected, doc=None):
+    doc = doc or f"widget:{parent.attrib['name']}"
+    assert parent is not None
+    child = getSubElement(parent, "double")
+    assert float(child.text) == float(expected)
+
+
+def assertEqualEnum(parent, expected, doc=None):
+    doc = doc or f"widget:{parent.attrib['name']}"
+    assert parent is not None
+    child = getSubElement(parent, "enum")
+    assert child.text == expected
+
+
+def assertEqualNumber(parent, expected, doc=None, dtype=float):
+    doc = doc or f"widget:{parent.attrib['name']}, expected:{expected}"
+    child = getSubElement(parent, "number")
+    assert parent is not None
+    assert child.text is not None
+    assert expected is not None
+    assert dtype(child.text) == dtype(expected), doc
+
+
+def assertEqualPropertyBool(parent, propName, expected):
+    doc = f"widget:{parent.attrib['name']}, property:{propName}"
+    prop = getNamedProperty(parent, propName)
+    assert prop is not None, doc
+    assertEqualBool(prop, expected, doc)
+
+
+def assertEqualPropertyDouble(parent, propName, expected):
+    doc = f"widget:{parent.attrib['name']}, property:{propName}"
+    prop = getNamedProperty(parent, propName)
+    assert prop is not None, doc
+    assertEqualDouble(prop, expected, doc)
+
+
+def assertEqualPropertyEnum(parent, propName, expected):
+    doc = f"widget:{parent.attrib['name']}, property:{propName}"
+    prop = getNamedProperty(parent, propName)
+    assert prop is not None, doc
+    assertEqualEnum(prop, expected, doc)
+
+
+def assertEqualPropertyNumber(parent, propName, expected, dtype=float):
+    doc = f"widget:{parent.attrib['name']}, property:{propName}"
+    prop = getNamedProperty(parent, propName)
+    assert prop is not None, doc
+    assertEqualNumber(prop, expected, doc=doc, dtype=dtype)
 
 
 def assertEqualPropertyString(parent, propName, expected):
@@ -110,3 +174,9 @@ def assertExpectedDictInRef(ref, doc=None, **kwargs):
     for k, v in kwargs.items():
         assert k in ref, f"{doc}, k={k}, v={v}"
         assert v == ref[k], f"{doc}, k={k}, v={v}"
+
+
+def assertIsNoneProperty(parent, propName):
+    doc = f"widget:{parent.attrib['name']}, property:{propName}"
+    prop = getNamedProperty(parent, propName)
+    assert prop is None, doc
