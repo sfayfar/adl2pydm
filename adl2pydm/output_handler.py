@@ -67,7 +67,7 @@ def convertDynamicAttribute_to_Rules(attr):
     for nm, ref in dict(chan="A", chanB="B", chanC="C", chanD="D").items():
         if nm in attr:
             pv = convertMacros(attr[nm])
-            channels[ref] = dict(channel=pv, trigger=len(pv) > 0)
+            channels[ref] = dict(channel=f"ca://{pv}", trigger=len(pv) > 0)
 
     calc = attr.get("calc")
     if calc is not None and len(calc) > 0:
@@ -226,11 +226,15 @@ class Widget2Pydm(object):
         handler = self.pydm_widget_handlers.get(block.symbol, self.write_block_default)
 
         cls = widget_info["pydm_widget"]
-        if cls == "PyDMLabel" and not (
-            block.contents.get("monitor") or block.contents.get("control")
-        ):
-            # Fall back to QLabel, as there is no associated channel.
-            cls = "QLabel"
+        if cls == "PyDMLabel":
+            c = block.contents
+            if not (c.get("monitor") or c.get("control")):
+                try:
+                    # check if accessible
+                    c["dynamic attribute"]["chan"]
+                except Exception:
+                    # Fall back to QLabel, as there is no associated channel.
+                    cls = "QLabel"
 
         # if block.symbol.find("chart") >= 0:
         #     _z = 2

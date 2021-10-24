@@ -420,7 +420,7 @@ def test_write_widget_oval(tempdir):
                 expected = {
                     "name": "visibility",
                     "property": "Visible",
-                    "channels": [{"channel": "demo:bar_RBV", "trigger": True}],
+                    "channels": [{"channel": "ca://demo:bar_RBV", "trigger": True}],
                     "expression": "ch[0]>128",
                 }
                 _core.assertEqualRules(w, expected)
@@ -428,7 +428,7 @@ def test_write_widget_oval(tempdir):
                 expected = {
                     "name": "visibility",
                     "property": "Visible",
-                    "channels": [{"channel": "demo:bar", "trigger": True}],
+                    "channels": [{"channel": "ca://demo:bar", "trigger": True}],
                     "expression": "ch[0]==0",
                 }
                 _core.assertEqualRules(w, expected)
@@ -492,7 +492,7 @@ def test_write_widget_polyline_with_rules(tempdir):
     expected = {
         "name": "visibility",
         "property": "Visible",
-        "channels": [{"channel": "PYDM:visible", "trigger": True}],
+        "channels": [{"channel": "ca://PYDM:visible", "trigger": True}],
         "expression": "ch[0]!=0",
     }
     _core.assertEqualRules(widget, expected)
@@ -585,7 +585,7 @@ def test_write_widget_rectangle(tempdir):
     expected = {
         "name": "visibility",
         "property": "Visible",
-        "channels": [{"channel": "${P}alldone", "trigger": True}],
+        "channels": [{"channel": "ca://${P}alldone", "trigger": True}],
         "expression": "ch[0]==0",
     }
     _core.assertExpectedDictInRef(rules[0], **expected)
@@ -607,8 +607,8 @@ def test_write_widget_rectangle(tempdir):
         "name": "visibility",
         "property": "Visible",
         "channels": [
-            {"channel": "${P}${M}.RBV", "trigger": True},
-            {"channel": "${P}${M}.VAL", "trigger": True},
+            {"channel": "ca://${P}${M}.RBV", "trigger": True},
+            {"channel": "ca://${P}${M}.VAL", "trigger": True},
         ],
         "expression": "ch[0]==ch[1]",
     }
