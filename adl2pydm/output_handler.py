@@ -226,11 +226,15 @@ class Widget2Pydm(object):
         handler = self.pydm_widget_handlers.get(block.symbol, self.write_block_default)
 
         cls = widget_info["pydm_widget"]
-        if cls == "PyDMLabel" and not (
-            block.contents.get("monitor") or block.contents.get("control")
-        ):
-            # Fall back to QLabel, as there is no associated channel.
-            cls = "QLabel"
+        if cls == "PyDMLabel":
+            c = block.contents
+            if not (c.get("monitor") or c.get("control")):
+                try:
+                    # check if accessible
+                    c["dynamic attribute"]["chan"]
+                except Exception:
+                    # Fall back to QLabel, as there is no associated channel.
+                    cls = "QLabel"
 
         # if block.symbol.find("chart") >= 0:
         #     _z = 2
