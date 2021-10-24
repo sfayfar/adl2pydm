@@ -17,15 +17,16 @@ from . import _core
 from ._core import tempdir
 
 
+TEST_ADL_FILE = "xxx-R6-0.adl"
+
+
 @pytest.mark.parametrize("key", "text text_1 text_2".split())
 def test_issue62_fixed(key, tempdir):
     assert os.path.exists(tempdir)
 
-    _core.convertAdlFile("xxx-R6-0.adl", "/tmp")  # TODO: developer
-
-    uiname = _core.convertAdlFile("xxx-R6-0.adl", tempdir)
+    uiname = _core.convertAdlFile(TEST_ADL_FILE, tempdir)
     full_uiname = os.path.join(tempdir, uiname)
-    _core.assertTrue(os.path.exists(full_uiname))
+    assert os.path.exists(full_uiname)
 
     root = ElementTree.parse(full_uiname).getroot()
     screen = _core.getSubElement(root, "widget")
