@@ -33,8 +33,9 @@ def test_issue62_fixed(key, tempdir):
 
     widget = _core.getNamedWidget(composite, key)
     assert widget is not None
-    # _core.assertEqualClassName(widget, "PyDMLabel", key)
+    _core.assertEqualClassName(widget, "PyDMLabel", key)
     _core.assertEqualPropertyString(widget, "text", "Moving")
+
     # test for "ca://" prefix on PV in the display rules
     prop = _core.getNamedProperty(widget, "rules")
     rules = _core.getSubElement(prop, "string")
