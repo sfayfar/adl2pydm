@@ -67,7 +67,7 @@ def convertDynamicAttribute_to_Rules(attr):
     for nm, ref in dict(chan="A", chanB="B", chanC="C", chanD="D").items():
         if nm in attr:
             pv = convertMacros(attr[nm])
-            channels[ref] = dict(channel=pv, trigger=len(pv) > 0)
+            channels[ref] = dict(channel=f"ca://{pv}", trigger=len(pv) > 0)
 
     calc = attr.get("calc")
     if calc is not None and len(calc) > 0:
