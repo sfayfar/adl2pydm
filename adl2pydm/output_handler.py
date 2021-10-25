@@ -409,8 +409,16 @@ class Widget2Pydm(object):
             logger.critical(f"sbit/ebit: {exc}")
         numBits = 1 + max(ebit, sbit) - min(ebit, sbit)
         if numBits < 1:
-            wmsg = "number of bits = %d" % numBits
-            logger.warning(wmsg)
+            logger.warning(
+                (
+                    "(%s,L%s,%s) "
+                    "number of bits = %d"
+                ),
+                block.symbol,
+                block.line_offset,
+                block.main.given_filename,
+                numBits
+            )
 
         self.write_tooltip(qw, nm)
         pv = self.get_channel(block.contents["monitor"])
@@ -443,7 +451,16 @@ class Widget2Pydm(object):
         }
         stacking = block.contents.get("stacking", "row")
         if stacking not in stacking_choices:
-            logger.warning(f"stacking '{stacking}' not supported, using 'row'")
+            logger.warning(
+                (
+                    "(%s,L%s,%s) "
+                    "stacking '%s' not supported, using 'row'"
+                ),
+                block.symbol,
+                block.line_offset,
+                block.main.given_filename,
+                stacking
+            )
             stacking = "row"
         orientation = stacking_choices[stacking]
         self.writer.writeProperty(qw, "orientation", orientation, stdset="0")
@@ -486,9 +503,16 @@ class Widget2Pydm(object):
             count = int(count)
         except ValueError:
             logger.warning(
-                "number of plot points must be an integer, "
-                f"using {DEFAULT_NUMBER_OF_POINTS} points "
-                f"instead of '{count}'"
+                (
+                    "(%s,L%s,%s) "
+                    "number of plot points must be an integer,"
+                    " using %s points instead of '%s'"
+                ),
+                block.symbol,
+                block.line_offset,
+                block.main.given_filename,
+                DEFAULT_NUMBER_OF_POINTS,
+                count
             )
             count = DEFAULT_NUMBER_OF_POINTS
 
@@ -581,10 +605,8 @@ class Widget2Pydm(object):
                 logger.error(emsg)
                 return
             # else:
+            #     TODO: Is this comment block still useful?
             #     emsg = "Rendering only first file from 'composite file'"
-            #     emsg += "=%s" % block.contents["composite file"]
-            #     emsg += " (file: %s, line %d)" % (block.main.given_filename, block.line_offset)
-            #     logger.warning(emsg)
         filename = replaceExtension(filelist[0])
         self.writer.writeProperty(qw, "filename", filename, stdset="0")
         if macros is not None:
@@ -606,7 +628,15 @@ class Widget2Pydm(object):
 
         precision = block.contents.get("precision")  # TODO: needs an example from .adl
         if precision is not None:
-            logger.warning("precision needs an example .adl file")
+            logger.warning(
+                (
+                    "(%s,L%s,%s) "
+                    "precision needs an example .adl file"
+                ),
+                block.symbol,
+                block.line_offset,
+                block.main.given_filename
+            )
 
     def write_block_menu(self, parent, block, nm, qw):
         pv = self.get_channel(block.contents["control"])
@@ -895,8 +925,15 @@ class Widget2Pydm(object):
             iprecision = int(precision)
             if iprecision != precision:
                 logger.warning(
-                    "truncation warning: "
-                    f"precision {precision} truncated to {iprecision}"
+                    (
+                        "(%s,L%s,%s) "
+                        "truncation warning: precision %s truncated to %s"
+                    ),
+                    block.symbol,
+                    block.line_offset,
+                    block.main.given_filename,
+                    precision,
+                    iprecision
                 )
             self.writer.writeProperty(
                 qw, "precision", str(iprecision), tag="number", stdset="0"
@@ -912,8 +949,16 @@ class Widget2Pydm(object):
 
         format = block.contents.get("format")
         if format is not None:
-            wmsg = "wheel switch format is unsupported now: " + format
-            logger.warning(wmsg)
+            logger.warning(
+                (
+                    "(%s,L%s,%s) "
+                    "wheel switch format is unsupported now: %s"
+                ),
+                block.symbol,
+                block.line_offset,
+                block.main.given_filename,
+                format
+            )
             # TODO: format -
             # maybe not be supported in Qt QDoubleSpinBox
             # https://doc.qt.io/qt-5/qdoublespinbox.html#details
