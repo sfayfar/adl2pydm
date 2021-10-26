@@ -581,7 +581,8 @@ class MedmRelatedDisplayWidget(MedmGenericWidget):
         for block in blocks:
             if not block.symbol.startswith("display["):
                 continue
-            del self.contents[block.symbol]
+            if block.symbol in self.contents:
+                del self.contents[block.symbol]
             aa = self.locateAssignments(buf[block.start + 1 : block.end])
             row = block.symbol.replace("[", " ").replace("]", "").split()[-1]
             displays[row] = aa
