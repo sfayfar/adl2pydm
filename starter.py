@@ -9,6 +9,8 @@ _path = os.path.dirname(__file__)
 sys.path.append(os.path.join(_path, "."))
 from adl2pydm import cli
 
-sys.argv.append(os.path.join(_path, "adl2pydm", "tests", "medm", "non_utf8.adl"))
+TEST_ADL = "Oxford_CS800_hourplot.adl"
+
+sys.argv.append(os.path.join(_path, "adl2pydm", "tests", "medm", TEST_ADL))
 
 cli.main()
