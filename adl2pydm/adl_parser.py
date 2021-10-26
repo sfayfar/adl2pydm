@@ -337,8 +337,9 @@ class MedmMainWidget(MedmBaseWidget):
             msg = "Could not find file: " + fname
             raise ValueError(msg)
         self.given_filename = fname
-        with open(fname, "r") as fp:
-            return fp.readlines()
+        # brutal: simply discard any non-utf8 characters
+        buf = open(fname, "r", encoding='utf8', errors='ignore').readlines()
+        return buf 
 
     def parseAdlBuffer(self, buf):  # lgtm [py/similar-function]
         logger.debug("\n" * 2)
