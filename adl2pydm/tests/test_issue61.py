@@ -23,6 +23,7 @@ TEST_ADL_FILE = "xxx-R6-0.adl"
 @pytest.mark.parametrize("key", "text text_1 text_2".split())
 def test_issue62_fixed(key, tempdir):
     assert os.path.exists(tempdir)
+    assert os.path.exists(os.path.join(_core.MEDM_SCREEN_DIR, TEST_ADL_FILE))
 
     uiname = _core.convertAdlFile(TEST_ADL_FILE, tempdir)
     full_uiname = os.path.join(tempdir, uiname)
