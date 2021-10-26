@@ -107,7 +107,3 @@ def main():
             processFile(adlfile, options.dir)
         except Exception as exc:
             logger.error(f"error processing {adlfile}:" f" {exc}")
-
-
-# if __name__ == "__main__":
-#     main()
