@@ -41,12 +41,13 @@ optional arguments:
 
 ## Install
 
-Only the `pip` install is working now:
+Only the `pip` install is working now ([PyPI package](https://pypi.org/project/punx/)):
 
 * `pip install adl2pydm`
 
-Once a `conda` package has been built and uploaded to the `aps-anl-tag` channel on conda-forge, 
-(se [related GitHub issue](https://github.com/BCDA-APS/adl2pydm/issues/85)) then:
+Once a `conda` package has been built and uploaded to the
+[`aps-anl-tag` channel on conda-forge](https://anaconda.org/aps-anl-tag),
+(see [related GitHub issue](https://github.com/BCDA-APS/adl2pydm/issues/85)) then:
 
 * `conda install adl2pydm -c aps-anl-tag`
 
