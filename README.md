@@ -41,9 +41,13 @@ optional arguments:
 
 ## Install
 
-Either:
+Only the `pip` install is working now:
 
 * `pip install adl2pydm`
+
+Once a `conda` package has been built and uploaded to the `aps-anl-tag` channel on conda-forge, 
+(se [related GitHub issue](https://github.com/BCDA-APS/adl2pydm/issues/85)) then:
+
 * `conda install adl2pydm -c aps-anl-tag`
 
 Note:  Only the standard Python (3.7 or higher) packages are needed to run
