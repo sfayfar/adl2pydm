@@ -68,8 +68,7 @@ adl_widgets = {
     "message button": dict(type="controller", pydm_widget="PyDMPushButton"),
     "meter": dict(type="monitor", pydm_widget="PyDMScaleIndicator"),
     "oval": dict(type="static", pydm_widget="PyDMDrawingEllipse"),
-    # "polygon" : dict(type="static", pydm_widget="PyDMDrawingIrregularPolygon"),
-    "polygon": dict(type="static", pydm_widget="PyDMDrawingPolyline"),
+    "polygon" : dict(type="static", pydm_widget="PyDMDrawingIrregularPolygon"),
     "polyline": dict(type="static", pydm_widget="PyDMDrawingPolyline"),
     "rectangle": dict(type="static", pydm_widget="PyDMDrawingRectangle"),
     "related display": dict(type="static", pydm_widget="PyDMRelatedDisplayButton"),
@@ -146,6 +145,9 @@ pydm_widgets = dict(
     ),
     PyDMDrawingPolyline=PyDM_CustomWidget(
         "PyDMDrawingPolyline", "QWidget", "pydm.widgets.drawing"
+    ),
+    PyDMDrawingIrregularPolygon=PyDM_CustomWidget(
+        "PyDMDrawingIrregularPolygon", "QWidget", "pydm.widgets.drawing"
     ),
     PyDMEmbeddedDisplay=PyDM_CustomWidget(
         "PyDMEmbeddedDisplay", "QFrame", "pydm.widgets.embedded_display"
