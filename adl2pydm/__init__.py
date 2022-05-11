@@ -2,7 +2,7 @@
 
 __project__ = u"adl2pydm"
 __description__ = __doc__
-__copyright__ = u"2017-2021, UChicago Argonne, LLC"
+__copyright__ = u"2017-2022, UChicago Argonne, LLC"
 __authors__ = [
     u"Pete Jemian",
 ]
