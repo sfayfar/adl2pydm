@@ -32,6 +32,7 @@ def test_write_extends_customwidget(tempdir):
     customs = [_core.getSubElement(w, "class").text for w in widgets]
     assert "PyDMDrawingPie" in customs
     assert "PyDMDrawingArc" in customs
+    assert output_handler.TOP_LEVEL_WIDGET_CLASS in customs
 
 
 def test_write_widget_arc(tempdir):
@@ -420,7 +421,7 @@ def test_write_widget_oval(tempdir):
                 expected = {
                     "name": "visibility",
                     "property": "Visible",
-                    "channels": [{"channel": "ca://demo:bar_RBV", "trigger": True, "use_enum": False}],
+                    "channels": [{"channel": "ca://demo:bar_RBV", "trigger": True}],
                     "expression": "ch[0]>128",
                 }
                 _core.assertEqualRules(w, expected)
@@ -428,7 +429,7 @@ def test_write_widget_oval(tempdir):
                 expected = {
                     "name": "visibility",
                     "property": "Visible",
-                    "channels": [{"channel": "ca://demo:bar", "trigger": True, "use_enum": False}],
+                    "channels": [{"channel": "ca://demo:bar", "trigger": True}],
                     "expression": "ch[0]==0",
                 }
                 _core.assertEqualRules(w, expected)
@@ -492,7 +493,7 @@ def test_write_widget_polyline_with_rules(tempdir):
     expected = {
         "name": "visibility",
         "property": "Visible",
-        "channels": [{"channel": "ca://PYDM:visible", "trigger": True, "use_enum": False}],
+        "channels": [{"channel": "ca://PYDM:visible", "trigger": True}],
         "expression": "ch[0]!=0",
     }
     _core.assertEqualRules(widget, expected)
@@ -513,15 +514,17 @@ def test_write_widget_rectangle(tempdir):
     _core.assertEqual(len(root), 3)
 
     screen = _core.getSubElement(root, "widget")
-    _core.assertEqualClassName(screen, "QWidget", "screen")
+    _core.assertEqualClassName(
+        screen, output_handler.TOP_LEVEL_WIDGET_CLASS, "screen"
+    )
     properties = screen.findall("property")
     _core.assertEqual(len(properties), 3)
     _core.assertEqualGeometry(screen, 96, 57, 142, 182)
     expected = (
-        "QWidget#screen {\n"
-        "  color: rgb(0, 0, 0);\n"
-        "  background-color: rgb(133, 133, 133);\n"
-        "  }"
+        f"{output_handler.TOP_LEVEL_WIDGET_CLASS}#screen"
+        " {\n  color: rgb(0, 0, 0);"
+        "\n  background-color: rgb(133, 133, 133);"
+        "\n  }"
     )
     _core.assertEqualStyleSheet(screen, expected)
 
@@ -586,7 +589,7 @@ def test_write_widget_rectangle(tempdir):
         "name": "visibility",
         "property": "Visible",
         "channels": [
-            {"channel": "ca://${P}alldone", "trigger": True, "use_enum": False}
+            {"channel": "ca://${P}alldone", "trigger": True}
         ],
         "expression": "ch[0]==0",
     }
@@ -609,8 +612,8 @@ def test_write_widget_rectangle(tempdir):
         "name": "visibility",
         "property": "Visible",
         "channels": [
-            {"channel": "ca://${P}${M}.RBV", "trigger": True, "use_enum": False},
-            {"channel": "ca://${P}${M}.VAL", "trigger": True, "use_enum": False},
+            {"channel": "ca://${P}${M}.RBV", "trigger": True},
+            {"channel": "ca://${P}${M}.VAL", "trigger": True},
         ],
         "expression": "ch[0]==ch[1]",
     }
