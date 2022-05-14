@@ -1,5 +1,5 @@
 """
-write the screen in the new XML protocol
+Write the screen in the new XML protocol.
 
 Only rely on packages in the standard Python distribution. (rules out lxml)
 """
@@ -21,6 +21,8 @@ QT_STYLESHEET_FILE = "stylesheet.qss"
 ENV_PYDM_DISPLAYS_PATH = "PYDM_DISPLAYS_PATH"
 SCREEN_FILE_EXTENSION = ".ui"
 DEFAULT_NUMBER_OF_POINTS = 1200
+# TOP_LEVEL_WIDGET = "QWidget"
+TOP_LEVEL_WIDGET_CLASS = "PyDMAbsoluteGeometry"
 
 logger = logging.getLogger(__name__)
 
@@ -67,9 +69,7 @@ def convertDynamicAttribute_to_Rules(attr):
     for nm, ref in dict(chan="A", chanB="B", chanC="C", chanD="D").items():
         if nm in attr:
             pv = convertMacros(attr[nm])
-            channels[ref] = dict(
-                channel=f"ca://{pv}", trigger=len(pv) > 0, use_enum=False
-            )
+            channels[ref] = dict(channel=f"ca://{pv}", trigger=len(pv) > 0)
 
     calc = attr.get("calc")
     if calc is not None and len(calc) > 0:
@@ -292,8 +292,7 @@ class Widget2Pydm(object):
 
     def write_ui(self, screen, output_path):
         """main entry point to write the .ui file"""
-        window_class = "QWidget"
-        # window_class = "QMainWindow"
+        window_class = TOP_LEVEL_WIDGET_CLASS
         title = (
             screen.title
             or os.path.split(os.path.splitext(screen.given_filename)[0])[-1]
@@ -308,7 +307,9 @@ class Widget2Pydm(object):
         root = self.writer.openFile(ui_filename)
         logging.info("writing screen file: %s", ui_filename)
         self.writer.writeTaggedString(root, "class", "Dialog")
-        form = self.writer.writeOpenTag(root, "widget", cls=window_class, name="screen")
+        form = self.writer.writeOpenTag(
+            root, "widget", cls=TOP_LEVEL_WIDGET_CLASS, name="screen"
+        )
 
         self.write_geometry(form, screen.geometry)
         self.write_stylesheet(form, screen)

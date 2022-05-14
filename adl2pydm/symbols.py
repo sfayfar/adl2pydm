@@ -94,6 +94,9 @@ example:
 """
 
 pydm_widgets = dict(
+    PyDMAbsoluteGeometry=PyDM_CustomWidget(
+        "PyDMAbsoluteGeometry", "QWidget", "pydm.widgets.absolute_geometry"
+    ),
     PyDMTabWidget=PyDM_CustomWidget(
         "PyDMTabWidget", "QTabWidget", "pydm.widgets.tab_bar"
     ),
