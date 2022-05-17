@@ -313,7 +313,7 @@ def assertExpectedDictInRef(ref, doc=None, **kwargs):
     assert isinstance(kwargs, dict), doc
     for k, v in kwargs.items():
         assert k in ref, f"{doc}, k={k}, v={v}"
-        assert v == ref[k], f"{doc}, k={k}, v={v}"
+        assert v == ref[k], f"{doc}, k={k}, v={v}, ref[k]={ref[k]}"
 
 
 def assertGreater(a, b, doc=None):
