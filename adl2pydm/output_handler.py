@@ -284,7 +284,12 @@ class Widget2Pydm(object):
         smallest = 4
         largest = 10
         margin = 3
-        pointsize = int(max(smallest, min(largest, block.geometry.height - 2 * margin)))
+        pointsize = int(
+            max(
+                smallest,
+                min(largest, block.geometry.height - 2 * margin)
+            )
+        )
 
         propty = self.writer.writeOpenProperty(qw, "font", stdset="0")
         font = self.writer.writeOpenTag(propty, "font")
