@@ -1051,6 +1051,8 @@ class Widget2Pydm(object):
         # example: PyDMDrawingPie extends PyDMDrawingArc
         while True:  # do..until
             additions = []
+            if TOP_LEVEL_WIDGET_CLASS not in self.custom_widgets:
+                self.custom_widgets.append(TOP_LEVEL_WIDGET_CLASS)
             for widget in self.custom_widgets:
                 if widget == "PyDMDrawingPie":
                     logger.debug("breakpoint")
