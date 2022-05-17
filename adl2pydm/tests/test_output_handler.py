@@ -20,6 +20,27 @@ def test_write_all_example_files_process(test_file, tempdir):
             assert os.path.exists(full_uiname), uiname
 
 
+@pytest.mark.parametrize("test_file", _core.ALL_EXAMPLE_FILES)
+def test_write_top_level_widget(test_file, tempdir):
+    uiname = _core.convertAdlFile("table_setup_SRI.adl", tempdir)
+    full_uiname = os.path.join(tempdir, uiname)
+    root = ElementTree.parse(full_uiname).getroot()
+
+    widgets = _core.getSubElement(root, "widget")
+    assert len(widgets) > 0
+    widget_classes = [
+        w.attrib.get("class")
+        for w in widgets
+        if w.attrib.get("class") is not None
+    ]
+    assert output_handler.TOP_LEVEL_WIDGET_CLASS in widget_classes
+
+    customwidgets = _core.getSubElement(root, "customwidgets")
+    widgets = customwidgets.findall("customwidget")
+    customs = [_core.getSubElement(w, "class").text for w in widgets]
+    assert output_handler.TOP_LEVEL_WIDGET_CLASS in customs
+
+
 def test_write_extends_customwidget(tempdir):
     uiname = _core.convertAdlFile("table_setup_SRI.adl", tempdir)
     full_uiname = os.path.join(tempdir, uiname)
@@ -241,7 +262,8 @@ def test_write_widget_composite(tempdir):
 
     key = "composite"
     widget = _core.getNamedWidget(screen, key)
-    _core.assertEqualClassName(widget, "PyDMFrame", key)
+    # _core.assertEqualClassName(widget, "PyDMFrame", key)
+    _core.assertEqualClassName(widget, output_handler.TOP_LEVEL_WIDGET_CLASS, key)
     _core.assertEqual(len(widget), 6)
 
 
