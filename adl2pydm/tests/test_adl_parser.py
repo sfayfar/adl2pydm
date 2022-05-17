@@ -1,4 +1,4 @@
-import os
+import pathlib
 import pytest
 
 from . import _core
@@ -7,7 +7,7 @@ from .. import adl_parser
 
 
 def parseFile(short_name):
-    full_name = os.path.join(_core.MEDM_SCREEN_DIR, short_name)
+    full_name = _core.MEDM_SCREEN_DIR / short_name
 
     screen = adl_parser.MedmMainWidget()
     buf = screen.getAdlLines(full_name)
@@ -54,8 +54,8 @@ def test_adl_parser(test_file):
     screen = adl_parser.MedmMainWidget()
     _core.assertEqual(screen.line_offset, 1)
 
-    full_name = os.path.join(_core.MEDM_SCREEN_DIR, test_file)
-    _core.assertTrue(os.path.exists(full_name))
+    full_name = _core.MEDM_SCREEN_DIR / test_file
+    _core.assertTrue(full_name.exists())
 
     buf = screen.getAdlLines(full_name)
     # any useful MEDM file has more than 10 lines

@@ -8,7 +8,7 @@ Ensure that troublesome screen files can be processed without error.
 - one instance: multiple `display[0]` items caused error
 """
 
-import os
+import pathlib
 import pytest
 
 from . import _core
@@ -23,9 +23,8 @@ SCREENS = """
 
 @pytest.mark.parametrize("test_adl", SCREENS)
 def test_issue76_fixed(test_adl, tempdir):
-    assert os.path.exists(tempdir)
-    assert os.path.exists(os.path.join(_core.MEDM_SCREEN_DIR, test_adl))
+    assert pathlib.Path(tempdir).exists()
+    assert (_core.MEDM_SCREEN_DIR / test_adl).exists()
 
     uiname = _core.convertAdlFile(test_adl, tempdir)
-    full_uiname = os.path.join(tempdir, uiname)
-    assert os.path.exists(full_uiname)  # fails if could not read
+    assert (pathlib.Path(tempdir) / uiname).exists()  # fails if could not read

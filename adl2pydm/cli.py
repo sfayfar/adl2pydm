@@ -8,9 +8,8 @@ Only rely on packages in this project or from the standard Python distribution.
 
 import argparse
 
-# from collections import namedtuple
 import logging
-import os
+import pathlib
 
 from . import adl_parser
 from . import output_handler
@@ -20,7 +19,7 @@ logger = None
 
 
 def processFile(adl_filename, output_path=None):
-    output_path = output_path or os.path.dirname(adl_filename)
+    output_path = output_path or str(pathlib.Path(adl_filename).parent)
 
     screen = adl_parser.MedmMainWidget(adl_filename)
     buf = screen.getAdlLines(adl_filename)
