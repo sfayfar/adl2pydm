@@ -1311,7 +1311,7 @@ def findFile(fname):
 
     path = pathlib.os.environ.get(ENV_PYDM_DISPLAYS_PATH)
     if path is None:
-        paths = [pathlib.os.getcwd()]  # safe choice that becomes redundant
+        paths = [str(pathlib.Path.cwd())]  # safe choice that becomes redundant
     else:
         paths = path.split(delimiter)
 
