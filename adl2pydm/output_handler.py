@@ -292,7 +292,6 @@ class Widget2Pydm(object):
 
     def write_ui(self, screen, output_path):
         """main entry point to write the .ui file"""
-        window_class = TOP_LEVEL_WIDGET_CLASS
         title = (
             screen.title
             or os.path.split(os.path.splitext(screen.given_filename)[0])[-1]
