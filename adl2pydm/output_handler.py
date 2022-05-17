@@ -7,7 +7,7 @@ Only rely on packages in the standard Python distribution. (rules out lxml)
 from collections import namedtuple
 import json
 import logging
-import os
+import pathlib
 from xml.dom import minidom
 from xml.etree import ElementTree
 
@@ -21,7 +21,6 @@ QT_STYLESHEET_FILE = "stylesheet.qss"
 ENV_PYDM_DISPLAYS_PATH = "PYDM_DISPLAYS_PATH"
 SCREEN_FILE_EXTENSION = ".ui"
 DEFAULT_NUMBER_OF_POINTS = 1200
-# TOP_LEVEL_WIDGET = "QWidget"
 TOP_LEVEL_WIDGET_CLASS = "PyDMAbsoluteGeometry"
 
 logger = logging.getLogger(__name__)
@@ -48,7 +47,7 @@ def replaceExtension(filename):
     """
     convert filename.adl to filename.ui
     """
-    return os.path.splitext(filename)[0] + SCREEN_FILE_EXTENSION
+    return pathlib.Path(filename).stem + SCREEN_FILE_EXTENSION
 
 
 def convertDynamicAttribute_to_Rules(attr):
@@ -299,10 +298,12 @@ class Widget2Pydm(object):
         """main entry point to write the .ui file"""
         title = (
             screen.title
-            or os.path.split(os.path.splitext(screen.given_filename)[0])[-1]
+            or str(pathlib.Path(screen.given_filename).stem)
         )
         if output_path is not None:
-            ui_filename = os.path.join(output_path, title + SCREEN_FILE_EXTENSION)
+            ui_filename = str(
+                pathlib.Path(output_path, f"{title}{SCREEN_FILE_EXTENSION}")
+            )
         else:
             ui_filename = None
 
@@ -1208,7 +1209,7 @@ class PYDM_Writer(object):
 
     def openFile(self, outFile):
         """actually, begin to create the .ui file content IN MEMORY"""
-        if os.environ.get(ENV_PYDM_DISPLAYS_PATH) is None:
+        if pathlib.os.environ.get(ENV_PYDM_DISPLAYS_PATH) is None:
             msg = "Environment variable %s is not defined." % "PYDM_DISPLAYS_PATH"
             logger.info(msg)
 
@@ -1225,7 +1226,7 @@ class PYDM_Writer(object):
 
         # adl2ui opened outFile here AND started to write XML-like content
         # that is not necessary now
-        if outFile is not None and os.path.exists(outFile):
+        if outFile is not None and pathlib.Path(outFile).exists():
             msg = "output file already exists: " + outFile
             logger.info(msg)
         self.outFile = outFile
@@ -1303,25 +1304,25 @@ def findFile(fname):
     if fname is None or len(fname) == 0:
         return None
 
-    if os.name == "nt":
+    if pathlib.os.name == "nt":
         delimiter = ";"
     else:
         delimiter = ":"
 
-    path = os.environ.get(ENV_PYDM_DISPLAYS_PATH)
+    path = pathlib.os.environ.get(ENV_PYDM_DISPLAYS_PATH)
     if path is None:
-        paths = [os.getcwd()]  # safe choice that becomes redundant
+        paths = [pathlib.os.getcwd()]  # safe choice that becomes redundant
     else:
         paths = path.split(delimiter)
 
-    if os.path.exists(fname):
+    if pathlib.Path(fname).exists():
         # found it in current directory
         return fname
 
     for path in paths:
-        path_fname = os.path.join(path, fname)
-        if os.path.exists(path_fname):
+        path_fname = pathlib.Path(path) / fname
+        if path_fname.exists():
             # found it in the DISPLAYS path
-            return path_fname
+            return str(path_fname)
 
     return None

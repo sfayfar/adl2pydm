@@ -1,5 +1,5 @@
 import json
-import os
+import pathlib
 
 from .. import calc2rules
 
@@ -8,9 +8,9 @@ TEST_FILE = "test_calcs.json"
 
 
 def test_example_calcs():
-    path = os.path.dirname(__file__)
-    test_file = os.path.abspath(os.path.join(path, TEST_FILE))
-    assert os.path.exists(test_file)
+    path = pathlib.Path(__file__).parent
+    test_file = path / TEST_FILE
+    assert test_file.exists()
 
     with open(test_file, "r") as f:
         buf = f.read()

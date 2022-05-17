@@ -4,12 +4,11 @@ packaging setup for adl2pydm
 
 # Always prefer setuptools over distutils
 from setuptools import setup, find_namespace_packages
-from os import path
+import pathlib
 import sys
 import versioneer
 
-here = path.abspath(path.dirname(__file__))
-sys.path.insert(0, path.join(".",))
+sys.path.insert(0, str(pathlib.Path.cwd()))
 import adl2pydm as package
 
 

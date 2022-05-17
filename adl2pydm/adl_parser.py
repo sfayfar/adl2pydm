@@ -33,7 +33,7 @@ parent GUI widget.
 
 from collections import namedtuple, OrderedDict
 import logging
-import os
+import pathlib
 
 from . import symbols
 
@@ -333,7 +333,7 @@ class MedmMainWidget(MedmBaseWidget):
 
     def getAdlLines(self, fname=None):
         fname = fname or self.given_filename
-        if not os.path.exists(fname):
+        if not pathlib.Path(fname).exists():
             msg = "Could not find file: " + fname
             raise ValueError(msg)
         self.given_filename = fname

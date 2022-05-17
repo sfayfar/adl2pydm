@@ -1,4 +1,4 @@
-import os
+import pathlib
 import pytest
 import shutil
 import sys
@@ -9,8 +9,8 @@ from .. import cli
 from .. import output_handler
 
 
-MEDM_SCREEN_DIR = os.path.join(os.path.dirname(__file__), "medm")
-ALL_EXAMPLE_FILES = os.listdir(MEDM_SCREEN_DIR)
+MEDM_SCREEN_DIR = pathlib.Path(__file__).parent / "medm"
+ALL_EXAMPLE_FILES = [d.name for d in MEDM_SCREEN_DIR.iterdir()]
 
 
 @pytest.fixture(scope="function")
@@ -18,22 +18,21 @@ def tempdir():
     path = tempfile.mkdtemp()
     yield path
 
-    if os.path.exists(path):
+    if pathlib.Path(path).exists():
         shutil.rmtree(path, ignore_errors=True)
 
 
 def convertAdlFile(adlname, temppath):
     medm_path = MEDM_SCREEN_DIR
-    assert os.path.exists(medm_path)
+    assert medm_path.exists()
 
-    full_name = os.path.join(medm_path, adlname)
-    assert os.path.exists(full_name)
+    full_name = medm_path / adlname
+    assert full_name.exists()
 
-    sys.argv = [sys.argv[0], "-d", temppath, full_name]
+    sys.argv = [sys.argv[0], "-d", temppath, str(full_name)]
     cli.main()
 
-    base = os.path.splitext(os.path.basename(full_name))[0]
-    uiname = base + output_handler.SCREEN_FILE_EXTENSION
+    uiname = full_name.stem + output_handler.SCREEN_FILE_EXTENSION
 
     return uiname
 

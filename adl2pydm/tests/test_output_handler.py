@@ -1,4 +1,4 @@
-import os
+import pathlib
 import pytest
 
 from xml.etree import ElementTree
@@ -13,17 +13,17 @@ from .. import output_handler
 def test_write_all_example_files_process(test_file, tempdir):
     "ensure all example MEDM files are converted to PyDM"
     path = _core.MEDM_SCREEN_DIR
-    if os.path.isfile(os.path.join(path, test_file)):
+    if (path / test_file).is_file():
         if test_file.endswith(".adl"):
             uiname = _core.convertAdlFile(test_file, tempdir)
-            full_uiname = os.path.join(tempdir, uiname)
-            assert os.path.exists(full_uiname), uiname
+            full_uiname = pathlib.Path(tempdir) / uiname
+            assert full_uiname.exists(), uiname
 
 
 @pytest.mark.parametrize("test_file", _core.ALL_EXAMPLE_FILES)
 def test_write_top_level_widget(test_file, tempdir):
     uiname = _core.convertAdlFile("table_setup_SRI.adl", tempdir)
-    full_uiname = os.path.join(tempdir, uiname)
+    full_uiname = pathlib.Path(tempdir) / uiname
     root = ElementTree.parse(full_uiname).getroot()
 
     widgets = _core.getSubElement(root, "widget")
@@ -43,8 +43,8 @@ def test_write_top_level_widget(test_file, tempdir):
 
 def test_write_extends_customwidget(tempdir):
     uiname = _core.convertAdlFile("table_setup_SRI.adl", tempdir)
-    full_uiname = os.path.join(tempdir, uiname)
-    assert os.path.exists(full_uiname)
+    full_uiname = pathlib.Path(tempdir) / uiname
+    assert full_uiname.exists()
 
     root = ElementTree.parse(full_uiname).getroot()
     customwidgets = _core.getSubElement(root, "customwidgets")
@@ -58,8 +58,8 @@ def test_write_extends_customwidget(tempdir):
 
 def test_write_widget_arc(tempdir):
     uiname = _core.convertAdlFile("testDisplay.adl", tempdir)
-    full_uiname = os.path.join(tempdir, uiname)
-    _core.assertTrue(os.path.exists(full_uiname))
+    full_uiname = pathlib.Path(tempdir) / uiname
+    _core.assertTrue(full_uiname.exists())
 
     root = ElementTree.parse(full_uiname).getroot()
     screen = _core.getSubElement(root, "widget")
@@ -77,8 +77,8 @@ def test_write_widget_arc(tempdir):
 
 def test_write_widget_bar(tempdir):
     uiname = _core.convertAdlFile("bar_monitor.adl", tempdir)
-    full_uiname = os.path.join(tempdir, uiname)
-    _core.assertTrue(os.path.exists(full_uiname))
+    full_uiname = pathlib.Path(tempdir) / uiname
+    _core.assertTrue(full_uiname.exists())
 
     root = ElementTree.parse(full_uiname).getroot()
     screen = _core.getSubElement(root, "widget")
@@ -134,8 +134,8 @@ def test_write_widget_bar(tempdir):
 
 def test_write_widget_byte(tempdir):
     uiname = _core.convertAdlFile("byte-monitor.adl", tempdir)
-    full_uiname = os.path.join(tempdir, uiname)
-    _core.assertTrue(os.path.exists(full_uiname))
+    full_uiname = pathlib.Path(tempdir) / uiname
+    _core.assertTrue(full_uiname.exists())
 
     root = ElementTree.parse(full_uiname).getroot()
     screen = _core.getSubElement(root, "widget")
@@ -201,8 +201,8 @@ def test_write_widget_byte(tempdir):
 
 def test_write_widget_cartesian_plot(tempdir):
     uiname = _core.convertAdlFile("testDisplay.adl", tempdir)
-    full_uiname = os.path.join(tempdir, uiname)
-    _core.assertTrue(os.path.exists(full_uiname))
+    full_uiname = pathlib.Path(tempdir) / uiname
+    _core.assertTrue(full_uiname.exists())
 
     root = ElementTree.parse(full_uiname).getroot()
     screen = _core.getSubElement(root, "widget")
@@ -236,8 +236,8 @@ def test_write_widget_cartesian_plot(tempdir):
 
 def test_write_widget_choice_button(tempdir):
     uiname = _core.convertAdlFile("testDisplay.adl", tempdir)
-    full_uiname = os.path.join(tempdir, uiname)
-    _core.assertTrue(os.path.exists(full_uiname))
+    full_uiname = pathlib.Path(tempdir) / uiname
+    _core.assertTrue(full_uiname.exists())
 
     root = ElementTree.parse(full_uiname).getroot()
     screen = _core.getSubElement(root, "widget")
@@ -252,8 +252,8 @@ def test_write_widget_choice_button(tempdir):
 
 def test_write_widget_composite(tempdir):
     uiname = _core.convertAdlFile("testDisplay.adl", tempdir)
-    full_uiname = os.path.join(tempdir, uiname)
-    _core.assertTrue(os.path.exists(full_uiname))
+    full_uiname = pathlib.Path(tempdir) / uiname
+    _core.assertTrue(full_uiname.exists())
 
     root = ElementTree.parse(full_uiname).getroot()
     screen = _core.getSubElement(root, "widget")
@@ -272,8 +272,8 @@ def test_write_widget_embedded_display(tempdir):
     # but we redirect (in the output_handler module)
     # that to be an "embedded display".
     uiname = _core.convertAdlFile("configMenu.adl", tempdir)
-    full_uiname = os.path.join(tempdir, uiname)
-    _core.assertTrue(os.path.exists(full_uiname))
+    full_uiname = pathlib.Path(tempdir) / uiname
+    _core.assertTrue(full_uiname.exists())
 
     root = ElementTree.parse(full_uiname).getroot()
     screen = _core.getSubElement(root, "widget")
@@ -290,8 +290,8 @@ def test_write_widget_embedded_display(tempdir):
 
 def test_write_widget_image(tempdir):
     uiname = _core.convertAdlFile("testDisplay.adl", tempdir)
-    full_uiname = os.path.join(tempdir, uiname)
-    _core.assertTrue(os.path.exists(full_uiname))
+    full_uiname = pathlib.Path(tempdir) / uiname
+    _core.assertTrue(full_uiname.exists())
 
     root = ElementTree.parse(full_uiname).getroot()
     screen = _core.getSubElement(root, "widget")
@@ -306,8 +306,8 @@ def test_write_widget_image(tempdir):
 
 def test_write_widget_indicator(tempdir):
     uiname = _core.convertAdlFile("testDisplay.adl", tempdir)
-    full_uiname = os.path.join(tempdir, uiname)
-    _core.assertTrue(os.path.exists(full_uiname))
+    full_uiname = pathlib.Path(tempdir) / uiname
+    _core.assertTrue(full_uiname.exists())
 
     root = ElementTree.parse(full_uiname).getroot()
     screen = _core.getSubElement(root, "widget")
@@ -339,8 +339,8 @@ def test_write_widget_indicator(tempdir):
 
 def test_write_widget_menu(tempdir):
     uiname = _core.convertAdlFile("testDisplay.adl", tempdir)
-    full_uiname = os.path.join(tempdir, uiname)
-    _core.assertTrue(os.path.exists(full_uiname))
+    full_uiname = pathlib.Path(tempdir) / uiname
+    _core.assertTrue(full_uiname.exists())
 
     root = ElementTree.parse(full_uiname).getroot()
     screen = _core.getSubElement(root, "widget")
@@ -355,8 +355,8 @@ def test_write_widget_menu(tempdir):
 
 def test_write_widget_message_button(tempdir):
     uiname = _core.convertAdlFile("testDisplay.adl", tempdir)
-    full_uiname = os.path.join(tempdir, uiname)
-    _core.assertTrue(os.path.exists(full_uiname))
+    full_uiname = pathlib.Path(tempdir) / uiname
+    _core.assertTrue(full_uiname.exists())
 
     root = ElementTree.parse(full_uiname).getroot()
     screen = _core.getSubElement(root, "widget")
@@ -374,8 +374,8 @@ def test_write_widget_message_button(tempdir):
 
 def test_write_widget_meter(tempdir):
     uiname = _core.convertAdlFile("meter.adl", tempdir)
-    full_uiname = os.path.join(tempdir, uiname)
-    _core.assertTrue(os.path.exists(full_uiname))
+    full_uiname = pathlib.Path(tempdir) / uiname
+    _core.assertTrue(full_uiname.exists())
 
     root = ElementTree.parse(full_uiname).getroot()
     screen = _core.getSubElement(root, "widget")
@@ -393,8 +393,8 @@ def test_write_widget_meter(tempdir):
 
 def test_write_widget_oval(tempdir):
     uiname = _core.convertAdlFile("bar_monitor.adl", tempdir)
-    full_uiname = os.path.join(tempdir, uiname)
-    _core.assertTrue(os.path.exists(full_uiname))
+    full_uiname = pathlib.Path(tempdir) / uiname
+    _core.assertTrue(full_uiname.exists())
 
     root = ElementTree.parse(full_uiname).getroot()
     screen = _core.getSubElement(root, "widget")
@@ -459,8 +459,8 @@ def test_write_widget_oval(tempdir):
 
 def test_write_widget_polygon(tempdir):
     uiname = _core.convertAdlFile("polygons.adl", tempdir)
-    full_uiname = os.path.join(tempdir, uiname)
-    _core.assertTrue(os.path.exists(full_uiname))
+    full_uiname = pathlib.Path(tempdir) / uiname
+    _core.assertTrue(full_uiname.exists())
 
     root = ElementTree.parse(full_uiname).getroot()
     screen = _core.getSubElement(root, "widget")
@@ -470,8 +470,8 @@ def test_write_widget_polygon(tempdir):
 
 def test_write_widget_polyline(tempdir):
     uiname = _core.convertAdlFile("polyline.adl", tempdir)
-    full_uiname = os.path.join(tempdir, uiname)
-    _core.assertTrue(os.path.exists(full_uiname))
+    full_uiname = pathlib.Path(tempdir) / uiname
+    _core.assertTrue(full_uiname.exists())
 
     root = ElementTree.parse(full_uiname).getroot()
     screen = _core.getSubElement(root, "widget")
@@ -499,8 +499,8 @@ def test_write_widget_polyline(tempdir):
 
 def test_write_widget_polyline_with_rules(tempdir):
     uiname = _core.convertAdlFile("polyline-arrow.adl", tempdir)
-    full_uiname = os.path.join(tempdir, uiname)
-    _core.assertTrue(os.path.exists(full_uiname))
+    full_uiname = pathlib.Path(tempdir) / uiname
+    _core.assertTrue(full_uiname.exists())
 
     root = ElementTree.parse(full_uiname).getroot()
     screen = _core.getSubElement(root, "widget")
@@ -526,8 +526,8 @@ def test_write_widget_rectangle(tempdir):
     also test the full file structure
     """
     uiname = _core.convertAdlFile("rectangle.adl", tempdir)
-    full_uiname = os.path.join(tempdir, uiname)
-    _core.assertTrue(os.path.exists(full_uiname))
+    full_uiname = pathlib.Path(tempdir) / uiname
+    _core.assertTrue(full_uiname.exists())
 
     # five rectangle widgets
     tree = ElementTree.parse(full_uiname)
@@ -644,8 +644,8 @@ def test_write_widget_rectangle(tempdir):
 
 def test_write_widget_related_display(tempdir):
     uiname = _core.convertAdlFile("testDisplay.adl", tempdir)
-    full_uiname = os.path.join(tempdir, uiname)
-    _core.assertTrue(os.path.exists(full_uiname))
+    full_uiname = pathlib.Path(tempdir) / uiname
+    _core.assertTrue(full_uiname.exists())
 
     root = ElementTree.parse(full_uiname).getroot()
     screen = _core.getSubElement(root, "widget")
@@ -692,8 +692,8 @@ def test_write_widget_related_display(tempdir):
 
 def test_write_widget_strip_chart_axis_labels(tempdir):
     uiname = _core.convertAdlFile("strip.adl", tempdir)
-    full_uiname = os.path.join(tempdir, uiname)
-    _core.assertTrue(os.path.exists(full_uiname))
+    full_uiname = pathlib.Path(tempdir) / uiname
+    _core.assertTrue(full_uiname.exists())
 
     root = ElementTree.parse(full_uiname).getroot()
     screen = _core.getSubElement(root, "widget")
@@ -710,8 +710,8 @@ def test_write_widget_strip_chart_axis_labels(tempdir):
 
 def test_write_widget_shell_command(tempdir):
     uiname = _core.convertAdlFile("test_shell_command.adl", tempdir)
-    full_uiname = os.path.join(tempdir, uiname)
-    _core.assertTrue(os.path.exists(full_uiname))
+    full_uiname = pathlib.Path(tempdir) / uiname
+    _core.assertTrue(full_uiname.exists())
 
     root = ElementTree.parse(full_uiname).getroot()
     screen = _core.getSubElement(root, "widget")
@@ -752,8 +752,8 @@ def test_write_widget_shell_command(tempdir):
 
 def test_write_widget_strip_chart(tempdir):
     uiname = _core.convertAdlFile("testDisplay.adl", tempdir)
-    full_uiname = os.path.join(tempdir, uiname)
-    assert os.path.exists(full_uiname)
+    full_uiname = pathlib.Path(tempdir) / uiname
+    assert full_uiname.exists()
 
     root = ElementTree.parse(full_uiname).getroot()
     screen = _core.getSubElement(root, "widget")
@@ -800,8 +800,8 @@ def test_write_widget_strip_chart(tempdir):
 
 def test_write_widget_text(tempdir):
     uiname = _core.convertAdlFile("testDisplay.adl", tempdir)
-    full_uiname = os.path.join(tempdir, uiname)
-    assert os.path.exists(full_uiname)
+    full_uiname = pathlib.Path(tempdir) / uiname
+    assert full_uiname.exists()
 
     root = ElementTree.parse(full_uiname).getroot()
     screen = _core.getSubElement(root, "widget")
@@ -824,8 +824,8 @@ def test_write_widget_text(tempdir):
 
 def test_write_widget_text_entry(tempdir):
     uiname = _core.convertAdlFile("testDisplay.adl", tempdir)
-    full_uiname = os.path.join(tempdir, uiname)
-    assert os.path.exists(full_uiname)
+    full_uiname = pathlib.Path(tempdir) / uiname
+    assert full_uiname.exists()
 
     root = ElementTree.parse(full_uiname).getroot()
     screen = _core.getSubElement(root, "widget")
@@ -843,12 +843,12 @@ def test_write_widget_text_entry(tempdir):
 
 
 def test_write_widget_text_examples(tempdir):
-    testfile = os.path.join(_core.MEDM_SCREEN_DIR, "text_examples.adl")
-    assert os.path.exists(testfile)
+    testfile = _core.MEDM_SCREEN_DIR / "text_examples.adl"
+    assert testfile.exists()
 
     uiname = _core.convertAdlFile(testfile, tempdir)
-    full_uiname = os.path.join(tempdir, uiname)
-    assert os.path.exists(full_uiname)
+    full_uiname = pathlib.Path(tempdir) / uiname
+    assert full_uiname.exists()
 
     root = ElementTree.parse(full_uiname).getroot()
     screen = _core.getSubElement(root, "widget")
@@ -881,8 +881,8 @@ def test_write_widget_text_examples(tempdir):
 
 def test_write_widget_text_update(tempdir):
     uiname = _core.convertAdlFile("testDisplay.adl", tempdir)
-    full_uiname = os.path.join(tempdir, uiname)
-    assert os.path.exists(full_uiname)
+    full_uiname = pathlib.Path(tempdir) / uiname
+    assert full_uiname.exists()
 
     root = ElementTree.parse(full_uiname).getroot()
     screen = _core.getSubElement(root, "widget")
@@ -916,8 +916,8 @@ def test_write_widget_text_update(tempdir):
 
 def test_write_widget_valuator_variations(tempdir):
     uiname = _core.convertAdlFile("slider.adl", tempdir)
-    full_uiname = os.path.join(tempdir, uiname)
-    assert os.path.exists(full_uiname)
+    full_uiname = pathlib.Path(tempdir) / uiname
+    assert full_uiname.exists()
 
     root = ElementTree.parse(full_uiname).getroot()
     screen = _core.getSubElement(root, "widget")
@@ -939,8 +939,8 @@ def test_write_widget_valuator_variations(tempdir):
 
 def test_write_widget_wheel_switch(tempdir):
     uiname = _core.convertAdlFile("wheel_switch.adl", tempdir)
-    full_uiname = os.path.join(tempdir, uiname)
-    assert os.path.exists(full_uiname)
+    full_uiname = pathlib.Path(tempdir) / uiname
+    assert full_uiname.exists()
 
     root = ElementTree.parse(full_uiname).getroot()
     screen = _core.getSubElement(root, "widget")
@@ -960,8 +960,8 @@ def test_write_widget_wheel_switch(tempdir):
 
 def test_write_widget_valuator(tempdir):
     uiname = _core.convertAdlFile("testDisplay.adl", tempdir)
-    full_uiname = os.path.join(tempdir, uiname)
-    assert os.path.exists(full_uiname)
+    full_uiname = pathlib.Path(tempdir) / uiname
+    assert full_uiname.exists()
 
     root = ElementTree.parse(full_uiname).getroot()
     screen = _core.getSubElement(root, "widget")
@@ -985,8 +985,8 @@ def test_write_widget_valuator(tempdir):
         _core.assertIsNoneProperty(widget, propName)
 
     uiname = _core.convertAdlFile("valuators.adl", tempdir)
-    full_uiname = os.path.join(tempdir, uiname)
-    assert os.path.exists(full_uiname)
+    full_uiname = pathlib.Path(tempdir) / uiname
+    assert full_uiname.exists()
     root = ElementTree.parse(full_uiname).getroot()
     screen = _core.getSubElement(root, "widget")
     assert screen is not None
@@ -1116,7 +1116,7 @@ def test_write_widget_valuator(tempdir):
 
 
 def test_zorder(tempdir):
-    fname = os.path.join(tempdir, "test.xml")
+    fname = pathlib.Path(tempdir) / "test.xml"
     writer = output_handler.PYDM_Writer(None)
     writer.openFile(fname)
     specs = [
@@ -1129,7 +1129,7 @@ def test_zorder(tempdir):
     for args in specs:
         writer.widget_stacking_info.append(output_handler.Qt_zOrder(*args))
     writer.closeFile()
-    _core.assertTrue(os.path.exists(fname))
+    _core.assertTrue(fname.exists())
 
     with open(fname, "r") as fp:
         buf = fp.readlines()
@@ -1148,7 +1148,7 @@ def test_zorder(tempdir):
 
 
 def test_xml_subelements(tempdir):
-    fname = os.path.join(tempdir, "test.xml")
+    fname = pathlib.Path(tempdir) / "test.xml"
     writer = output_handler.PYDM_Writer(None)
     writer.openFile(fname)
     root = writer.root
@@ -1158,7 +1158,7 @@ def test_xml_subelements(tempdir):
     for tag in "banana banana banana orange".split():
         sub = writer.writeOpenTag(sub, tag)
     writer.closeFile()
-    _core.assertTrue(os.path.exists(fname))
+    _core.assertTrue(fname.exists())
 
     with open(fname, "r") as fp:
         buf = fp.readlines()

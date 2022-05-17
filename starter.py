@@ -2,15 +2,15 @@
 
 "Used by developer to debug."
 
-import os
+import pathlib
 import sys
 
-_path = os.path.dirname(__file__)
-sys.path.append(os.path.join(_path, "."))
+_path = pathlib.Path(__file__).parent
+sys.path.append(str(_path + "."))
 from adl2pydm import cli
 
 TEST_ADL = "Oxford_CS800_hourplot.adl"
 
-sys.argv.append(os.path.join(_path, "adl2pydm", "tests", "medm", TEST_ADL))
+sys.argv.append(str(_path + "adl2pydm" + "tests" + "medm" + TEST_ADL))
 
 cli.main()

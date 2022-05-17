@@ -8,7 +8,7 @@ Also, all PV names in the display rules should start with the ``ca://`` protocol
 specification.  Each of these widgets has one PV name for testing.
 """
 
-import os
+import pathlib
 import pytest
 
 from xml.etree import ElementTree
@@ -22,12 +22,12 @@ TEST_ADL_FILE = "xxx-R6-0.adl"
 
 @pytest.mark.parametrize("key", "text text_1 text_2".split())
 def test_issue62_fixed(key, tempdir):
-    assert os.path.exists(tempdir)
-    assert os.path.exists(os.path.join(_core.MEDM_SCREEN_DIR, TEST_ADL_FILE))
+    assert pathlib.Path(tempdir).exists()
+    assert (_core.MEDM_SCREEN_DIR / TEST_ADL_FILE).exists()
 
     uiname = _core.convertAdlFile(TEST_ADL_FILE, tempdir)
-    full_uiname = os.path.join(tempdir, uiname)
-    assert os.path.exists(full_uiname)
+    full_uiname = pathlib.Path(tempdir) / uiname
+    assert full_uiname.exists()
 
     root = ElementTree.parse(full_uiname).getroot()
     screen = _core.getSubElement(root, "widget")
