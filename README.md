@@ -4,7 +4,7 @@
 
 Convert [MEDM](https://epics.anl.gov/extensions/medm/index.php)'s .adl files to [PyDM](https://github.com/slaclab/pydm)'s .ui format
 
-[![license: ANL](https://img.shields.io/badge/license-ANL-brightgreen)](https://raw.githubusercontent.com/BCDA-APS/adl2pydm/main/LICENSE.txt)
+[![license: ANL](https://img.shields.io/badge/license-ANL-brightgreen)](LICENSE.txt)
 
 [![Python version](https://img.shields.io/pypi/pyversions/adl2pydm.svg)](https://pypi.python.org/pypi/adl2pydm)
 [![unit test](https://travis-ci.org/BCDA-APS/adl2pydm.svg?branch=master)](https://travis-ci.org/BCDA-APS/adl2pydm)
