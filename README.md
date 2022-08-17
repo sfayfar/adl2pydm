@@ -1,6 +1,7 @@
 # adl2pydm
 
 [![release](https://img.shields.io/github/release/BCDA-APS/adl2pydm.svg)](https://github.com/BCDA-APS/adl2pydm/releases)
+[![tag](https://img.shields.io/github/tag/BCDA-APS/adl2pydm.svg)](https://github.com/BCDA-APS/adl2pydm/tags)
 [![Python version](https://img.shields.io/pypi/pyversions/adl2pydm.svg)](https://pypi.python.org/pypi/adl2pydm)
 [![PyPi](https://img.shields.io/pypi/v/adl2pydm.svg)](https://pypi.python.org/pypi/adl2pydm)
 [![aps-anl-tag](https://img.shields.io/conda/vn/aps-anl-tag/adl2pydm)](https://anaconda.org/aps-anl-tag/adl2pydm)
