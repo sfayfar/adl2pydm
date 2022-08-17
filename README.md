@@ -1,18 +1,16 @@
 # adl2pydm
 
+[![release](https://img.shields.io/github/release/BCDA-APS/adl2pydm.svg)](https://github.com/BCDA-APS/adl2pydm/releases)
+[![Python version](https://img.shields.io/pypi/pyversions/adl2pydm.svg)](https://pypi.python.org/pypi/adl2pydm)
+[![PyPi](https://img.shields.io/pypi/v/adl2pydm.svg)](https://pypi.python.org/pypi/adl2pydm)
+[![aps-anl-tag](https://img.shields.io/conda/vn/aps-anl-tag/adl2pydm)](https://anaconda.org/aps-anl-tag/adl2pydm)
+
+[![license: ANL](https://img.shields.io/badge/license-ANL-brightgreen)](LICENSE.txt)
+![Unit Tests](https://github.com/BCDA-APS/adl2pydm/workflows/Unit%20Tests/badge.svg)
+
 **NOTE**:  This project is in initial development.  *Be amazed when something works right at this time.  If you find something that does not work right or could be better, please file an [issue](https://github.com/BCDA-APS/adl2pydm/issues/new/choose) since that will be an important matter to be resolved.*
 
 Convert [MEDM](https://epics.anl.gov/extensions/medm/index.php)'s .adl files to [PyDM](https://github.com/slaclab/pydm)'s .ui format
-
-[![license: ANL](https://img.shields.io/badge/license-ANL-brightgreen)](LICENSE.txt)
-
-[![Python version](https://img.shields.io/pypi/pyversions/adl2pydm.svg)](https://pypi.python.org/pypi/adl2pydm)
-[![unit test](https://travis-ci.org/BCDA-APS/adl2pydm.svg?branch=master)](https://travis-ci.org/BCDA-APS/adl2pydm)
-[![Coverage Status](https://coveralls.io/repos/github/BCDA-APS/adl2pydm/badge.svg?branch=master)](https://coveralls.io/github/BCDA-APS/adl2pydm?branch=master)
-
-
-[![Total alerts](https://img.shields.io/lgtm/alerts/g/BCDA-APS/adl2pydm.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/BCDA-APS/adl2pydm/alerts/)
-[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/BCDA-APS/adl2pydm.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/BCDA-APS/adl2pydm/context:python)
 
 ## Usage
 
