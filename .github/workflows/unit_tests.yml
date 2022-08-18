@@ -70,6 +70,11 @@ jobs:
         micromamba env list
         printenv | sort
 
+    - name: micromamba env & list
+      run: |
+        micromamba env list
+        micromamba list
+
     - name: Run tests with pytest & coverage
       shell: bash -l {0}
       run: |
@@ -78,10 +83,10 @@ jobs:
         coverage combine
         coverage report --precision 3
 
-    - name: Upload to coveralls
-      # https://github.com/TheKevJames/coveralls-python
-      shell: bash -l {0}
-      run: |
-        coveralls --service=github
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    # - name: Upload to coveralls
+    #   # https://github.com/TheKevJames/coveralls-python
+    #   shell: bash -l {0}
+    #   run: |
+    #     coveralls --service=github
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
