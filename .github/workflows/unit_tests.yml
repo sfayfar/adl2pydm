@@ -91,7 +91,7 @@ jobs:
         flag-name: run-${{ matrix.test_number }}
         github-token: ${{ secrets.GITHUB_TOKEN }}
         parallel: true
-        # path-to-lcov: coverage.xml
+        path-to-lcov: coverage.xml
 
   upload-coverage:
     name: Upload combined coverage
