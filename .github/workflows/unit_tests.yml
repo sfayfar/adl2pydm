@@ -83,28 +83,38 @@ jobs:
         python -m pip install pytest pytest-cov
         python -m pytest -vvv --cov=. --cov-report xml
 
-    # https://stackoverflow.com/questions/6091077
-    # https://github.com/marketplace/actions/coveralls-github-action
-    - name: Coveralls Parallel
-      uses: coverallsapp/github-action@master
-      with:
-        flag-name: run-${{ matrix.test_number }}
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        parallel: true
-        path-to-lcov: coverage.xml
-        # path-to-lcov: ${{ github.workspace }}/coverage/lcov.info
+    - name: Post-test diagnostic
+      run: |
+        ls -lart
+
+    # # https://stackoverflow.com/questions/6091077
+    # # https://github.com/marketplace/actions/coveralls-github-action
+    # - name: Coveralls Parallel
+    #   uses: coverallsapp/github-action@master
+    #   with:
+    #     flag-name: run-${{ matrix.test_number }}
+    #     github-token: ${{ secrets.GITHUB_TOKEN }}
+    #     parallel: true
+    #     path-to-lcov: coverage.xml
+    #     # path-to-lcov: ${{ github.workspace }}/coverage/lcov.info
 
   upload-coverage:
     name: Upload combined coverage
     needs: test-matrix
     runs-on: ubuntu-latest
     steps:
-    - name: Coveralls Finished
-      uses: coverallsapp/github-action@master
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        parallel-finished: true
 
+    - name: Directory listing
+      run: |
+        ls -lart
+
+    # - name: Coveralls Finished
+    #   uses: coverallsapp/github-action@master
+    #   with:
+    #     github-token: ${{ secrets.GITHUB_TOKEN }}
+    #     parallel-finished: true
+
+# ------------------------------- # ------------------------------- #
     # - name: Run tests with pytest & coverage
     #   shell: bash -l {0}
     #   run: |
