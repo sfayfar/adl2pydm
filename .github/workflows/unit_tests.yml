@@ -92,6 +92,7 @@ jobs:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         parallel: true
         path-to-lcov: coverage.xml
+        # path-to-lcov: ${{ github.workspace }}/coverage/lcov.info
 
   upload-coverage:
     name: Upload combined coverage
