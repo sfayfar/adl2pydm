@@ -153,7 +153,7 @@ class MedmBaseWidget(object):
         return fmt % ", ".join(args)
 
     def getNamedBlock(self, block_name, blocks):
-        """ docs needed """
+        """docs needed"""
         block = [b for b in blocks if b.symbol == block_name]
         if len(block) > 0:
             return block[0]
