@@ -36,7 +36,7 @@ jobs:
 
       - name: Run black (code style)
         run: |
-          black
+          black .
 
   test-matrix:
     name: Python ${{ matrix.python-version }}
