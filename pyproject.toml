@@ -19,5 +19,6 @@ exclude = '''
     | docs
   )/
   | versioneer.py
+  | _version.py
 )
 '''
