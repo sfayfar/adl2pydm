@@ -28,11 +28,13 @@ def test_write_top_level_widget(test_file, tempdir):
 
     widgets = _core.getSubElement(root, "widget")
     assert len(widgets) > 0
+    # fmt: off
     widget_classes = [
         w.attrib.get("class")
         for w in widgets
         if w.attrib.get("class") is not None
     ]
+    # fmt: on
     assert output_handler.TOP_LEVEL_WIDGET_CLASS in widget_classes
 
     customwidgets = _core.getSubElement(root, "customwidgets")
@@ -213,8 +215,20 @@ def test_write_widget_cartesian_plot(tempdir):
     widget = _core.getNamedWidget(screen, key)
     _core.assertEqualClassName(widget, "PyDMWaveformPlot", key)
     _core.assertEqualTitle(widget, "Calibration Curve (S1A:H1)")
-    _core.assertEqualPropertyStringlist(widget, "xLabels", ["Magnetic Field",])
-    _core.assertEqualPropertyStringlist(widget, "yLabels", ["Current",])
+    _core.assertEqualPropertyStringlist(
+        widget,
+        "xLabels",
+        [
+            "Magnetic Field",
+        ],
+    )
+    _core.assertEqualPropertyStringlist(
+        widget,
+        "yLabels",
+        [
+            "Current",
+        ],
+    )
 
     prop = _core.getNamedProperty(widget, "curves")
     stringlist = _core.getSubElement(prop, "stringlist")
@@ -536,9 +550,7 @@ def test_write_widget_rectangle(tempdir):
     _core.assertEqual(len(root), 3)
 
     screen = _core.getSubElement(root, "widget")
-    _core.assertEqualClassName(
-        screen, output_handler.TOP_LEVEL_WIDGET_CLASS, "screen"
-    )
+    _core.assertEqualClassName(screen, output_handler.TOP_LEVEL_WIDGET_CLASS, "screen")
     properties = screen.findall("property")
     _core.assertEqual(len(properties), 3)
     _core.assertEqualGeometry(screen, 96, 57, 142, 182)
@@ -610,9 +622,7 @@ def test_write_widget_rectangle(tempdir):
     expected = {
         "name": "visibility",
         "property": "Visible",
-        "channels": [
-            {"channel": "ca://${P}alldone", "trigger": True}
-        ],
+        "channels": [{"channel": "ca://${P}alldone", "trigger": True}],
         "expression": "ch[0]==0",
     }
     _core.assertExpectedDictInRef(rules[0], **expected)
@@ -909,9 +919,7 @@ def test_write_widget_text_update(tempdir):
     prop = _core.getNamedProperty(widget, "textInteractionFlags")
     child = _core.getSubElement(prop, "set")
     assert child is not None
-    assert (
-        child.text == "Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse"
-    )
+    assert child.text == "Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse"
 
 
 def test_write_widget_valuator_variations(tempdir):

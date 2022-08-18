@@ -2,12 +2,13 @@ import pytest
 
 from .. import symbols
 
+
 @pytest.mark.parametrize(
-    "widget_set, length", 
+    "widget_set, length",
     [
         [symbols.adl_widgets, 24],
         [symbols.pydm_widgets, 35],
-    ]
+    ],
 )
 def test_symbols_dict(widget_set, length):
     assert isinstance(widget_set, dict)

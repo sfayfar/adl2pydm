@@ -30,7 +30,7 @@ def assertEqualGeometry(parent, x, y, w, h):
     _core.assertEqual(geom.height, h)
 
 
-def assertEqualPoint( point, x, y):
+def assertEqualPoint(point, x, y):
     _core.assertIsInstance(point, adl_parser.Point)
     _core.assertEqual(point.x, x)
     _core.assertEqual(point.y, y)
@@ -64,7 +64,9 @@ def test_adl_parser(test_file):
     screen.parseAdlBuffer(buf)
     _core.assertGreater(len(screen.widgets), 0)
 
+
 # -------------------------------------------------
+
 
 def test_parse_medm_file_std():
     screen = parseFile("std-R3-5-ID_ctrl.adl")
@@ -72,9 +74,7 @@ def test_parse_medm_file_std():
     assertEqualGeometry(screen, 10, 10, 290, 310)
     _core.assertEqualColor(screen.color, 0, 0, 0)
     _core.assertEqualColor(screen.background_color, 212, 219, 157)
-    _core.assertEqual(
-        screen.adl_filename, "/home/oxygen16/MOHAN/user_adl/ID_ctrl.adl"
-    )
+    _core.assertEqual(screen.adl_filename, "/home/oxygen16/MOHAN/user_adl/ID_ctrl.adl")
     _core.assertEqual(screen.adl_version, "020199")
     _core.assertEqual(screen.cmap, "")
     _core.assertEqual(len(screen.color_table), 65)
@@ -93,9 +93,7 @@ def test_parse_medm_file_beamHistory_full():
     assertEqualGeometry(screen, 10, 10, 500, 650)
     _core.assertEqualColor(screen.color, 0, 0, 0)
     _core.assertEqualColor(screen.background_color, 212, 219, 157)
-    _core.assertEqual(
-        screen.adl_filename, "/net/epics/xfd/WWW/xfd/operations/SR_Status.adl"
-    )
+    _core.assertEqual(screen.adl_filename, "/net/epics/xfd/WWW/xfd/operations/SR_Status.adl")
     _core.assertEqual(screen.adl_version, "020199")
     _core.assertEqual(screen.cmap, "")
     _core.assertEqual(len(screen.color_table), 65)
@@ -157,6 +155,7 @@ def test_parse_medm_widget_bar():
     _core.assertEqual(len(monitor), 1)
     assertEqualDictKeyValue(monitor, "chan", "$(P)$(M).IDTIM")
 
+
 def test_parse_medm_widget_byte():
     screen = parseFile("optics-R2-13-1-pf4more.adl")
     w = _core.pickWidget(screen, 79, 41, "byte", 754)
@@ -175,6 +174,7 @@ def test_parse_medm_widget_byte():
     monitor = w.contents["monitor"]
     _core.assertEqual(len(monitor), 1)
     assertEqualDictKeyValue(monitor, "chan", "$(P)$(H)bitFlag$(A)")
+
 
 def test_parse_medm_widget_byte_additional():
     # see: https://github.com/BCDA-APS/adl2pydm/issues/32
@@ -199,6 +199,7 @@ def test_parse_medm_widget_byte_additional():
     assertEqualDictKeyValue(w.contents, "direction", "down")
     assertEqualDictKeyValue(w.contents, "ebit", "3")
     assertEqualDictKeyValue(w.contents, "sbit", "0")
+
 
 def test_parse_medm_widget_cartesian_plot():
     screen = parseFile("beamHistory_full-R3-5.adl")
@@ -316,6 +317,7 @@ def test_parse_medm_widget_image():
     assertEqualDictKeyValue(w.contents, "image name", "sampleWheel.gif")
     assertEqualDictKeyValue(w.contents, "type", "gif")
 
+
 def test_parse_medm_widget_indicator():
     screen = parseFile("optics-R2-13-1-CoarseFineMotorShow.adl")
     w = _core.pickWidget(screen, 12, 5, "indicator", 156)
@@ -335,6 +337,7 @@ def test_parse_medm_widget_indicator():
     _core.assertEqual(len(monitor), 1)
     assertEqualDictKeyValue(monitor, "chan", "$(PM)$(CM).RBV")
 
+
 def test_parse_medm_widget_menu():
     screen = parseFile("motorx_all-R6-10-1.adl")
     w = _core.pickWidget(screen, 175, 23, "composite", 417)
@@ -353,6 +356,7 @@ def test_parse_medm_widget_menu():
     _core.assertIsInstance(control, dict)
     _core.assertEqual(len(control), 1)
     assertEqualDictKeyValue(control, "chan", "$(P)$(M).FOFF")
+
 
 def test_parse_medm_widget_message_button():
     screen = parseFile("std-R3-5-ID_ctrl.adl")
@@ -375,6 +379,7 @@ def test_parse_medm_widget_message_button():
     _core.assertEqual(len(control), 1)
     assertEqualDictKeyValue(control, "ctrl", "ID$(xx):UN:stopSQ.PROC")
 
+
 def test_parse_medm_widget_meter():
     screen = parseFile("calc-R3-7-userCalcMeter.adl")
     w = _core.pickWidget(screen, 6, 0, "meter", 87)
@@ -390,6 +395,7 @@ def test_parse_medm_widget_meter():
     monitor = w.contents["monitor"]
     _core.assertEqual(len(monitor), 1)
     assertEqualDictKeyValue(monitor, "chan", "$(P)$(C).VAL")
+
 
 def test_parse_medm_widget_oval():
     screen = parseFile("motorx_all-R6-10-1.adl")
@@ -413,6 +419,7 @@ def test_parse_medm_widget_oval():
     assertEqualDictKeyValue(attr, "chan", "$(P)$(M).LLS")
     assertEqualDictKeyValue(attr, "vis", "if not zero")
 
+
 def test_parse_medm_widget_polygon():
     screen = parseFile("calc-R3-7-1-FuncGen_full.adl")
     w = _core.pickWidget(screen, 38, 18, "composite", 337)
@@ -435,6 +442,7 @@ def test_parse_medm_widget_polygon():
     assertEqualPoint(w.points[2], 260, 184)
     assertEqualPoint(w.points[3], 260, 174)
 
+
 def test_parse_medm_widget_polyline():
     screen = parseFile("calc-R3-7-1-FuncGen_full.adl")
     w = _core.pickWidget(screen, 38, 18, "composite", 337)
@@ -456,6 +464,7 @@ def test_parse_medm_widget_polyline():
     assertEqualPoint(w.points[0], 121, 179)
     assertEqualPoint(w.points[1], 261, 179)
 
+
 def test_parse_medm_widget_rectangle():
     screen = parseFile("ADBase-R3-3-1.adl")
     w = _core.pickWidget(screen, 10, 0, "rectangle", 90)
@@ -470,6 +479,7 @@ def test_parse_medm_widget_rectangle():
     _core.assertIn("basic attribute", w.contents)
     attr = w.contents["basic attribute"]
     _core.assertEqual(len(attr), 0)
+
 
 def test_parse_medm_widget_related_display():
     screen = parseFile("std-R3-5-ID_ctrl.adl")
@@ -487,6 +497,7 @@ def test_parse_medm_widget_related_display():
     assertEqualDictKeyValue(display, "args", "xx=$(xx)")
     assertEqualDictKeyValue(display, "label", "Taper Control")
     assertEqualDictKeyValue(display, "name", "ID_taper_ctrl.adl")
+
 
 def test_parse_medm_widget_shell_command():
     screen = parseFile("sscan-R2-11-1-scanAux.adl")
@@ -509,6 +520,7 @@ def test_parse_medm_widget_shell_command():
     _core.assertEqual(len(cmd), 2)
     assertEqualDictKeyValue(cmd, "label", "Help")
     assertEqualDictKeyValue(cmd, "name", "medm_help.sh &T")
+
 
 def test_parse_medm_widget_strip_chart():
     screen = parseFile("calc-R3-7-1-FuncGen_full.adl")
@@ -534,6 +546,7 @@ def test_parse_medm_widget_strip_chart():
     _core.assertEqualColor(pens[0]["color"], 0, 0, 0)
     _core.assertEqualColor(pens[1]["color"], 253, 0, 0)
 
+
 def test_parse_medm_widget_text():
     screen = parseFile("ADBase-R3-3-1.adl")
     w = _core.pickWidget(screen, 10, 9, "text", 181)
@@ -549,6 +562,7 @@ def test_parse_medm_widget_text():
     _core.assertIn("basic attribute", w.contents)
     attr = w.contents["basic attribute"]
     _core.assertEqual(len(attr), 0)
+
 
 def test_parse_medm_widget_text_entry():
     screen = parseFile("std-R3-5-ID_ctrl.adl")
@@ -570,6 +584,7 @@ def test_parse_medm_widget_text_entry():
     _core.assertEqual(len(control), 1)
     assertEqualDictKeyValue(control, "ctrl", "ID$(xx):UN:setavgAI.VAL")
 
+
 def test_parse_medm_widget_text_update():
     screen = parseFile("text_examples.adl")
     w = _core.pickWidget(screen, 17, 0, "text update", 90)
@@ -589,6 +604,7 @@ def test_parse_medm_widget_text_update():
     _core.assertEqual(len(mon), 1)
     assertEqualDictKeyValue(mon, "chan", "$(P)")
 
+
 def test_parse_medm_widget_valuator():
     screen = parseFile("optics-R2-13-xiahsc.adl")
     w = _core.pickWidget(screen, 55, 8, "valuator", 201)
@@ -602,6 +618,7 @@ def test_parse_medm_widget_valuator():
     _core.assertEqual(len(control), 1)
     assertEqualDictKeyValue(control, "chan", "$(P)$(HSC)l")
     assertEqualTitle(w, None)
+
 
 def test_parse_medm_widget_wheel_switch():
     screen = parseFile("wheel_switch.adl")
@@ -620,6 +637,7 @@ def test_parse_medm_widget_wheel_switch():
     control = w.contents["control"]
     _core.assertEqual(len(control), 1)
     assertEqualDictKeyValue(control, "chan", "sky:userCalc2.A")
+
 
 def test_parse_medm_userArrayCalc():
     screen = parseFile("userArrayCalc.adl")
