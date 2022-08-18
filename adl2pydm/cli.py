@@ -39,18 +39,17 @@ def get_user_parameters():
 
     msg = "MEDM '.adl' file(s) to convert"
     parser.add_argument(
-        "adlfiles", action="store", nargs=argparse.ONE_OR_MORE, help=msg,
+        "adlfiles",
+        action="store",
+        nargs=argparse.ONE_OR_MORE,
+        help=msg,
     )
 
     msg = "output directory"
     msg += ", default: same directory as input file"
-    parser.add_argument(
-        "-d", "--dir", action="store", dest="dir", help=msg, default=None
-    )
+    parser.add_argument("-d", "--dir", action="store", dest="dir", help=msg, default=None)
 
-    parser.add_argument(
-        "-v", "--version", action="version", version=adl2pydm.__version__
-    )
+    parser.add_argument("-v", "--version", action="version", version=adl2pydm.__version__)
 
     parser.add_argument(
         "-log",
@@ -84,10 +83,12 @@ def configure_logging(options):
     }
     level = levels.get(options.log.lower())
     if level is None:
+        # fmt: off
         raise ValueError(
             f"log level given: {options.log}"
             f" -- must be one of: {' | '.join(levels.keys())}"
         )
+        # fmt: on
     logging.basicConfig(level=level)
     logger = logging.getLogger(__name__)
 

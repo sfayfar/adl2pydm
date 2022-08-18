@@ -1,17 +1,17 @@
 """Convert MEDM's .adl files to PyDM's .ui format."""
 
-__project__ = u"adl2pydm"
+__project__ = "adl2pydm"
 __description__ = __doc__
-__copyright__ = u"2017-2022, UChicago Argonne, LLC"
+__copyright__ = "2017-2022, UChicago Argonne, LLC"
 __authors__ = [
-    u"Pete Jemian",
+    "Pete Jemian",
 ]
 __author__ = ", ".join(__authors__)
-__institution__ = u"Advanced Photon Source, Argonne National Laboratory"
-__author_email__ = u"jemian@anl.gov"
-__url__ = u"https://github.com/BCDA-APS/adl2pydm"
-__license__ = u"(c) " + __copyright__
-__license__ += u" (see LICENSE.txt file for details)"
+__institution__ = "Advanced Photon Source, Argonne National Laboratory"
+__author_email__ = "jemian@anl.gov"
+__url__ = "https://github.com/BCDA-APS/adl2pydm"
+__license__ = "(c) " + __copyright__
+__license__ += " (see LICENSE.txt file for details)"
 __platforms__ = "any"
 __zip_safe__ = False
 __exclude_project_dirs__ = "adl2pydm/tests tests conda-recipe build".split()

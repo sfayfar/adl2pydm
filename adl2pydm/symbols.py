@@ -69,7 +69,7 @@ adl_widgets = {
     "message button": dict(type="controller", pydm_widget="PyDMPushButton"),
     "meter": dict(type="monitor", pydm_widget="PyDMScaleIndicator"),
     "oval": dict(type="static", pydm_widget="PyDMDrawingEllipse"),
-    "polygon" : dict(type="static", pydm_widget="PyDMDrawingIrregularPolygon"),
+    "polygon": dict(type="static", pydm_widget="PyDMDrawingIrregularPolygon"),
     "polyline": dict(type="static", pydm_widget="PyDMDrawingPolyline"),
     "rectangle": dict(type="static", pydm_widget="PyDMDrawingRectangle"),
     "related display": dict(type="static", pydm_widget="PyDMRelatedDisplayButton"),
@@ -95,99 +95,43 @@ example:
 """
 
 pydm_widgets = dict(
-    PyDMAbsoluteGeometry=PyDM_CustomWidget(
-        "PyDMAbsoluteGeometry", "QWidget", "pydm.widgets.absolute_geometry"
-    ),
-    PyDMTabWidget=PyDM_CustomWidget(
-        "PyDMTabWidget", "QTabWidget", "pydm.widgets.tab_bar"
-    ),
+    PyDMAbsoluteGeometry=PyDM_CustomWidget("PyDMAbsoluteGeometry", "QWidget", "pydm.widgets.absolute_geometry"),
+    PyDMTabWidget=PyDM_CustomWidget("PyDMTabWidget", "QTabWidget", "pydm.widgets.tab_bar"),
     PyDMLabel=PyDM_CustomWidget("PyDMLabel", "QLabel", "pydm.widgets.label"),
-    PyDMTimePlot=PyDM_CustomWidget(
-        "PyDMTimePlot", "QGraphicsView", "pydm.widgets.timeplot"
-    ),
-    PyDMWaveformPlot=PyDM_CustomWidget(
-        "PyDMWaveformPlot", "QGraphicsView", "pydm.widgets.waveformplot"
-    ),
-    PyDMScatterPlot=PyDM_CustomWidget(
-        "PyDMScatterPlot", "QGraphicsView", "pydm.widgets.scatterplot"
-    ),
-    PyDMByteIndicator=PyDM_CustomWidget(
-        "PyDMByteIndicator", "QWidget", "pydm.widgets.byte"
-    ),
-    PyDMCheckbox=PyDM_CustomWidget(
-        "PyDMCheckbox", "QCheckBox", "pydm.widgets.checkbox"
-    ),
-    PyDMDrawingArc=PyDM_CustomWidget(
-        "PyDMDrawingArc", "QWidget", "pydm.widgets.drawing"
-    ),
-    PyDMDrawingChord=PyDM_CustomWidget(
-        "PyDMDrawingChord", "PyDMDrawingArc", "pydm.widgets.drawing"
-    ),
-    PyDMDrawingCircle=PyDM_CustomWidget(
-        "PyDMDrawingCircle", "QWidget", "pydm.widgets.drawing"
-    ),
-    PyDMDrawingEllipse=PyDM_CustomWidget(
-        "PyDMDrawingEllipse", "QWidget", "pydm.widgets.drawing"
-    ),
-    PyDMDrawingImage=PyDM_CustomWidget(
-        "PyDMDrawingImage", "QWidget", "pydm.widgets.drawing"
-    ),
-    PyDMDrawingLine=PyDM_CustomWidget(
-        "PyDMDrawingLine", "QWidget", "pydm.widgets.drawing"
-    ),
-    PyDMDrawingPie=PyDM_CustomWidget(
-        "PyDMDrawingPie", "PyDMDrawingArc", "pydm.widgets.drawing"
-    ),
-    PyDMDrawingRectangle=PyDM_CustomWidget(
-        "PyDMDrawingRectangle", "QWidget", "pydm.widgets.drawing"
-    ),
-    PyDMDrawingTriangle=PyDM_CustomWidget(
-        "PyDMDrawingTriangle", "QWidget", "pydm.widgets.drawing"
-    ),
-    PyDMDrawingPolygon=PyDM_CustomWidget(
-        "PyDMDrawingPolygon", "QWidget", "pydm.widgets.drawing"
-    ),
-    PyDMDrawingPolyline=PyDM_CustomWidget(
-        "PyDMDrawingPolyline", "QWidget", "pydm.widgets.drawing"
-    ),
+    PyDMTimePlot=PyDM_CustomWidget("PyDMTimePlot", "QGraphicsView", "pydm.widgets.timeplot"),
+    PyDMWaveformPlot=PyDM_CustomWidget("PyDMWaveformPlot", "QGraphicsView", "pydm.widgets.waveformplot"),
+    PyDMScatterPlot=PyDM_CustomWidget("PyDMScatterPlot", "QGraphicsView", "pydm.widgets.scatterplot"),
+    PyDMByteIndicator=PyDM_CustomWidget("PyDMByteIndicator", "QWidget", "pydm.widgets.byte"),
+    PyDMCheckbox=PyDM_CustomWidget("PyDMCheckbox", "QCheckBox", "pydm.widgets.checkbox"),
+    PyDMDrawingArc=PyDM_CustomWidget("PyDMDrawingArc", "QWidget", "pydm.widgets.drawing"),
+    PyDMDrawingChord=PyDM_CustomWidget("PyDMDrawingChord", "PyDMDrawingArc", "pydm.widgets.drawing"),
+    PyDMDrawingCircle=PyDM_CustomWidget("PyDMDrawingCircle", "QWidget", "pydm.widgets.drawing"),
+    PyDMDrawingEllipse=PyDM_CustomWidget("PyDMDrawingEllipse", "QWidget", "pydm.widgets.drawing"),
+    PyDMDrawingImage=PyDM_CustomWidget("PyDMDrawingImage", "QWidget", "pydm.widgets.drawing"),
+    PyDMDrawingLine=PyDM_CustomWidget("PyDMDrawingLine", "QWidget", "pydm.widgets.drawing"),
+    PyDMDrawingPie=PyDM_CustomWidget("PyDMDrawingPie", "PyDMDrawingArc", "pydm.widgets.drawing"),
+    PyDMDrawingRectangle=PyDM_CustomWidget("PyDMDrawingRectangle", "QWidget", "pydm.widgets.drawing"),
+    PyDMDrawingTriangle=PyDM_CustomWidget("PyDMDrawingTriangle", "QWidget", "pydm.widgets.drawing"),
+    PyDMDrawingPolygon=PyDM_CustomWidget("PyDMDrawingPolygon", "QWidget", "pydm.widgets.drawing"),
+    PyDMDrawingPolyline=PyDM_CustomWidget("PyDMDrawingPolyline", "QWidget", "pydm.widgets.drawing"),
     PyDMDrawingIrregularPolygon=PyDM_CustomWidget(
         "PyDMDrawingIrregularPolygon", "QWidget", "pydm.widgets.drawing"
     ),
-    PyDMEmbeddedDisplay=PyDM_CustomWidget(
-        "PyDMEmbeddedDisplay", "QFrame", "pydm.widgets.embedded_display"
-    ),
-    PyDMEnumButton=PyDM_CustomWidget(
-        "PyDMEnumButton", "QWidget", "pydm.widgets.enum_button"
-    ),
-    PyDMEnumComboBox=PyDM_CustomWidget(
-        "PyDMEnumComboBox", "QComboBox", "pydm.widgets.enum_combo_box"
-    ),
+    PyDMEmbeddedDisplay=PyDM_CustomWidget("PyDMEmbeddedDisplay", "QFrame", "pydm.widgets.embedded_display"),
+    PyDMEnumButton=PyDM_CustomWidget("PyDMEnumButton", "QWidget", "pydm.widgets.enum_button"),
+    PyDMEnumComboBox=PyDM_CustomWidget("PyDMEnumComboBox", "QComboBox", "pydm.widgets.enum_combo_box"),
     PyDMFrame=PyDM_CustomWidget("PyDMFrame", "QFrame", "pydm.widgets.frame"),
     PyDMImageView=PyDM_CustomWidget("PyDMImageView", "QWidget", "pydm.widgets.image"),
-    PyDMLineEdit=PyDM_CustomWidget(
-        "PyDMLineEdit", "QLineEdit", "pydm.widgets.line_edit"
-    ),
-    PyDMLogDisplay=PyDM_CustomWidget(
-        "PyDMLogDisplay", "QWidget", "pydm.widgets.logdisplay"
-    ),
-    PyDMPushButton=PyDM_CustomWidget(
-        "PyDMPushButton", "QPushButton", "pydm.widgets.pushbutton"
-    ),
+    PyDMLineEdit=PyDM_CustomWidget("PyDMLineEdit", "QLineEdit", "pydm.widgets.line_edit"),
+    PyDMLogDisplay=PyDM_CustomWidget("PyDMLogDisplay", "QWidget", "pydm.widgets.logdisplay"),
+    PyDMPushButton=PyDM_CustomWidget("PyDMPushButton", "QPushButton", "pydm.widgets.pushbutton"),
     PyDMRelatedDisplayButton=PyDM_CustomWidget(
         "PyDMRelatedDisplayButton", "QPushButton", "pydm.widgets.related_display_button"
     ),
-    PyDMShellCommand=PyDM_CustomWidget(
-        "PyDMShellCommand", "QPushButton", "pydm.widgets.shell_command"
-    ),
+    PyDMShellCommand=PyDM_CustomWidget("PyDMShellCommand", "QPushButton", "pydm.widgets.shell_command"),
     PyDMSlider=PyDM_CustomWidget("PyDMSlider", "QFrame", "pydm.widgets.slider"),
-    PyDMSpinbox=PyDM_CustomWidget(
-        "PyDMSpinbox", "QDoubleSpinBox", "pydm.widgets.spinbox"
-    ),
-    PyDMScaleIndicator=PyDM_CustomWidget(
-        "PyDMScaleIndicator", "QFrame", "pydm.widgets.scale"
-    ),
+    PyDMSpinbox=PyDM_CustomWidget("PyDMSpinbox", "QDoubleSpinBox", "pydm.widgets.spinbox"),
+    PyDMScaleIndicator=PyDM_CustomWidget("PyDMScaleIndicator", "QFrame", "pydm.widgets.scale"),
     PyDMSymbol=PyDM_CustomWidget("PyDMSymbol", "QWidget", "pydm.widgets.symbol"),
-    PyDMWaveformTable=PyDM_CustomWidget(
-        "PyDMWaveformTable", "QTableWidget", "pydm.widgets.waveformtable"
-    ),
+    PyDMWaveformTable=PyDM_CustomWidget("PyDMWaveformTable", "QTableWidget", "pydm.widgets.waveformtable"),
 )

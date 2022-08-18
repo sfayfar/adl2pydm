@@ -153,8 +153,7 @@ class MedmBaseWidget(object):
         return fmt % ", ".join(args)
 
     def getNamedBlock(self, block_name, blocks):
-        """
-        """
+        """docs needed"""
         block = [b for b in blocks if b.symbol == block_name]
         if len(block) > 0:
             return block[0]
@@ -270,9 +269,7 @@ class MedmBaseWidget(object):
     def parseChildren(self, main, blocks, buf):
         for block in blocks:
             if block.symbol in symbols.adl_widgets:
-                logger.debug(
-                    "(#%d) %s" % (self.line_offset + block.start, block.symbol)
-                )
+                logger.debug("(#%d) %s" % (self.line_offset + block.start, block.symbol))
                 handler = self.medm_widget_handlers.get(block.symbol, MedmGenericWidget)
                 widget = handler(self.line_offset + block.start, main, block.symbol)
                 widget.parseAdlBuffer(buf[block.start + 1 : block.end])
@@ -305,9 +302,11 @@ class MedmBaseWidget(object):
     def parsePlotcomBlock(self, buf, blocks):
         block = self.getNamedBlock("plotcom", blocks)
         if block is not None:
+            # fmt: off
             self.parseColorAssignments(
                 self.locateAssignments(buf[block.start + 1 : block.end])
             )
+            # fmt: on
             aa = self.locateAssignments(buf[block.start + 1 : block.end])
             for symbol in "clr bclr".split():
                 if symbol in aa:
@@ -338,7 +337,7 @@ class MedmMainWidget(MedmBaseWidget):
             raise ValueError(msg)
         self.given_filename = fname
         # brutal: simply discard any non-utf8 characters
-        buf = open(fname, "r", encoding='utf8', errors='ignore').readlines()
+        buf = open(fname, "r", encoding="utf8", errors="ignore").readlines()
         return buf
 
     def parseAdlBuffer(self, buf):  # lgtm [py/similar-function]
@@ -436,9 +435,7 @@ class MedmGenericWidget(MedmBaseWidget):
 
     def parseAdlBuffer(self, buf):  # lgtm [py/similar-function]
         # assignments, blocks =
-        MedmBaseWidget.parseAdlBuffer(
-            self, buf
-        )
+        MedmBaseWidget.parseAdlBuffer(self, buf)
 
 
 class MedmArcWidget(MedmGenericWidget):

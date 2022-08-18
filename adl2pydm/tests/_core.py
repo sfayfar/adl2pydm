@@ -60,11 +60,13 @@ def getSubElement(parent, tag):
 
 def getWidgetsClass(parent, cls):
     widgets = parent.findall("widget")
+    # fmt: off
     findings = [
         w.attrib["class"]
         for w in widgets
         if w.attrib["class"] == cls
     ]
+    # fmt: on
     return findings
 
 
@@ -79,6 +81,7 @@ def pickWidget(parent, num_widgets, n, symbol, line_offset):
 
 # custom assertions
 # some assertions are for compatibility with code that used unittest
+
 
 def assertColor(parent, r, g, b, **kwargs):
     for item in parent.iter():

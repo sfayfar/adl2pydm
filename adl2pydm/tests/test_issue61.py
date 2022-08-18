@@ -44,6 +44,6 @@ def test_issue62_fixed(key, tempdir):
     k = '"channel":'
     pos = rules.text.find(k)
     assert pos > 0
-    fragment = rules.text[pos+len(k):].strip().strip('"')
+    fragment = rules.text[pos + len(k) :].strip().strip('"')
     assert len(fragment) > 0
     assert fragment.startswith("ca://xxx:")
