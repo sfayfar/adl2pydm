@@ -4,7 +4,7 @@
 [![tag](https://img.shields.io/github/tag/BCDA-APS/adl2pydm.svg)](https://github.com/BCDA-APS/adl2pydm/tags)
 [![Python version](https://img.shields.io/pypi/pyversions/adl2pydm.svg)](https://pypi.python.org/pypi/adl2pydm)
 [![PyPi](https://img.shields.io/pypi/v/adl2pydm.svg)](https://pypi.python.org/pypi/adl2pydm)
-[![aps-anl-tag](https://img.shields.io/conda/vn/aps-anl-tag/adl2pydm)](https://anaconda.org/aps-anl-tag/adl2pydm)
+[![conda-forge](https://img.shields.io/conda/vn/conda-forge/adl2pydm)](https://anaconda.org/conda-forge/adl2pydm)
 
 [![license: ANL](https://img.shields.io/badge/license-ANL-brightgreen)](LICENSE.txt)
 ![Unit Tests](https://github.com/BCDA-APS/adl2pydm/workflows/Unit%20Tests/badge.svg)
