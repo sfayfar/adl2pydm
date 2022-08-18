@@ -14,7 +14,6 @@ exclude = '''
     | \.venv
     | \.pytest_cache
     | _build
-    | buck-out
     | build
     | dist
     | docs
