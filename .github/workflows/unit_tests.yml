@@ -35,8 +35,7 @@ jobs:
           flake8
 
       - name: Run black (code style)
-        run: |
-          black .
+        uses: psf/black@stable
 
   test-matrix:
     name: Python ${{ matrix.python-version }}
