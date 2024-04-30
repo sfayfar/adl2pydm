@@ -6,7 +6,7 @@ packaging setup for adl2pydm
 from setuptools import setup, find_namespace_packages
 import pathlib
 import sys
-import versioneer
+# import versioneer
 
 sys.path.insert(0, str(pathlib.Path.cwd()))
 import adl2pydm as package
@@ -36,6 +36,7 @@ setup(
     python_requires=package.__python_version_required__,
     zip_safe=package.__zip_safe__,
     entry_points=__entry_points__,
-    version=versioneer.get_version(),
-    cmdclass=versioneer.get_cmdclass(),
+    version='0.0.5'
+    # version=versioneer.get_version(),
+    # cmdclass=versioneer.get_cmdclass(),
 )
