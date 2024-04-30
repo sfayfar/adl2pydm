@@ -60,8 +60,8 @@ adl_widgets = {
     "byte": dict(type="monitor", pydm_widget="PyDMByteIndicator"),
     "cartesian plot": dict(type="monitor", pydm_widget="PyDMWaveformPlot"),
     "choice button": dict(type="controller", pydm_widget="PyDMEnumButton"),
-    # "composite": dict(type="static", pydm_widget="PyDMFrame"),
-    "composite": dict(type="static", pydm_widget="PyDMAbsoluteGeometry"),
+    "composite": dict(type="static", pydm_widget="PyDMFrame"),
+    # "composite": dict(type="static", pydm_widget="PyDMAbsoluteGeometry"),
     "embedded display": dict(type="static", pydm_widget="PyDMEmbeddedDisplay"),
     "image": dict(type="monitor", pydm_widget="PyDMDrawingImage"),
     "indicator": dict(type="monitor", pydm_widget="PyDMScaleIndicator"),
@@ -95,7 +95,7 @@ example:
 """
 
 pydm_widgets = dict(
-    PyDMAbsoluteGeometry=PyDM_CustomWidget("PyDMAbsoluteGeometry", "QWidget", "pydm.widgets.absolute_geometry"),
+    # PyDMAbsoluteGeometry=PyDM_CustomWidget("PyDMAbsoluteGeometry", "QWidget", "pydm.widgets.absolute_geometry"),
     PyDMTabWidget=PyDM_CustomWidget("PyDMTabWidget", "QTabWidget", "pydm.widgets.tab_bar"),
     PyDMLabel=PyDM_CustomWidget("PyDMLabel", "QLabel", "pydm.widgets.label"),
     PyDMTimePlot=PyDM_CustomWidget("PyDMTimePlot", "QGraphicsView", "pydm.widgets.timeplot"),
