@@ -892,7 +892,7 @@ class Widget2Pydm(object):
         # self.assertEqualPropertyBool(w, "showLimitLabels", False)
 
         # tickPosition
-        self.writer.writeProperty(qw, "tickPosition", "NoTicks", tag="enum", stdset="0")
+        self.writer.writeProperty(qw, "tickPosition", "QSlider::NoTicks", tag="enum", stdset="0")
 
         precision = block.contents.get("dPrecision")
         if precision is not None:
