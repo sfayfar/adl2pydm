@@ -36,7 +36,5 @@ setup(
     python_requires=package.__python_version_required__,
     zip_safe=package.__zip_safe__,
     entry_points=__entry_points__,
-    version='0.0.5'
-    # version=versioneer.get_version(),
-    # cmdclass=versioneer.get_cmdclass(),
+    version=package.__version__,
 )

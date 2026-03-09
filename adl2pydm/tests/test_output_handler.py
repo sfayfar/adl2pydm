@@ -1155,6 +1155,18 @@ def test_zorder(tempdir):
         _core.assertEqual(buf[idx].rstrip(), expected[idx])
 
 
+def test_openfile_reads_stylesheet_from_pydm_displays_path(tempdir, monkeypatch):
+    stylesheet = pathlib.Path(tempdir) / output_handler.QT_STYLESHEET_FILE
+    stylesheet_text = "QWidget { color: rgb(1, 2, 3); }"
+    stylesheet.write_text(stylesheet_text)
+    monkeypatch.setenv(output_handler.ENV_PYDM_DISPLAYS_PATH, str(tempdir))
+
+    writer = output_handler.PYDM_Writer(None)
+    writer.openFile(pathlib.Path(tempdir) / "test.ui")
+
+    _core.assertEqual(writer.stylesheet, stylesheet_text)
+
+
 def test_xml_subelements(tempdir):
     fname = pathlib.Path(tempdir) / "test.xml"
     writer = output_handler.PYDM_Writer(None)

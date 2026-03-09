@@ -16,6 +16,7 @@ __platforms__ = "any"
 __zip_safe__ = False
 __exclude_project_dirs__ = "adl2pydm/tests tests conda-recipe build".split()
 __python_version_required__ = ">=3.7"
+__version__ = "0.0.6"
 
 __package_name__ = __project__
 __long_description__ = __description__
@@ -48,8 +49,3 @@ __classifiers__ = [
     "Topic :: Software Development",
     "Topic :: Utilities",
 ]
-
-from ._version import get_versions
-
-__version__ = get_versions()["version"]
-del get_versions

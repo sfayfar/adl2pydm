@@ -7,6 +7,7 @@ Only rely on packages in the standard Python distribution. (rules out lxml)
 from collections import namedtuple
 import json
 import logging
+import os
 import pathlib
 from xml.dom import minidom
 from xml.etree import ElementTree
@@ -1157,7 +1158,7 @@ class PYDM_Writer(object):
 
     def openFile(self, outFile):
         """actually, begin to create the .ui file content IN MEMORY"""
-        if pathlib.os.environ.get(ENV_PYDM_DISPLAYS_PATH) is None:
+        if os.environ.get(ENV_PYDM_DISPLAYS_PATH) is None:
             msg = "Environment variable %s is not defined." % "PYDM_DISPLAYS_PATH"
             logger.info(msg)
 
@@ -1169,7 +1170,7 @@ class PYDM_Writer(object):
             with open(sfile, "r") as fp:
                 self.stylesheet = fp.read()
                 msg = "Using stylesheet file in .ui files: " + sfile
-                msg += "\n  unset %d to not use any stylesheet" % ENV_PYDM_DISPLAYS_PATH
+                msg += "\n  unset %s to not use any stylesheet" % ENV_PYDM_DISPLAYS_PATH
                 logger.info(msg)
 
         # adl2ui opened outFile here AND started to write XML-like content
@@ -1252,16 +1253,11 @@ def findFile(fname):
     if fname is None or len(fname) == 0:
         return None
 
-    if pathlib.os.name == "nt":
-        delimiter = ";"
-    else:
-        delimiter = ":"
-
-    path = pathlib.os.environ.get(ENV_PYDM_DISPLAYS_PATH)
+    path = os.environ.get(ENV_PYDM_DISPLAYS_PATH)
     if path is None:
         paths = [str(pathlib.Path.cwd())]  # safe choice that becomes redundant
     else:
-        paths = path.split(delimiter)
+        paths = path.split(os.pathsep)
 
     if pathlib.Path(fname).exists():
         # found it in current directory
